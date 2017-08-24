@@ -3045,7 +3045,7 @@ containing a value of this type.
         public static final int action_mode_bar=0x7f0d0065;
         public static final int action_mode_bar_stub=0x7f0d0064;
         public static final int action_mode_close_button=0x7f0d0047;
-        public static final int action_settings=0x7f0d009e;
+        public static final int action_settings=0x7f0d009f;
         public static final int action_text=0x7f0d0085;
         public static final int actions=0x7f0d0093;
         public static final int activity_chooser_view_content=0x7f0d0048;
@@ -3085,7 +3085,7 @@ containing a value of this type.
         public static final int exitUntilCollapsed=0x7f0d001f;
         public static final int expand_activities_button=0x7f0d0049;
         public static final int expanded_menu=0x7f0d005e;
-        public static final int fab=0x7f0d009b;
+        public static final int fab_start=0x7f0d009b;
         public static final int fill=0x7f0d0038;
         public static final int fill_horizontal=0x7f0d0039;
         public static final int fill_vertical=0x7f0d002f;
@@ -3096,6 +3096,7 @@ containing a value of this type.
         public static final int icon_group=0x7f0d0094;
         public static final int ifRoom=0x7f0d0040;
         public static final int image=0x7f0d004a;
+        public static final int include=0x7f0d009c;
         public static final int info=0x7f0d0090;
         public static final int item_touch_helper_previous_elevation=0x7f0d0005;
         public static final int largeLabel=0x7f0d0078;
@@ -3104,7 +3105,7 @@ containing a value of this type.
         public static final int line3=0x7f0d0097;
         public static final int listMode=0x7f0d0013;
         public static final int list_item=0x7f0d004c;
-        public static final int masked=0x7f0d009d;
+        public static final int masked=0x7f0d009e;
         public static final int media_actions=0x7f0d0089;
         public static final int middle=0x7f0d003d;
         public static final int mini=0x7f0d003b;
@@ -3184,7 +3185,7 @@ containing a value of this type.
         public static final int up=0x7f0d000d;
         public static final int useLogo=0x7f0d001c;
         public static final int view_offset_helper=0x7f0d000e;
-        public static final int visible=0x7f0d009c;
+        public static final int visible=0x7f0d009d;
         public static final int withText=0x7f0d0042;
         public static final int wrap_content=0x7f0d0028;
     }
@@ -3281,18 +3282,18 @@ containing a value of this type.
         public static final int abc_activitychooserview_choose_application=0x7f070007;
         public static final int abc_capital_off=0x7f070008;
         public static final int abc_capital_on=0x7f070009;
-        public static final int abc_font_family_body_1_material=0x7f070015;
-        public static final int abc_font_family_body_2_material=0x7f070016;
-        public static final int abc_font_family_button_material=0x7f070017;
-        public static final int abc_font_family_caption_material=0x7f070018;
-        public static final int abc_font_family_display_1_material=0x7f070019;
-        public static final int abc_font_family_display_2_material=0x7f07001a;
-        public static final int abc_font_family_display_3_material=0x7f07001b;
-        public static final int abc_font_family_display_4_material=0x7f07001c;
-        public static final int abc_font_family_headline_material=0x7f07001d;
-        public static final int abc_font_family_menu_material=0x7f07001e;
-        public static final int abc_font_family_subhead_material=0x7f07001f;
-        public static final int abc_font_family_title_material=0x7f070020;
+        public static final int abc_font_family_body_1_material=0x7f070016;
+        public static final int abc_font_family_body_2_material=0x7f070017;
+        public static final int abc_font_family_button_material=0x7f070018;
+        public static final int abc_font_family_caption_material=0x7f070019;
+        public static final int abc_font_family_display_1_material=0x7f07001a;
+        public static final int abc_font_family_display_2_material=0x7f07001b;
+        public static final int abc_font_family_display_3_material=0x7f07001c;
+        public static final int abc_font_family_display_4_material=0x7f07001d;
+        public static final int abc_font_family_headline_material=0x7f07001e;
+        public static final int abc_font_family_menu_material=0x7f07001f;
+        public static final int abc_font_family_subhead_material=0x7f070020;
+        public static final int abc_font_family_title_material=0x7f070021;
         public static final int abc_search_hint=0x7f07000a;
         public static final int abc_searchview_description_clear=0x7f07000b;
         public static final int abc_searchview_description_query=0x7f07000c;
@@ -3302,17 +3303,18 @@ containing a value of this type.
         public static final int abc_shareactionprovider_share_with=0x7f070010;
         public static final int abc_shareactionprovider_share_with_application=0x7f070011;
         public static final int abc_toolbar_collapse_description=0x7f070012;
-        public static final int action_settings=0x7f070021;
-        public static final int app_name=0x7f070022;
-        public static final int appbar_scrolling_view_behavior=0x7f070023;
-        public static final int bottom_sheet_behavior=0x7f070024;
-        public static final int character_counter_pattern=0x7f070025;
-        public static final int password_toggle_content_description=0x7f070026;
-        public static final int path_password_eye=0x7f070027;
-        public static final int path_password_eye_mask_strike_through=0x7f070028;
-        public static final int path_password_eye_mask_visible=0x7f070029;
-        public static final int path_password_strike_through=0x7f07002a;
+        public static final int action_settings=0x7f070022;
+        public static final int app_name=0x7f070023;
+        public static final int appbar_scrolling_view_behavior=0x7f070024;
+        public static final int bottom_sheet_behavior=0x7f070025;
+        public static final int character_counter_pattern=0x7f070026;
+        public static final int password_toggle_content_description=0x7f070027;
+        public static final int path_password_eye=0x7f070028;
+        public static final int path_password_eye_mask_strike_through=0x7f070029;
+        public static final int path_password_eye_mask_visible=0x7f07002a;
+        public static final int path_password_strike_through=0x7f07002b;
         public static final int search_menu_title=0x7f070013;
+        public static final int start=0x7f070015;
         public static final int status_bar_notification_info_overflow=0x7f070014;
     }
     public static final class style {

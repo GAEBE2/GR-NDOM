@@ -21,14 +21,32 @@
 
     </android.support.design.widget.AppBarLayout>
 
-    <include layout="@layout/content_start"/>
+    <FrameLayout
+        android:layout_width="256dp"
+        android:layout_height="256dp"
+        android:layout_gravity="center"
+        app:layout_anchorGravity="center">
 
-    <android.support.design.widget.FloatingActionButton
-        android:id="@+id/fab"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="bottom|end"
-        android:layout_margin="@dimen/fab_margin"
-        app:srcCompat="@android:drawable/ic_dialog_email"/>
+        <android.support.design.widget.FloatingActionButton
+            android:id="@+id/fab_start"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_margin="@dimen/fab_margin"
+            app:layout_anchor="@+id/include"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:textSize="48sp"
+            android:text="@string/start"
+            android:elevation="16dp"
+            android:textColor="@android:color/white"
+            android:textAppearance="?android:attr/textAppearanceMedium" />
+    </FrameLayout>
+
+    <include
+        android:id="@+id/include"
+        layout="@layout/content_start"/>
 
 </android.support.design.widget.CoordinatorLayout>
