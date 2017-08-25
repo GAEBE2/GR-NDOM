@@ -1,0 +1,7 @@
+#Fri Aug 25 19:16:12 CEST 2017
+base.0=D\:\\Android\\school\\GroendomChat\\GroendomC\\app\\build\\intermediates\\transforms\\dex\\debug\\folders\\1000\\10000\\instant-run_5881c3dbfe10f94808edd5c6eb3608a4d3b9968d
+renamed.1=classes2.dex
+renamed.0=classes.dex
+file.1=D\:\\Android\\school\\GroendomChat\\GroendomC\\app\\build\\intermediates\\transforms\\dex\\debug\\folders\\1000\\10000\\instant-run-bootstrap_474f6e4f1d9c66bee1af503b1c884f88fbb32539\\classes.dex
+base.1=D\:\\Android\\school\\GroendomChat\\GroendomC\\app\\build\\intermediates\\transforms\\dex\\debug\\folders\\1000\\10000\\instant-run-bootstrap_474f6e4f1d9c66bee1af503b1c884f88fbb32539
+file.0=D\:\\Android\\school\\GroendomChat\\GroendomC\\app\\build\\intermediates\\transforms\\dex\\debug\\folders\\1000\\10000\\instant-run_5881c3dbfe10f94808edd5c6eb3608a4d3b9968d\\classes.dex
