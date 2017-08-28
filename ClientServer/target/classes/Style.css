@@ -1,0 +1,116 @@
+.body{
+    -fx-font-family: "Karla";
+    -fx-font-size: 11pt;
+    -fx-background-color: #FAFAFA;
+    -fx-text-fill: #212121;
+}
+
+.content-holder{
+    -fx-background-color: #FAFAFA;
+    -fx-effect: innershadow( gaussian, rgba( 0, 0, 0, 0.3 ), 10, 0, 0, 0 );
+    -fx-fill-height: true;
+    -fx-fill-width: true;
+}
+
+.content-item{
+    -fx-padding: 20px;
+    -fx-background-color: #FAFAFA;
+}
+
+.header{
+    -fx-background-color: #FAFAFA;
+    -fx-pref-height: 80px;
+    -fx-max-height: 80px;
+    -fx-padding: 20px;
+}
+
+.sidebar{
+    -fx-background-color: #F5F5F5;
+    -fx-border-color: #EEEEEE;
+    -fx-border-width: 0 1px 0 1px;
+    -fx-padding: 10px;
+    -fx-text-fill: #FAFAFA;
+
+    /*-fx-effect: dropshadow( gaussian, rgba( 0, 0, 0, 0.5 ), 10, 0, 0, 0 );*/
+}
+
+.sidebar-title{
+    -fx-padding: 15px 0px;
+    -fx-font-weight: bold;
+    -fx-font-size: 18px;
+    -fx-text-fill: #0288D1;
+}
+
+.footer{
+    -fx-background-color: #FAFAFA;
+    -fx-padding: 20px;
+}
+
+.title{
+    -fx-font-weight: bold;
+    -fx-text-fill: #01579B;
+}
+
+.message{
+    -fx-wrap-text: true;
+}
+
+.send-btn{
+    -fx-background-color: #0288D1;
+    -fx-text-fill: #FFFFFF;
+    -fx-border-radius: 0px;
+    -fx-font-weight: bold;
+}
+
+.message-item{
+    -fx-padding: 10px 0px;
+    -fx-border-width: 1px 0 0 0;
+    -fx-border-color: #E0E0E0;
+}
+
+.timestamp{
+    -fx-font-size: 8pt;
+    -fx-text-fill: #BDBDBD;
+}
+
+.server-btn{
+    -fx-background-color: transparent;
+    -fx-alignment: top-left;
+    -fx-padding: 0 0px 10px 0px;
+}
+
+.port-btn{
+    -fx-background-color: transparent;
+    -fx-alignment: top-left;
+    -fx-text-fill: #9E9E9E;
+}
+
+.server-name{
+    -fx-text-fill: #9E9E9E;
+    -fx-font-size: 14pt;
+}
+
+.user-display{
+    -fx-background-color: #F5F5F5;
+    -fx-border-color: #EEEEEE;
+    -fx-border-width: 1px 0 0 0;
+    -fx-padding: 10px;
+}
+
+.split-pane{
+    -fx-background-color: #F5F5F5;
+}
+
+
+.context-menu-title:disabled:hover {
+    -fx-background-color: white;
+}
+
+.context-menu-title:disabled:hover .label {
+    -fx-background-color: white;
+    -fx-text-fill: black;
+}
+
+.context-menu-title:disabled:selected {
+    -fx-background-color: white;
+}
