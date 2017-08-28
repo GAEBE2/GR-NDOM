@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">GroendomChat</string>
+    <string name="find_chat">Find chat</string>
+    <string name="send">Send</string>
+</resources>
