@@ -1,3 +1,3 @@
-#GR-NDOM
+#GRÖNDOM
 ##SETUP
 install android sdk and maven
