@@ -1,3 +1,17 @@
+
 */*.iml
 */.idea
 */target
+*.iml
+.gradle
+/local.properties
+.idea/*
+.DS_Store
+/build
+/captures
+.externalNativeBuild
+gradlew
+gradlew.bat
+settings.gradle
+/GroendomC/.idea
+/GroendomC/build
