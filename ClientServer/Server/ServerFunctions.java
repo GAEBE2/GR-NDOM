@@ -18,7 +18,7 @@ public class ServerFunctions {
     static List<Handler> handlerList = new ArrayList<>();
     static List<User> userList = new ArrayList<>();
     static PublicKey publicServerKey;
-    static Logger LOG = Logger.getLogger("");
+    private static Logger LOG = Logger.getLogger("");
     static PrivateKey privateServerKey;
 
     private static boolean open = true;
