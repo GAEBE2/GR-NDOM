@@ -89,7 +89,7 @@ public class ClientFunctions {
         return openConnection(address, user, PORT);
     }
 
-    public String openConnection (String address, ClientUser user, in   t port) {
+    public String openConnection (String address, ClientUser user, int port) {
         if(!address.equals(oldAddress) || oldPort != port) { //one should not be able to connect to a server twice
             closeConnection();
             oldAddress = address;
