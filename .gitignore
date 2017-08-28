@@ -16,5 +16,3 @@ gradlew.bat
 settings.gradle
 /GroendomC/.idea
 /GroendomC/build
-*.docx
-*.pptx
