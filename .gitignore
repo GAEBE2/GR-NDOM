@@ -1,3 +1,8 @@
+
+*/*.iml
+*/.idea
+*/target
+GroendomC/local.properties
 *.iml
 .gradle
 /local.properties
