@@ -1,6 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">GroendomChat</string>
+    <string name="app_name">Groendom Chat</string>
     <string name="find_chat">Chat suchen</string>
     <string name="type_message">Nachricht eingeben</string>
+    <string name="home">Home</string>
+    <string name="settings">Einstellungen</string>
+    <string name="content">Inhalt</string>
+    <string name="navigation_drawer_open">Navigation öffnen</string>
+    <string name="navigation_drawer_close">Navigation schliessen</string>
+    <string name="nav_header_subtitle">Ein super chat!</string>
 </resources>

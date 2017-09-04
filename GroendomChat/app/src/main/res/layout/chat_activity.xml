@@ -29,12 +29,14 @@
             android:id="@+id/button_send"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_weight="0.1"
             android:clickable="true"
             app:fabSize="mini"
-            app:srcCompat="@android:drawable/ic_menu_send" />
+            app:srcCompat="@drawable/ic_send"
+            android:layout_weight="0.1"/>
 
 
     </LinearLayout>
+
+    <include layout="@layout/drawer_layout"/>
 
 </android.support.design.widget.CoordinatorLayout>
