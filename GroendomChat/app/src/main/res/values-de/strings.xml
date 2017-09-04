@@ -2,5 +2,5 @@
 <resources>
     <string name="app_name">GroendomChat</string>
     <string name="find_chat">Chat suchen</string>
-    <string name="send">Senden</string>
+    <string name="type_message">Nachricht eingeben</string>
 </resources>
