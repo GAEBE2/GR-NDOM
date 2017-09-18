@@ -15,7 +15,6 @@
             android:layout_height="?attr/actionBarSize"
             android:background="?attr/colorPrimary"
             android:titleTextColor="@color/primaryTextColor"
-            android:title="hio"
             app:popupTheme="@style/AppTheme.PopupOverlay" />
 
     </android.support.design.widget.AppBarLayout>

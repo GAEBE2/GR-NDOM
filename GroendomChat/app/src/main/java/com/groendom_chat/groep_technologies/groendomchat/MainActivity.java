@@ -2,8 +2,11 @@ package com.groendom_chat.groep_technologies.groendomchat;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
-import android.view.View;
+import android.support.v7.widget.Toolbar;
+
+import com.groendom_chat.groep_technologies.groendomchat.activities.ChatActivity;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -12,11 +15,6 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main_activity);
 
-        findViewById(R.id.fab_start).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                startActivity(new Intent(MainActivity.this, ChatActivity.class));
-            }
-        });
+        findViewById(R.id.fab_start).setOnClickListener(view -> startActivity(new Intent(MainActivity.this, ChatActivity.class)));
     }
 }
