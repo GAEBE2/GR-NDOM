@@ -1,2 +1,4 @@
-
-
+.idea/
+GroendomChat/build/*
+GroendomChat/local.properties
+*.iml
