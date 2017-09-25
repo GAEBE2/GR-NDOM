@@ -5,7 +5,9 @@ import java.io.Serializable;
 import java.security.PublicKey;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.UUID;
 
 /**
  * Created by serge on 20-Mar-17.
@@ -14,7 +16,7 @@ import java.util.List;
 public class Message implements Serializable{
 
     public enum MessageType{
-        TEXT, IMAGE, USER_ADD, USER_LIST, LOGIN, USER_REMOVE, ENCRYPTED_TEXT, CHANGE_USERNAME
+        TEXT, IMAGE, USER_ADD, USER_LIST, LOGIN, USER_REMOVE, ENCRYPTED_TEXT, NEXT, RECONNECT
     }
 
     private MessageType messageType;
@@ -22,7 +24,7 @@ public class Message implements Serializable{
     //default port
     private static final int PORT = 9001;
 
-    private List<ClientUser> userList;
+    private List<User> userList;
     private int port;
     private byte[] encryptedMessage;
     private String message;
@@ -37,12 +39,12 @@ public class Message implements Serializable{
         this.timeSend = LocalDateTime.now();
     }
 
-    public Message(String newUsername, PublicKey key) {
+
+
+    public Message(UUID userID, PublicKey publicKey){
         this();
-        message = newUsername;
-        messageType = MessageType.CHANGE_USERNAME;
-        author.setPublicKey(key);
-        author.setName(newUsername);
+        messageType = MessageType.NEXT;
+        author = new User(userID, publicKey);
     }
 
     public Message(String loginUName, String address, int port) {
@@ -63,6 +65,17 @@ public class Message implements Serializable{
         this();
         this.userList = new ArrayList<>();
         userList.forEach(user -> this.userList.add(new ClientUser(user)));
+        messageType = MessageType.USER_LIST;
+    }
+
+    public Message(Handler[] users){
+        this();
+        this.userList = new ArrayList<>();
+        for (Handler handler : users) {
+            if(handler != null) {
+                userList.add(handler.getUser());
+            }
+        }
         messageType = MessageType.USER_LIST;
     }
 
@@ -162,11 +175,11 @@ public class Message implements Serializable{
         this.file = file;
     }
 
-    public List<ClientUser> getUserList() {
+    public List<User> getUserList() {
         return userList;
     }
 
-    public void setUserList(List<ClientUser> userList) {
+    public void setUserList(List<User> userList) {
         this.userList = userList;
     }
 
@@ -188,5 +201,13 @@ public class Message implements Serializable{
 
     public byte[] getEncryptedMessage() {
         return encryptedMessage;
+    }
+
+    public static Message getReconnectMessage(User user, int arrNumber){
+        Message message = new Message(user);
+        message.messageType = MessageType.RECONNECT;
+        message.port = arrNumber;
+
+        return message;
     }
 }

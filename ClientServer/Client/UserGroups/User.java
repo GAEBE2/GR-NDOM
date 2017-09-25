@@ -1,7 +1,9 @@
 package UserGroups;
 
 import java.io.Serializable;
+import java.security.KeyPair;
 import java.security.PublicKey;
+import java.util.UUID;
 
 /**
  * Created by tkr6u on 21.04.2017.
@@ -10,10 +12,30 @@ import java.security.PublicKey;
 public class User implements Serializable{
 
     private PublicKey publicKey;
-
     private String name;
+    private UUID uuid;
+    private int connection;
 
-    public User(){}
+    public User(ClientUser user) {
+        uuid = user.getUuid();
+        publicKey = user.getPublicKey();
+        connection = user.getConnection();
+        name = user.getName();
+    }
+
+    public User(){
+        uuid = UUID.randomUUID();
+    }
+
+    public User(KeyPair key){
+        this();
+        this.publicKey = key.getPublic();
+    }
+
+    public User(UUID uuid, PublicKey key){
+        this.uuid = uuid;
+        this.publicKey = key;
+    }
 
     public User(String name) {
         this.name = name;
@@ -37,6 +59,18 @@ public class User implements Serializable{
 
     public void setPublicKey(PublicKey publicKey) {
         this.publicKey = publicKey;
+    }
+
+    public UUID getUuid() {
+        return uuid;
+    }
+
+    public int getConnection() {
+        return connection;
+    }
+
+    public void setConnection(int connection) {
+        this.connection = connection;
     }
 
     @Override

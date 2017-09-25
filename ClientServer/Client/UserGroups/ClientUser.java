@@ -1,7 +1,9 @@
 package UserGroups;
 
+import java.security.KeyPair;
 import java.security.PrivateKey;
 import java.security.PublicKey;
+import java.util.UUID;
 
 /**
  * Created by tkr6u on 20.04.2017.
@@ -9,7 +11,6 @@ import java.security.PublicKey;
  */
 public class ClientUser extends User{
     private PrivateKey privateKey;
-
     private String customName;
 
     public ClientUser(User user) {
@@ -19,6 +20,11 @@ public class ClientUser extends User{
     public ClientUser(String name, PublicKey publicKey, PrivateKey privateKey) {
         super(name, publicKey);
         this.privateKey = privateKey;
+    }
+    public ClientUser(KeyPair pair){
+        super(pair);
+        this.privateKey = pair.getPrivate();
+        setName("test");
     }
 
     public String getOriginalName() {
@@ -67,4 +73,5 @@ public class ClientUser extends User{
         }
         return result;
     }
+
 }

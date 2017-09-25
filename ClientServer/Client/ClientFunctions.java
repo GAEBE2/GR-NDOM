@@ -1,17 +1,18 @@
 import UserGroups.ClientUser;
 import UserGroups.User;
-import javafx.application.Platform;
 
-import java.io.*;
+import java.io.EOFException;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.net.Socket;
 import java.net.SocketException;
-import java.security.KeyPair;
-import java.security.NoSuchAlgorithmException;
-import java.security.NoSuchProviderException;
 import java.security.PublicKey;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.function.Consumer;
-import java.util.function.Predicate;
 
 /**
  * Created by serge on 20-Mar-17.
@@ -33,7 +34,7 @@ public class ClientFunctions {
 
     private boolean active;
 
-    private List<ClientUser> users = new ArrayList<>();
+    private List<User> users = new ArrayList<>();
 
     public List<Message> getMessages() {
         return messages;
@@ -56,7 +57,6 @@ public class ClientFunctions {
     private Consumer<Message> activeMessageReceiver;
     private Consumer<String> activeUserRemover;
     private Consumer<List<ClientUser>> activeUserAdder;
-    private Consumer<ClientUser> activeChangeUsername;
 
     //Consumers which are used when this active == false
     private Consumer<Message> passiveMessageReceiver;
@@ -69,8 +69,16 @@ public class ClientFunctions {
         this.passiveUserAdder = passiveUserAdder;
     }
 
-    public ClientFunctions() {
+    public void setActiveConsumers(Consumer<Message> messageConsumer){
+        activeMessageReceiver = messageConsumer;
+    }
+
+    public ClientFunctions(Consumer<Message> consumer) {
         active = false;
+    }
+
+    public void sendNextMessage(ClientUser user) throws IOException {
+        outputStream.writeObject(new Message(user.getUuid(), user.getPublicKey()));
     }
 
     public void sendMessage(String messageToSend) throws IOException {
@@ -104,8 +112,7 @@ public class ClientFunctions {
                 this.clientUser = user;
                 if (outputStream != null && inputStream != null) {
                     authenticate();
-
-                    outputStream.writeObject(new Message(clientUser.getName(), address, getPORT()));
+                    outputStream.writeObject(new Message(clientUser));
                     connected = true;
                     return null;
                 }
@@ -116,6 +123,14 @@ public class ClientFunctions {
         }
         return "";
     }
+
+    public String reOpenConnection(ClientUser user){
+        //openConnection(oldAddress, user, oldPort);
+        //utputStream.writeObject(new Message(user.getPublicKey()));
+        //TODO: implement
+        return "";
+    }
+
 
     public void closeConnection() {
         if(socket != null) {
@@ -148,24 +163,21 @@ public class ClientFunctions {
                             messages.add(message);
                             chooseActiveOrPassiveConsumer(passiveMessageReceiver, activeMessageReceiver, message);
                             break;
-                        case CHANGE_USERNAME:
-                            ClientUser user = ((ClientUser) getUserFromList(message.getAuthor()));
-                            user.setName(message.getMessage());
-                            chooseActiveOrPassiveConsumer(null, activeChangeUsername, user);
-                            break;
                         case USER_ADD:
-                            user = new ClientUser(new ClientUser(message.getAuthor()));
+                            ClientUser user = new ClientUser(new ClientUser(message.getAuthor()));
                             users.add(user);
                             chooseActiveOrPassiveConsumer(passiveUserAdder, activeUserAdder, Collections.singletonList(user));
                             break;
                         case USER_LIST:
-                            List<ClientUser> usernameList = message.getUserList();
+                            List<User> usernameList = message.getUserList();
                             getUsers().addAll(usernameList);
                             chooseActiveOrPassiveConsumer(passiveUserAdder, activeUserAdder, usernameList);
                             break;
                         case USER_REMOVE:
                             this.users.remove(getUserFromList(message.getAuthor()));
                             chooseActiveOrPassiveConsumer(passiveUserRemover, activeUserRemover, message.getAuthor().getName());
+                            break;
+                        default:
                             break;
                     }
                 }
@@ -222,11 +234,11 @@ public class ClientFunctions {
         this.PORT = PORT;
     }
 
-    public List<ClientUser> getUsers() {
+    public List<User> getUsers() {
         return users;
     }
 
-    public void setUsers(List<ClientUser> users) {
+    public void setUsers(List<User> users) {
         this.users = users;
     }
 
@@ -270,7 +282,6 @@ public class ClientFunctions {
         this.activeMessageReceiver = activeMessageReceiver;
         this.activeUserRemover = activeUserRemover;
         this.activeUserAdder = activeUserAdder;
-        this.activeChangeUsername = activeChangeUsername;
         this.active = true;
     }
 
@@ -278,7 +289,6 @@ public class ClientFunctions {
         this.activeMessageReceiver = null;
         this.activeUserRemover = null;
         this.activeUserAdder = null;
-        this.activeChangeUsername = null;
         this.active = false;
     }
 
@@ -299,10 +309,5 @@ public class ClientFunctions {
         users.stream().filter(clientUser -> clientUser.equals(userKey)).forEach(clientUser1 -> result[0] = clientUser1);
         users.forEach(clientUser -> {});
         return result[0];
-    }
-
-    public void changeUsername(String newName) throws IOException {
-        clientUser.setName(newName);
-        outputStream.writeObject(new Message(newName, clientUser.getPublicKey()));
     }
 }
