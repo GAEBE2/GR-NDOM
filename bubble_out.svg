@@ -1,0 +1,141 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:xlink="http://www.w3.org/1999/xlink"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   width="30mm"
+   height="20mm"
+   viewBox="0 0 30 20"
+   version="1.1"
+   id="svg8"
+   inkscape:version="0.92.1 r15371"
+   sodipodi:docname="bubble_out.svg"
+   inkscape:export-filename="D:\TBZ Auftraege PC\Modul 426\Groendom\GroendomChat\app\src\main\res\drawable\bubble_out.9.png"
+   inkscape:export-xdpi="50.799999"
+   inkscape:export-ydpi="50.799999">
+  <defs
+     id="defs2">
+    <linearGradient
+       inkscape:collect="always"
+       id="linearGradient4551">
+      <stop
+         style="stop-color:#ffffff;stop-opacity:1;"
+         offset="0"
+         id="stop4547" />
+      <stop
+         style="stop-color:#ffffff;stop-opacity:0;"
+         offset="1"
+         id="stop4549" />
+    </linearGradient>
+    <linearGradient
+       inkscape:collect="always"
+       id="linearGradient4663">
+      <stop
+         style="stop-color:#ffffff;stop-opacity:1;"
+         offset="0"
+         id="stop4659" />
+      <stop
+         style="stop-color:#ffffff;stop-opacity:0;"
+         offset="1"
+         id="stop4661" />
+    </linearGradient>
+    <linearGradient
+       inkscape:collect="always"
+       xlink:href="#linearGradient4663"
+       id="linearGradient4756"
+       gradientUnits="userSpaceOnUse"
+       x1="66.334824"
+       y1="210.06548"
+       x2="65.578873"
+       y2="297.75598" />
+    <linearGradient
+       inkscape:collect="always"
+       xlink:href="#linearGradient4663"
+       id="linearGradient4758"
+       gradientUnits="userSpaceOnUse"
+       x1="66.334824"
+       y1="210.06548"
+       x2="65.578873"
+       y2="297.75598" />
+    <linearGradient
+       inkscape:collect="always"
+       xlink:href="#linearGradient4551"
+       id="linearGradient4553"
+       x1="226.27417"
+       y1="861.90033"
+       x2="226.27417"
+       y2="1124.54"
+       gradientUnits="userSpaceOnUse"
+       gradientTransform="matrix(0.39687498,0,0,0.26458333,0,3.9461286e-6)" />
+  </defs>
+  <sodipodi:namedview
+     id="base"
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     inkscape:pageopacity="0.0"
+     inkscape:pageshadow="2"
+     inkscape:zoom="0.98994949"
+     inkscape:cx="236.26638"
+     inkscape:cy="-17.084154"
+     inkscape:document-units="mm"
+     inkscape:current-layer="layer1"
+     showgrid="false"
+     showguides="false"
+     inkscape:window-width="1536"
+     inkscape:window-height="801"
+     inkscape:window-x="-8"
+     inkscape:window-y="-8"
+     inkscape:window-maximized="1" />
+  <metadata
+     id="metadata5">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title />
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <g
+     inkscape:label="Layer 1"
+     inkscape:groupmode="layer"
+     id="layer1"
+     transform="translate(0,-277)">
+    <g
+       id="g4497-6"
+       style="fill:url(#linearGradient4758);fill-opacity:1"
+       transform="matrix(0.89607815,0,0,1,-25.041331,-0.56696)"
+       inkscape:export-xdpi="50.799999"
+       inkscape:export-ydpi="50.799999">
+      <g
+         id="g4493-6"
+         style="fill:url(#linearGradient4756);fill-opacity:1" />
+    </g>
+    <path
+       style="opacity:1;fill:url(#linearGradient4553);fill-opacity:1;fill-rule:evenodd;stroke:none;stroke-width:7.34846926;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;paint-order:fill markers stroke"
+       d="M 7.5003171,276.99981 C 3.3453172,276.99981 0,279.23002 0,282.00002 v 5.66271 c 0,5.17306 6.2465283,9.33741 14.006121,9.33741 h 8.494055 c 4.155,0 7.499542,-2.23021 7.499542,-5.00021 v -9.99991 c 0,-2.77 -3.344542,-5.00021 -7.499542,-5.00021 z"
+       id="rect4505"
+       inkscape:connector-curvature="0" />
+    <rect
+       style="opacity:1;fill:#a3d3cb;fill-opacity:0.78431374;fill-rule:evenodd;stroke:none;stroke-width:7.34846926;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;paint-order:fill markers stroke"
+       id="rect4508"
+       width="30"
+       height="20"
+       x="-1.7763568e-015"
+       y="277"
+       ry="5"
+       inkscape:export-filename="C:\Users\P\Desktop\bubble_out.png"
+       inkscape:export-xdpi="50.799999"
+       inkscape:export-ydpi="50.799999" />
+  </g>
+</svg>
