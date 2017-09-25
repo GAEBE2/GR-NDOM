@@ -1,5 +1,11 @@
-import UserGroups.ClientUser;
-import UserGroups.User;
+package com.groendom_chat.groep_technologies.ClientServer.Client;
+
+import com.groendom_chat.groep_technologies.ClientServer.Client.UserGroups.ClientUser;
+import com.groendom_chat.groep_technologies.ClientServer.Client.UserGroups.User;
+import com.groendom_chat.groep_technologies.ClientServer.Operations.Authentication;
+import com.groendom_chat.groep_technologies.ClientServer.Operations.MessageToSend;
+import com.groendom_chat.groep_technologies.ClientServer.Operations.Security;
+import com.groendom_chat.groep_technologies.groendomchat.model.Message;
 
 import java.io.EOFException;
 import java.io.IOException;
@@ -13,6 +19,8 @@ import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.function.Consumer;
+
+import static com.groendom_chat.groep_technologies.ClientServer.Operations.MessageToSend.MessageType;
 
 /**
  * Created by serge on 20-Mar-17.
@@ -28,7 +36,7 @@ public class ClientFunctions {
 
     private String oldAddress;
 
-    private int PORT = Message.getPORT();
+    private int PORT = MessageToSend.getPORT();
 
     private int oldPort;
 
@@ -36,40 +44,40 @@ public class ClientFunctions {
 
     private List<User> users = new ArrayList<>();
 
-    public List<Message> getMessages() {
+    public List<MessageToSend> getMessages() {
         return messages;
     }
 
-    public List<Message> getNewMessages(int oldAmount) {
+    public List<MessageToSend> getNewMessages(int oldAmount) {
         return messages.subList(oldAmount, messages.size());
     }
 
-    public void setMessages(List<Message> messages) {
+    public void setMessages(List<MessageToSend> messages) {
         this.messages = messages;
     }
 
-    private List<Message> messages = new LinkedList<>();
+    private List<MessageToSend> messages = new LinkedList<>();
     private ObjectOutputStream outputStream;
     private ObjectInputStream inputStream;
     private boolean connected = false;
 
     //Consumers which are used when this active == true
-    private Consumer<Message> activeMessageReceiver;
+    private Consumer<MessageToSend> activeMessageReceiver;
     private Consumer<String> activeUserRemover;
     private Consumer<List<ClientUser>> activeUserAdder;
 
     //Consumers which are used when this active == false
-    private Consumer<Message> passiveMessageReceiver;
+    private Consumer<MessageToSend> passiveMessageReceiver;
     private Consumer<String> passiveUserRemover;
     private Consumer<List<ClientUser>> passiveUserAdder;
 
-    public ClientFunctions(Consumer<Message> passiveMessageReceiver, Consumer<String> passiveUserRemover, Consumer<List<ClientUser>> passiveUserAdder) {
+    public ClientFunctions(Consumer<MessageToSend> passiveMessageReceiver, Consumer<String> passiveUserRemover, Consumer<List<ClientUser>> passiveUserAdder) {
         this.passiveMessageReceiver = passiveMessageReceiver;
         this.passiveUserRemover = passiveUserRemover;
         this.passiveUserAdder = passiveUserAdder;
     }
 
-    public void setActiveConsumers(Consumer<Message> messageConsumer){
+    public void setActiveConsumers(Consumer<MessageToSend> messageConsumer){
         activeMessageReceiver = messageConsumer;
     }
 
@@ -78,11 +86,11 @@ public class ClientFunctions {
     }
 
     public void sendNextMessage(ClientUser user) throws IOException {
-        outputStream.writeObject(new Message(user.getUuid(), user.getPublicKey()));
+        outputStream.writeObject(new MessageToSend(user.getUuid(), user.getPublicKey()));
     }
 
     public void sendMessage(String messageToSend) throws IOException {
-        outputStream.writeObject(new Message(Security.encrypt(messageToSend, publicServerKey) , clientUser.getName(), clientUser.getPublicKey()));
+        outputStream.writeObject(new MessageToSend(Security.encrypt(messageToSend, publicServerKey) , clientUser.getName(), clientUser.getPublicKey()));
     }
 
 
@@ -112,7 +120,7 @@ public class ClientFunctions {
                 this.clientUser = user;
                 if (outputStream != null && inputStream != null) {
                     authenticate();
-                    outputStream.writeObject(new Message(clientUser));
+                    outputStream.writeObject(new MessageToSend(clientUser));
                     connected = true;
                     return null;
                 }
@@ -126,7 +134,7 @@ public class ClientFunctions {
 
     public String reOpenConnection(ClientUser user){
         //openConnection(oldAddress, user, oldPort);
-        //utputStream.writeObject(new Message(user.getPublicKey()));
+        //utputStream.writeObject(new MessageToSend(user.getPublicKey()));
         //TODO: implement
         return "";
     }
@@ -153,7 +161,7 @@ public class ClientFunctions {
             try {
                 Object object = inputStream.readObject();
                 if(object != null && object instanceof Message) {
-                    Message message = ((Message) object);
+                    MessageToSend message = ((MessageToSend) object);
                     switch (message.getMessageType()) {
                         case ENCRYPTED_TEXT:
                             String decryptedMessage = Security.decrypt(message.getEncryptedMessage(), clientUser.getPrivateKey());
@@ -274,11 +282,11 @@ public class ClientFunctions {
         }
     }
 
-    public void addActiveConsumers (Consumer<Message> activeMessageReceiver, Consumer<String> activeUserRemover, Consumer<List<ClientUser>> activeUserAdder) {
+    public void addActiveConsumers (Consumer<MessageToSend> activeMessageReceiver, Consumer<String> activeUserRemover, Consumer<List<ClientUser>> activeUserAdder) {
         addActiveConsumers(activeMessageReceiver, activeUserRemover, activeUserAdder, user -> {});
     }
 
-    public void addActiveConsumers (Consumer<Message> activeMessageReceiver, Consumer<String> activeUserRemover, Consumer<List<ClientUser>> activeUserAdder, Consumer<ClientUser> activeChangeUsername) {
+    public void addActiveConsumers (Consumer<MessageToSend> activeMessageReceiver, Consumer<String> activeUserRemover, Consumer<List<ClientUser>> activeUserAdder, Consumer<ClientUser> activeChangeUsername) {
         this.activeMessageReceiver = activeMessageReceiver;
         this.activeUserRemover = activeUserRemover;
         this.activeUserAdder = activeUserAdder;
@@ -292,7 +300,7 @@ public class ClientFunctions {
         this.active = false;
     }
 
-    public void setPassiveMessageReceiver(Consumer<Message> passiveMessageReceiver) {
+    public void setPassiveMessageReceiver(Consumer<MessageToSend> passiveMessageReceiver) {
         this.passiveMessageReceiver = passiveMessageReceiver;
     }
 

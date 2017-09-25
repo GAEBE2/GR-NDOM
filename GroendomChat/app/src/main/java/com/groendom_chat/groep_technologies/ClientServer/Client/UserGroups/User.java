@@ -1,5 +1,4 @@
-package UserGroups;
-
+package com.groendom_chat.groep_technologies.ClientServer.Client.UserGroups;
 import java.io.Serializable;
 import java.security.KeyPair;
 import java.security.PublicKey;

@@ -1,9 +1,8 @@
-package UserGroups;
+package com.groendom_chat.groep_technologies.ClientServer.Client.UserGroups;
 
 import java.security.KeyPair;
 import java.security.PrivateKey;
 import java.security.PublicKey;
-import java.util.UUID;
 
 /**
  * Created by tkr6u on 20.04.2017.
