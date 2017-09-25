@@ -26,7 +26,6 @@
                 android:layout_height="match_parent"
                 android:layout_margin="@dimen/fab_margin"
                 android:clickable="true"
-                app:rippleColor="@color/accentColorLight"
                 app:layout_anchor="@+id/include" />
 
             <TextView
