@@ -28,9 +28,16 @@ public class ChatActivity extends Activity {
         MessageHandler messageHandler = new MessageHandler(getApplicationContext());
         LinearLayout layout = (LinearLayout) findViewById(R.id.chat_activity_content);
 
+
         for (int i = 1; i < 10; i++) {
-            messageHandler.createOut(layout, new Message("Hallo" + i));
+            //Sent Message
+            messageHandler.createOut(layout, new Message("Hallo " + i));
+
+            //Incoming Message
+            messageHandler.createIn(layout, new Message("Guten Morgen " + i));
         }
+
+
         final Calendar cal = Calendar.getInstance();
         cal.add(Calendar.DATE, -1);
         messageHandler.createOut(layout, new Message("HIOOOooooooooooooooooooooooooooooooooooooo", cal.getTime()));
