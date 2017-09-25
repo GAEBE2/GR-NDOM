@@ -1,6 +1,6 @@
-import sun.misc.BASE64Decoder;
-import sun.misc.BASE64Encoder;
+package com.groendom_chat.groep_technologies.ClientServer.Operations;
 
+import android.util.Base64;
 import javax.crypto.Cipher;
 import javax.crypto.NoSuchPaddingException;
 import java.io.IOException;
@@ -13,8 +13,6 @@ import java.security.spec.*;
  */
 public class Security {
 
-    private static BASE64Decoder decoder = new BASE64Decoder();
-    private static BASE64Encoder encoder = new BASE64Encoder();
     private static SecureRandom random = new SecureRandom();
     private static KeyFactory factory = getNewFactory();
     private static KeyPairGenerator keyPairGenerator;
@@ -101,9 +99,9 @@ public class Security {
     public static Key convertStringToKey(String string, boolean isPublic) {
         byte[] encodedKey;
         try {
-            encodedKey = decoder.decodeBuffer(string);
+            encodedKey = Base64.decode(string, Base64.DEFAULT);
             return isPublic ? factory.generatePublic(new X509EncodedKeySpec(encodedKey)) : factory.generatePrivate(new PKCS8EncodedKeySpec(encodedKey));
-        } catch (IOException | InvalidKeySpecException e) {
+        } catch (InvalidKeySpecException e) {
             e.printStackTrace();
         }
         return null;
@@ -119,24 +117,27 @@ public class Security {
      */
     public static Key convertStringToKeyWithException(String string, boolean isPublic) throws IOException, InvalidKeySpecException {
         byte[] encodedKey;
-        encodedKey = decoder.decodeBuffer(string);
+        encodedKey = Base64.decode(string, Base64.DEFAULT);
         return isPublic ? factory.generatePublic(new X509EncodedKeySpec(encodedKey)) : factory.generatePrivate(new PKCS8EncodedKeySpec(encodedKey));
     }
 
+    /*
     /**
      *
      * @param key key one wants to convert
      * @return converted key
      */
+    /*
     public static String convertKeyToString(Key key) {
         try {
             EncodedKeySpec spec = key instanceof PublicKey ? factory.getKeySpec(key, X509EncodedKeySpec.class) : factory.getKeySpec(key, PKCS8EncodedKeySpec.class);
-            return encoder.encode(spec.getEncoded());
+            return Base64.encode(spec.getEncoded(), Base64.DEFAULT);
         } catch (InvalidKeySpecException e) {
             e.printStackTrace();
         }
-        return encoder.encode(key.getEncoded());
+         return encoder.encode(key.getEncoded());
     }
+    */
     //TODO: add message digest for more security
 
     public static KeyFactory getFactory() {

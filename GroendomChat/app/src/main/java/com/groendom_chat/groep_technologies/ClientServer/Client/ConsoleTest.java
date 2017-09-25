@@ -1,10 +1,11 @@
-import UserGroups.ClientUser;
+package com.groendom_chat.groep_technologies.ClientServer.Client;
+
+import com.groendom_chat.groep_technologies.ClientServer.Client.UserGroups.ClientUser;
+import com.groendom_chat.groep_technologies.ClientServer.Operations.Security;
 
 import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
-import java.util.List;
-import java.util.function.Consumer;
 
 public class ConsoleTest {
     public static void main(String[] args) throws NoSuchProviderException, NoSuchAlgorithmException, IOException {

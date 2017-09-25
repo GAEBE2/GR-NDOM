@@ -1,3 +1,5 @@
+package com.groendom_chat.groep_technologies.ClientServer.Operations;
+
 import java.io.Serializable;
 import java.security.PublicKey;
 

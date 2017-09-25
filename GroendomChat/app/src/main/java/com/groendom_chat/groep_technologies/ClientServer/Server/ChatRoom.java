@@ -1,11 +1,13 @@
-import UserGroups.User;
+package com.groendom_chat.groep_technologies.ClientServer.Server;
+
+import com.groendom_chat.groep_technologies.ClientServer.Operations.MessageToSend;
 
 import java.util.LinkedList;
 import java.util.List;
 
 public class ChatRoom {
     private Handler[] handlers = new Handler[2];
-    private List<Message> messageList = new LinkedList<>();
+    private List<MessageToSend> messageList = new LinkedList<>();
     private boolean searching = true;
 
     public ChatRoom(Handler user) {
@@ -21,7 +23,7 @@ public class ChatRoom {
         return false;
     }
 
-    public void addMessage(Message message){
+    public void addMessage(MessageToSend message){
         messageList.add(message);
     }
 
@@ -33,7 +35,7 @@ public class ChatRoom {
         return searching;
     }
 
-    public List<Message> getMessages(){
+    public List<MessageToSend> getMessages(){
         return messageList;
     }
 }

@@ -1,4 +1,5 @@
-package UserGroups;
+package com.groendom_chat.groep_technologies.ClientServer.Client.UserGroups;
+
 
 import java.util.List;
 

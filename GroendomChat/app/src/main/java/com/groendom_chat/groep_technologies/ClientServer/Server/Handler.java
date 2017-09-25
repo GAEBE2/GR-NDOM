@@ -1,4 +1,9 @@
-import UserGroups.User;
+package com.groendom_chat.groep_technologies.ClientServer.Server;
+
+import com.groendom_chat.groep_technologies.ClientServer.Client.UserGroups.User;
+import com.groendom_chat.groep_technologies.ClientServer.Operations.Authentication;
+import com.groendom_chat.groep_technologies.ClientServer.Operations.MessageToSend;
+import com.groendom_chat.groep_technologies.ClientServer.Operations.Security;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -10,9 +15,7 @@ import java.security.PublicKey;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-import java.util.UUID;
 import java.util.function.Consumer;
-import java.util.logging.Logger;
 
 public class Handler extends Thread {
     private User user;
@@ -47,29 +50,29 @@ public class Handler extends Thread {
             roomIndex = insetIntoRoom();
 
             //send active users on server to user
-            outputStream.writeObject(new Message(roomList.get(roomIndex).getHandlers()));
+            outputStream.writeObject(new MessageToSend(roomList.get(roomIndex).getHandlers()));
 
             //send new user to active users
             for (Handler handler : roomList.get(roomIndex).getHandlers()) {
                 if(handler != null) {
-                    handler.outputStream.writeObject(new Message(user));
+                    handler.outputStream.writeObject(new MessageToSend(user));
                 }
             }
 
             //send all stored messages
             String originalMessage;
-            for (Message message : roomList.get(roomIndex).getMessages()) {
-                originalMessage = message.getMessage();
+            for (MessageToSend messageToSend : roomList.get(roomIndex).getMessages()) {
+                originalMessage = messageToSend.getMessage();
                 if(originalMessage != null) {
-                    message.setEncryptedMessage(Security.encrypt(originalMessage, publicKey));
-                    message.setMessage(null);
-                    message.setMessageType(Message.MessageType.ENCRYPTED_TEXT);
-                    message.setPublicKey(keyPair.getPublic());
-                    outputStream.writeObject(message);
+                    messageToSend.setEncryptedMessage(Security.encrypt(originalMessage, publicKey));
+                    messageToSend.setMessage(null);
+                    messageToSend.setMessageType(MessageToSend.MessageType.ENCRYPTED_TEXT);
+                    messageToSend.setPublicKey(keyPair.getPublic());
+                    outputStream.writeObject(messageToSend);
                 }
-                message.setMessage(originalMessage);
-                message.setPublicKey(null);
-                message.setEncryptedMessage(null);
+                messageToSend.setMessage(originalMessage);
+                messageToSend.setPublicKey(null);
+                messageToSend.setEncryptedMessage(null);
             }
 
             ServerFunctions.log("client connected; IP: " + socket.getRemoteSocketAddress().toString() + " | username: " + user.getName());
@@ -130,8 +133,8 @@ public class Handler extends Thread {
             try {
                 Object object = inputStream.readObject();
                 if(object != null) {
-                    Message message = ((Message) object);
-                    result = message.getAuthor();
+                    MessageToSend messageToSend = ((MessageToSend) object);
+                    result = messageToSend.getAuthor();
                 }
             } catch (ClassNotFoundException e) {
                 e.printStackTrace();
@@ -151,10 +154,10 @@ public class Handler extends Thread {
                 if(object == null){
                     return;
                 }
-                Message message = ((Message) object);
-                roomList.get(roomIndex).addMessage(message);
-                sendMessageToEveryone(message);
-                ServerFunctions.log("message: " + message.getMessage() + " author: " + message.getAuthor() + "|| Send to: " + userList.size() + " clients");
+                MessageToSend messageToSend = ((MessageToSend) object);
+                roomList.get(roomIndex).addMessage(messageToSend);
+                sendMessageToEveryone(messageToSend);
+                ServerFunctions.log("messageToSend: " + messageToSend.getMessage() + " author: " + messageToSend.getAuthor() + "|| Send to: " + userList.size() + " clients");
             } catch (ClassNotFoundException e) {
             }
         }
@@ -166,7 +169,7 @@ public class Handler extends Thread {
                 userList.remove(user);
                 disconnect.accept(this);
                 //tell everyone that user left the channel
-                sendMessageToEveryone(Message.createLogoutMessage(user));
+                sendMessageToEveryone(MessageToSend.createLogoutMessage(user));
             }
             ServerFunctions.log("client disconnected; IP: ");
             if(socket.getRemoteSocketAddress() != null && user != null) {
@@ -179,30 +182,30 @@ public class Handler extends Thread {
     }
 
     /**
-     * send a message to all active users
-     * @param message message to send
+     * send a messageToSend to all active users
+     * @param messageToSend messageToSend to send
      * @throws IOException
      */
-    public void sendMessageToEveryone(Message message) throws IOException{
+    public void sendMessageToEveryone(MessageToSend messageToSend) throws IOException{
         String decryptedMessage = "";
-        if(message.getEncryptedMessage() != null) {
-            decryptedMessage = Security.decrypt(message.getEncryptedMessage(), keyPair.getPrivate());
+        if(messageToSend.getEncryptedMessage() != null) {
+            decryptedMessage = Security.decrypt(messageToSend.getEncryptedMessage(), keyPair.getPrivate());
         }
 
         if(roomList.size() != 0) {
             for (Handler handler : roomList.get(roomIndex).getHandlers()) {
                 try {
                     if (handler != null){
-                        if (message.getMessageType() == Message.MessageType.ENCRYPTED_TEXT) {
-                            message.setEncryptedMessage(Security.encrypt(decryptedMessage, handler.user.getPublicKey()));
+                        if (messageToSend.getMessageType() == MessageToSend.MessageType.ENCRYPTED_TEXT) {
+                            messageToSend.setEncryptedMessage(Security.encrypt(decryptedMessage, handler.user.getPublicKey()));
                         }
-                        handler.outputStream.writeObject(message);
+                        handler.outputStream.writeObject(messageToSend);
                     }
                 } catch (SocketException ignored) { //ignores disconnection
 
                 }
             }
-            message.setMessage("".equals(decryptedMessage) ? message.getMessage() : decryptedMessage);
+            messageToSend.setMessage("".equals(decryptedMessage) ? messageToSend.getMessage() : decryptedMessage);
         }
     }
 

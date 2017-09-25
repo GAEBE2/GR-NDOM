@@ -1,11 +1,13 @@
-import UserGroups.ClientUser;
-import UserGroups.User;
+package com.groendom_chat.groep_technologies.ClientServer.Operations;
+
+import com.groendom_chat.groep_technologies.ClientServer.Client.UserGroups.ClientUser;
+import com.groendom_chat.groep_technologies.ClientServer.Client.UserGroups.User;
+import com.groendom_chat.groep_technologies.ClientServer.Server.Handler;
 
 import java.io.Serializable;
 import java.security.PublicKey;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
@@ -13,7 +15,7 @@ import java.util.UUID;
  * Created by serge on 20-Mar-17.
  * Used to send all diffrent types of message in one object to avoid 10 else if with instance ofs
  */
-public class Message implements Serializable{
+public class MessageToSend implements Serializable{
 
     public enum MessageType{
         TEXT, IMAGE, USER_ADD, USER_LIST, LOGIN, USER_REMOVE, ENCRYPTED_TEXT, NEXT, RECONNECT
@@ -28,26 +30,26 @@ public class Message implements Serializable{
     private int port;
     private byte[] encryptedMessage;
     private String message;
-    private LocalDateTime timeSend;
+    private Date timeSend;
     private byte[] file;
     //private PublicKey publicKey;
     //private String author;
     private User author;
 
-    private Message(){
+    private MessageToSend(){
         author = new User();
-        this.timeSend = LocalDateTime.now();
+        this.timeSend = new Date();
     }
 
 
 
-    public Message(UUID userID, PublicKey publicKey){
+    public MessageToSend(UUID userID, PublicKey publicKey){
         this();
         messageType = MessageType.NEXT;
         author = new User(userID, publicKey);
     }
 
-    public Message(String loginUName, String address, int port) {
+    public MessageToSend(String loginUName, String address, int port) {
         this();
         messageType = MessageType.LOGIN;
         author = new User(loginUName);
@@ -55,20 +57,20 @@ public class Message implements Serializable{
         this.port = port;
     }
 
-    public Message(User user) {
+    public MessageToSend(User user) {
         this();
         messageType = MessageType.USER_ADD;
         author = user;
     }
 
-    public Message(List<User> userList) {
+    public MessageToSend(List<User> userList) {
         this();
         this.userList = new ArrayList<>();
         userList.forEach(user -> this.userList.add(new ClientUser(user)));
         messageType = MessageType.USER_LIST;
     }
 
-    public Message(Handler[] users){
+    public MessageToSend(Handler[] users){
         this();
         this.userList = new ArrayList<>();
         for (Handler handler : users) {
@@ -79,39 +81,39 @@ public class Message implements Serializable{
         messageType = MessageType.USER_LIST;
     }
 
-    public Message(String message, String author) {
+    public MessageToSend(String message, String author) {
         this();
         messageType = MessageType.TEXT;
         this.message = message;
         this.author = new User(author);
     }
 
-    public Message(byte[] encryptedMessage, String author, PublicKey publicKey) {
+    public MessageToSend(byte[] encryptedMessage, String author, PublicKey publicKey) {
         this();
         messageType = MessageType.ENCRYPTED_TEXT;
         this.encryptedMessage = encryptedMessage;
         this.author = new User(author, publicKey);
     }
 
-    public Message(byte[] encryptedMessage, String author, PublicKey publicKey, byte[] file) {
+    public MessageToSend(byte[] encryptedMessage, String author, PublicKey publicKey, byte[] file) {
         this(encryptedMessage, author, publicKey);
         this.file = file;
         messageType = MessageType.IMAGE;
     }
 
-    public Message(String message, String author, PublicKey publicKey) {
+    public MessageToSend(String message, String author, PublicKey publicKey) {
         this(message, author);
         this.author.setPublicKey(publicKey);
     }
 
-    public Message(String message, String author, PublicKey publicKey, byte[] file) {
+    public MessageToSend(String message, String author, PublicKey publicKey, byte[] file) {
         this(message, author, publicKey);
         this.file = file;
         messageType = MessageType.IMAGE;
     }
 
-    static Message createLogoutMessage(User user) {
-        Message res = new Message(user);
+    public static MessageToSend createLogoutMessage(User user) {
+        MessageToSend res = new MessageToSend(user);
         res.setMessageType(MessageType.USER_REMOVE);
         return res;
     }
@@ -144,11 +146,11 @@ public class Message implements Serializable{
         this.author = author;
     }
 
-    public LocalDateTime getTimeSend() {
+    public Date getTimeSend() {
         return timeSend;
     }
 
-    public void setTimeSend(LocalDateTime timeSend) {
+    public void setTimeSend(Date timeSend) {
         this.timeSend = timeSend;
     }
 
@@ -203,11 +205,11 @@ public class Message implements Serializable{
         return encryptedMessage;
     }
 
-    public static Message getReconnectMessage(User user, int arrNumber){
-        Message message = new Message(user);
-        message.messageType = MessageType.RECONNECT;
-        message.port = arrNumber;
+    public static MessageToSend getReconnectMessage(User user, int arrNumber){
+        MessageToSend messageToSend = new MessageToSend(user);
+        messageToSend.messageType = MessageType.RECONNECT;
+        messageToSend.port = arrNumber;
 
-        return message;
+        return messageToSend;
     }
 }
