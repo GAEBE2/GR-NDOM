@@ -1,0 +1,99 @@
+-- Merging decision tree log ---
+manifest
+ADDED from S:\tbz\modul 426\GR-NDOM\GroendomChat\app\src\main\AndroidManifest.xml:2:1-22:12
+	package
+		ADDED from S:\tbz\modul 426\GR-NDOM\GroendomChat\app\src\main\AndroidManifest.xml:3:5-64
+		INJECTED from S:\tbz\modul 426\GR-NDOM\GroendomChat\app\src\main\AndroidManifest.xml
+		INJECTED from S:\tbz\modul 426\GR-NDOM\GroendomChat\app\src\main\AndroidManifest.xml
+	android:versionName
+		INJECTED from S:\tbz\modul 426\GR-NDOM\GroendomChat\app\src\main\AndroidManifest.xml
+		INJECTED from S:\tbz\modul 426\GR-NDOM\GroendomChat\app\src\main\AndroidManifest.xml
+	xmlns:android
+		ADDED from S:\tbz\modul 426\GR-NDOM\GroendomChat\app\src\main\AndroidManifest.xml:2:11-69
+	android:versionCode
+		INJECTED from S:\tbz\modul 426\GR-NDOM\GroendomChat\app\src\main\AndroidManifest.xml
+		INJECTED from S:\tbz\modul 426\GR-NDOM\GroendomChat\app\src\main\AndroidManifest.xml
+application
+ADDED from S:\tbz\modul 426\GR-NDOM\GroendomChat\app\src\main\AndroidManifest.xml:5:5-20:19
+MERGED from [com.android.support.constraint:constraint-layout:1.0.2] C:\Users\serge\.android\build-cache\baafea4e515b72176bfb0c8befd344aff46dc9ca\output\AndroidManifest.xml:9:5-20
+MERGED from [com.android.support:design:25.3.1] C:\Users\serge\.android\build-cache\964f04850440da03d0bceca493cf63f303131df9\output\AndroidManifest.xml:29:5-20
+MERGED from [com.android.support:appcompat-v7:25.3.1] C:\Users\serge\.android\build-cache\fcbe9e4b3d783d12903ee4b8e7c58450e6c81502\output\AndroidManifest.xml:29:5-20
+MERGED from [com.android.support:animated-vector-drawable:25.3.1] C:\Users\serge\.android\build-cache\5f61305efc3ed0802dd3a242b8d68ff1114d4e0c\output\AndroidManifest.xml:26:5-20
+MERGED from [com.android.support:support-vector-drawable:25.3.1] C:\Users\serge\.android\build-cache\03f4cda58e4e96f865550d05a2cf690c8e0108b1\output\AndroidManifest.xml:26:5-20
+MERGED from [com.android.support:transition:25.3.1] C:\Users\serge\.android\build-cache\acbdd5842e50498f26b073a76dd57a1355a305a4\output\AndroidManifest.xml:26:5-20
+MERGED from [com.android.support:support-v4:25.3.1] C:\Users\serge\.android\build-cache\28d2a9eab6cd24fa578bb7323e0ba21b02caaa57\output\AndroidManifest.xml:29:5-20
+MERGED from [com.android.support:support-fragment:25.3.1] C:\Users\serge\.android\build-cache\289f1fdd1e44079cffc58c70c08b4fbafa9ea4cb\output\AndroidManifest.xml:29:5-20
+MERGED from [com.android.support:support-media-compat:25.3.1] C:\Users\serge\.android\build-cache\4feed29faa448c5f1ce33bd69c8be6f672fd3ef9\output\AndroidManifest.xml:29:5-20
+MERGED from [com.android.support:support-core-ui:25.3.1] C:\Users\serge\.android\build-cache\b0446ffe3f04dfd4a17a9fa5a927db501fc0aec0\output\AndroidManifest.xml:29:5-20
+MERGED from [com.android.support:support-core-utils:25.3.1] C:\Users\serge\.android\build-cache\3aeae859328423f588e6efb204a912377191a9f8\output\AndroidManifest.xml:29:5-20
+MERGED from [com.android.support:support-compat:25.3.1] C:\Users\serge\.android\build-cache\f9f6fd9a83ca9e2205e1d4cf6795b43fb374f47f\output\AndroidManifest.xml:29:5-20
+	android:label
+		ADDED from S:\tbz\modul 426\GR-NDOM\GroendomChat\app\src\main\AndroidManifest.xml:8:9-41
+	android:supportsRtl
+		ADDED from S:\tbz\modul 426\GR-NDOM\GroendomChat\app\src\main\AndroidManifest.xml:10:9-35
+	android:roundIcon
+		ADDED from S:\tbz\modul 426\GR-NDOM\GroendomChat\app\src\main\AndroidManifest.xml:9:9-54
+	android:allowBackup
+		ADDED from S:\tbz\modul 426\GR-NDOM\GroendomChat\app\src\main\AndroidManifest.xml:6:9-35
+	android:icon
+		ADDED from S:\tbz\modul 426\GR-NDOM\GroendomChat\app\src\main\AndroidManifest.xml:7:9-43
+	android:theme
+		ADDED from S:\tbz\modul 426\GR-NDOM\GroendomChat\app\src\main\AndroidManifest.xml:11:9-40
+activity#com.groendom_chat.groep_technologies.groendomchat.MainActivity
+ADDED from S:\tbz\modul 426\GR-NDOM\GroendomChat\app\src\main\AndroidManifest.xml:12:9-18:20
+	android:name
+		ADDED from S:\tbz\modul 426\GR-NDOM\GroendomChat\app\src\main\AndroidManifest.xml:12:19-47
+intent-filter#android.intent.action.MAIN+android.intent.category.LAUNCHER
+ADDED from S:\tbz\modul 426\GR-NDOM\GroendomChat\app\src\main\AndroidManifest.xml:13:13-17:29
+action#android.intent.action.MAIN
+ADDED from S:\tbz\modul 426\GR-NDOM\GroendomChat\app\src\main\AndroidManifest.xml:14:17-69
+	android:name
+		ADDED from S:\tbz\modul 426\GR-NDOM\GroendomChat\app\src\main\AndroidManifest.xml:14:25-66
+category#android.intent.category.LAUNCHER
+ADDED from S:\tbz\modul 426\GR-NDOM\GroendomChat\app\src\main\AndroidManifest.xml:16:17-77
+	android:name
+		ADDED from S:\tbz\modul 426\GR-NDOM\GroendomChat\app\src\main\AndroidManifest.xml:16:27-74
+activity#com.groendom_chat.groep_technologies.groendomchat.activities.ChatActivity
+ADDED from S:\tbz\modul 426\GR-NDOM\GroendomChat\app\src\main\AndroidManifest.xml:19:9-60
+	android:name
+		ADDED from S:\tbz\modul 426\GR-NDOM\GroendomChat\app\src\main\AndroidManifest.xml:19:19-58
+uses-sdk
+INJECTED from S:\tbz\modul 426\GR-NDOM\GroendomChat\app\src\main\AndroidManifest.xml reason: use-sdk injection requested
+MERGED from [com.android.support.constraint:constraint-layout:1.0.2] C:\Users\serge\.android\build-cache\baafea4e515b72176bfb0c8befd344aff46dc9ca\output\AndroidManifest.xml:5:5-7:41
+MERGED from [com.android.support:design:25.3.1] C:\Users\serge\.android\build-cache\964f04850440da03d0bceca493cf63f303131df9\output\AndroidManifest.xml:21:5-23:62
+MERGED from [com.android.support:appcompat-v7:25.3.1] C:\Users\serge\.android\build-cache\fcbe9e4b3d783d12903ee4b8e7c58450e6c81502\output\AndroidManifest.xml:21:5-23:78
+MERGED from [com.android.support:animated-vector-drawable:25.3.1] C:\Users\serge\.android\build-cache\5f61305efc3ed0802dd3a242b8d68ff1114d4e0c\output\AndroidManifest.xml:20:5-44
+MERGED from [com.android.support:support-vector-drawable:25.3.1] C:\Users\serge\.android\build-cache\03f4cda58e4e96f865550d05a2cf690c8e0108b1\output\AndroidManifest.xml:20:5-43
+MERGED from [com.android.support:recyclerview-v7:25.3.1] C:\Users\serge\.android\build-cache\e9e974a5accea29ace1384840c9987c03561db7e\output\AndroidManifest.xml:20:5-43
+MERGED from [com.android.support:transition:25.3.1] C:\Users\serge\.android\build-cache\acbdd5842e50498f26b073a76dd57a1355a305a4\output\AndroidManifest.xml:20:5-44
+MERGED from [com.android.support:support-v4:25.3.1] C:\Users\serge\.android\build-cache\28d2a9eab6cd24fa578bb7323e0ba21b02caaa57\output\AndroidManifest.xml:21:5-23:54
+MERGED from [com.android.support:support-fragment:25.3.1] C:\Users\serge\.android\build-cache\289f1fdd1e44079cffc58c70c08b4fbafa9ea4cb\output\AndroidManifest.xml:21:5-23:60
+MERGED from [com.android.support:support-media-compat:25.3.1] C:\Users\serge\.android\build-cache\4feed29faa448c5f1ce33bd69c8be6f672fd3ef9\output\AndroidManifest.xml:21:5-23:63
+MERGED from [com.android.support:support-core-ui:25.3.1] C:\Users\serge\.android\build-cache\b0446ffe3f04dfd4a17a9fa5a927db501fc0aec0\output\AndroidManifest.xml:21:5-23:58
+MERGED from [com.android.support:support-core-utils:25.3.1] C:\Users\serge\.android\build-cache\3aeae859328423f588e6efb204a912377191a9f8\output\AndroidManifest.xml:21:5-23:61
+MERGED from [com.android.support:support-compat:25.3.1] C:\Users\serge\.android\build-cache\f9f6fd9a83ca9e2205e1d4cf6795b43fb374f47f\output\AndroidManifest.xml:21:5-23:58
+	tools:overrideLibrary
+		ADDED from [com.android.support:design:25.3.1] C:\Users\serge\.android\build-cache\964f04850440da03d0bceca493cf63f303131df9\output\AndroidManifest.xml:23:9-59
+	android:targetSdkVersion
+		INJECTED from S:\tbz\modul 426\GR-NDOM\GroendomChat\app\src\main\AndroidManifest.xml
+		INJECTED from S:\tbz\modul 426\GR-NDOM\GroendomChat\app\src\main\AndroidManifest.xml
+	android:minSdkVersion
+		INJECTED from S:\tbz\modul 426\GR-NDOM\GroendomChat\app\src\main\AndroidManifest.xml
+		INJECTED from S:\tbz\modul 426\GR-NDOM\GroendomChat\app\src\main\AndroidManifest.xml
+meta-data#android.support.VERSION
+ADDED from [com.android.support:design:25.3.1] C:\Users\serge\.android\build-cache\964f04850440da03d0bceca493cf63f303131df9\output\AndroidManifest.xml:25:5-27:34
+MERGED from [com.android.support:appcompat-v7:25.3.1] C:\Users\serge\.android\build-cache\fcbe9e4b3d783d12903ee4b8e7c58450e6c81502\output\AndroidManifest.xml:25:5-27:34
+MERGED from [com.android.support:animated-vector-drawable:25.3.1] C:\Users\serge\.android\build-cache\5f61305efc3ed0802dd3a242b8d68ff1114d4e0c\output\AndroidManifest.xml:22:5-24:34
+MERGED from [com.android.support:support-vector-drawable:25.3.1] C:\Users\serge\.android\build-cache\03f4cda58e4e96f865550d05a2cf690c8e0108b1\output\AndroidManifest.xml:22:5-24:34
+MERGED from [com.android.support:recyclerview-v7:25.3.1] C:\Users\serge\.android\build-cache\e9e974a5accea29ace1384840c9987c03561db7e\output\AndroidManifest.xml:22:5-24:34
+MERGED from [com.android.support:transition:25.3.1] C:\Users\serge\.android\build-cache\acbdd5842e50498f26b073a76dd57a1355a305a4\output\AndroidManifest.xml:22:5-24:34
+MERGED from [com.android.support:support-v4:25.3.1] C:\Users\serge\.android\build-cache\28d2a9eab6cd24fa578bb7323e0ba21b02caaa57\output\AndroidManifest.xml:25:5-27:34
+MERGED from [com.android.support:support-fragment:25.3.1] C:\Users\serge\.android\build-cache\289f1fdd1e44079cffc58c70c08b4fbafa9ea4cb\output\AndroidManifest.xml:25:5-27:34
+MERGED from [com.android.support:support-media-compat:25.3.1] C:\Users\serge\.android\build-cache\4feed29faa448c5f1ce33bd69c8be6f672fd3ef9\output\AndroidManifest.xml:25:5-27:34
+MERGED from [com.android.support:support-core-ui:25.3.1] C:\Users\serge\.android\build-cache\b0446ffe3f04dfd4a17a9fa5a927db501fc0aec0\output\AndroidManifest.xml:25:5-27:34
+MERGED from [com.android.support:support-core-utils:25.3.1] C:\Users\serge\.android\build-cache\3aeae859328423f588e6efb204a912377191a9f8\output\AndroidManifest.xml:25:5-27:34
+MERGED from [com.android.support:support-compat:25.3.1] C:\Users\serge\.android\build-cache\f9f6fd9a83ca9e2205e1d4cf6795b43fb374f47f\output\AndroidManifest.xml:25:5-27:34
+	android:value
+		ADDED from [com.android.support:design:25.3.1] C:\Users\serge\.android\build-cache\964f04850440da03d0bceca493cf63f303131df9\output\AndroidManifest.xml:27:9-31
+	android:name
+		ADDED from [com.android.support:design:25.3.1] C:\Users\serge\.android\build-cache\964f04850440da03d0bceca493cf63f303131df9\output\AndroidManifest.xml:26:9-47
