@@ -1,6 +1,7 @@
-.idea/
+GroendomChat/.idea/
 GroendomChat/build/*
 GroendomChat/local.properties
+GroendomChat/.gradle
 *.iml
 GroendomChat/.gradle/3.3/taskArtifacts/fileHashes.bin
 GroendomChat/.gradle/3.3/taskArtifacts/fileSnapshots.bin
