@@ -2,16 +2,9 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
-<<<<<<< HEAD
     android:background="@drawable/bubble_in"
     android:padding="8dp"
     android:layout_margin="8dp">
-=======
-    android:layout_margin="8dp"
-    android:background="@drawable/bubble_out"
-    android:padding="8dp">
-    android:layout_alignParentRight="true"/>
->>>>>>> 0a0529e16ee977bbc037cd9161d5a6d75a1efcc8
 
     <TextView
         android:id="@+id/bubble_text_content"
