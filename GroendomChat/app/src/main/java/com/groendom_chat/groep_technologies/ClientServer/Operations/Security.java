@@ -60,7 +60,7 @@ public class Security {
     public static byte[] encrypt(String text, Key key) {
         byte[] cipherText = null;
         try {
-            Cipher cipher = key instanceof PrivateKey ? getSingingCipher() :  getCipher();
+            Cipher cipher = key instanceof PrivateKey ? getSingingCipher() : getCipher();
             cipher.init(Cipher.ENCRYPT_MODE, key);
             cipherText = cipher.doFinal(text.getBytes());
         } catch (Exception e) {

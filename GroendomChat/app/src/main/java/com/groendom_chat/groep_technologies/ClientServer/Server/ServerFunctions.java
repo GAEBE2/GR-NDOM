@@ -1,5 +1,6 @@
 package com.groendom_chat.groep_technologies.ClientServer.Server;
 
+import com.groendom_chat.groep_technologies.ClientServer.Client.Consumer;
 import com.groendom_chat.groep_technologies.ClientServer.Client.UserGroups.User;
 import com.groendom_chat.groep_technologies.ClientServer.Operations.MessageToSend;
 import com.groendom_chat.groep_technologies.ClientServer.Operations.Security;
@@ -44,7 +45,12 @@ public class ServerFunctions {
         log("The chat server is running on port: " + port);
         try (ServerSocket listener = new ServerSocket(port)) {
             while (open) {
-                Handler handler = new Handler(listener.accept(), pair, roomList, userList, handler1 -> handlerList.remove(handler1));
+                Handler handler = new Handler(listener.accept(), pair, roomList, userList, new Consumer<Handler>() {
+                    @Override
+                    public void accept(Handler handler) {
+                        handlerList.remove(handler);
+                    }
+                });
                 handlerList.add(handler);
                 handler.start();
             }
