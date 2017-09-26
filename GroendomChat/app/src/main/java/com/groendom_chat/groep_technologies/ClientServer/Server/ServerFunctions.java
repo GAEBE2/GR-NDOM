@@ -34,7 +34,8 @@ public class ServerFunctions {
 
     public static void main(String[] args) throws IOException {
         LOG.setLevel(Level.ALL);
-        //set custom port and public/private key dir
+        //set custom port and public/private key dir razin99
+
         for (String string : args) {
             if(NumberUtils.isParsable(string)) {
                 port = Integer.parseInt(string);

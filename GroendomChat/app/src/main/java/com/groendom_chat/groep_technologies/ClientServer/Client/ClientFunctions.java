@@ -1,5 +1,7 @@
 package com.groendom_chat.groep_technologies.ClientServer.Client;
 
+import android.os.AsyncTask;
+
 import com.groendom_chat.groep_technologies.ClientServer.Client.UserGroups.ClientUser;
 import com.groendom_chat.groep_technologies.ClientServer.Client.UserGroups.User;
 import com.groendom_chat.groep_technologies.ClientServer.Operations.Authentication;
@@ -17,6 +19,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
+
+import static android.R.attr.port;
 
 /**
  * Created by serge on 20-Mar-17.
@@ -87,7 +91,7 @@ public class ClientFunctions {
     }
 
     public void sendMessage(String messageToSend) throws IOException {
-        outputStream.writeObject(new MessageToSend(Security.encrypt(messageToSend, publicServerKey), clientUser.getName(), clientUser.getPublicKey()));
+        new SendTask().execute(messageToSend);
     }
 
 
@@ -98,34 +102,10 @@ public class ClientFunctions {
      * otherwise return a String with the reason
      */
     public String openConnection(String address, ClientUser user) {
-        return openConnection(address, user, PORT);
-    }
-
-    public String openConnection(String address, ClientUser user, int port) {
-        if (!address.equals(oldAddress) || oldPort != port) { //one should not be able to connect to a server twice
-            closeConnection();
-            oldAddress = address;
-            oldPort = port;
-            connected = false;
-            users = new ArrayList<>();
-            messages = new LinkedList<>();
-            try {
-                socket = new Socket(address, port); //opens the connection
-                outputStream = new ObjectOutputStream(socket.getOutputStream());
-                inputStream = new ObjectInputStream(socket.getInputStream());
-                this.clientUser = user;
-                if (outputStream != null && inputStream != null) {
-                    authenticate();
-                    outputStream.writeObject(new MessageToSend(clientUser));
-                    connected = true;
-                    return null;
-                }
-            } catch (IOException | IllegalArgumentException e) {
-                return e.getClass().getSimpleName(); //gets the exception and turns it into an error message
-            }
-            return "unknown Error"; //if there is an unkown error
-        }
-        return "";
+        this.clientUser = user;
+        OpenConnectionBackgroundTask task = new OpenConnectionBackgroundTask(address);
+        task.execute();
+        return ""; //TODO: return result of doInBackground!!!!!
     }
 
     public String reOpenConnection(ClientUser user) {
@@ -318,5 +298,62 @@ public class ClientFunctions {
             }
         }
         return result[0];
+    }
+
+    private class OpenConnectionBackgroundTask extends AsyncTask<String, Void, String> {
+        private String address;
+
+        OpenConnectionBackgroundTask(String address) {
+            this.address = address;
+        }
+
+        protected String doInBackground(String... params) {
+            if (!address.equals(oldAddress) || oldPort != PORT) { //one should not be able to connect to a server twice
+                closeConnection();
+                oldAddress = address;
+                oldPort = port;
+                connected = false;
+                users = new ArrayList<>();
+                messages = new LinkedList<>();
+                try {
+                    socket = new Socket(address, PORT); //opens the connection
+                    outputStream = new ObjectOutputStream(socket.getOutputStream());
+                    inputStream = new ObjectInputStream(socket.getInputStream());
+                    if (outputStream != null) {
+                        authenticate();
+                        outputStream.writeObject(new MessageToSend(clientUser));
+                        connected = true;
+                        return null;
+                    }
+                } catch (IOException | IllegalArgumentException e) {
+                    e.printStackTrace();
+                    return e.getClass().getSimpleName(); //gets the exception and turns it into an error message
+                }
+                return "unknown Error"; //if there is an unkown error
+            }
+            return "";
+        }
+
+        protected void onPostExecute(String feed) {
+            //when task is finished
+            // TODO: check this.exception
+            // TODO: do something with the feed
+        }
+    }
+
+    private class SendTask extends AsyncTask<String, Void, Void>{
+
+        @Override
+        protected Void doInBackground(String... params) {
+            for (String messageToSend : params) {
+                try {
+                    outputStream.writeObject(new MessageToSend(Security.encrypt(messageToSend, publicServerKey), clientUser.getName(), clientUser.getPublicKey()));
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+            return null;
+        }
+
     }
 }

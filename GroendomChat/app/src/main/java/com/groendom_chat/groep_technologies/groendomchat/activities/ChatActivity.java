@@ -1,6 +1,7 @@
 package com.groendom_chat.groep_technologies.groendomchat.activities;
 
 import android.app.Activity;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.widget.Toolbar;
@@ -43,7 +44,7 @@ public class ChatActivity extends Activity {
         }, new Consumer<List<ClientUser>>() {
             @Override
             public void accept(List<ClientUser> obj) {
-                for(ClientUser user : obj) {
+                for (ClientUser user : obj) {
                     System.out.println(user);
                 }
             }
@@ -100,13 +101,17 @@ public class ChatActivity extends Activity {
                 System.out.println(obj.getMessage());
             }
         });
-        functions.openConnection("localhost", clientUser);
-        Thread thread = new Thread(new Runnable() {
-            @Override
-            public void run() {
-                functions.waitForMessages();
-            }
-        });
-        thread.start();
+        functions.openConnection("192.168.0.71", clientUser);
+        new ReceiveTask().execute();
+    }
+
+    private class ReceiveTask extends AsyncTask<Void, Void, Void> {
+
+        @Override
+        protected Void doInBackground(Void... params) {
+            functions.waitForMessages();
+            return null;
+        }
+
     }
 }

@@ -1,12 +1,24 @@
 package com.groendom_chat.groep_technologies.ClientServer.Operations;
 
 import android.util.Base64;
-import javax.crypto.Cipher;
-import javax.crypto.NoSuchPaddingException;
+
 import java.io.IOException;
 import java.math.BigInteger;
-import java.security.*;
-import java.security.spec.*;
+import java.security.Key;
+import java.security.KeyFactory;
+import java.security.KeyPair;
+import java.security.KeyPairGenerator;
+import java.security.NoSuchAlgorithmException;
+import java.security.NoSuchProviderException;
+import java.security.PrivateKey;
+import java.security.PublicKey;
+import java.security.SecureRandom;
+import java.security.spec.InvalidKeySpecException;
+import java.security.spec.PKCS8EncodedKeySpec;
+import java.security.spec.X509EncodedKeySpec;
+
+import javax.crypto.Cipher;
+import javax.crypto.NoSuchPaddingException;
 
 /**
  * Created by tkr6u on 20.04.2017.
@@ -38,7 +50,7 @@ public class Security {
      */
     public static KeyPair generateKeyPair() throws NoSuchAlgorithmException, NoSuchProviderException {
         keyPairGenerator = keyPairGenerator == null ? KeyPairGenerator.getInstance("RSA") : keyPairGenerator;
-        SecureRandom random = SecureRandom.getInstance("SHA1PRNG", "SUN");
+        //SecureRandom random = SecureRandom.getInstance("SHA1PRNG", "SUN");
         keyPairGenerator.initialize(2048);
         return keyPairGenerator.genKeyPair();
     }
