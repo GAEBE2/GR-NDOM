@@ -8,17 +8,18 @@ import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
 
 public class ConsoleTest {
-    public static void main(String[] args) throws NoSuchProviderException, NoSuchAlgorithmException, IOException {
+    public static void main(String[] args) throws NoSuchProviderException, NoSuchAlgorithmException, IOException, InterruptedException {
         ClientFunctions functions = new ClientFunctions(message -> System.out.println(message.getMessage()),
                 System.out::println, clientUsers -> clientUsers.forEach(System.out::println));
         functions.setActiveConsumers(System.out::println);
         functions.openConnection("localhost", new ClientUser(Security.generateKeyPair()));
         //functions.sendMessage("hay§");
-        Thread thread = new Thread(() -> functions.waitForMessages());
+        Thread thread = new Thread(functions::waitForMessages);
         thread.start();
-
-        while (true){
+        for (int i = 0; i < 1000; i++) {
+            System.out.println(i);
             functions.sendMessage("test");
+            Thread.sleep(500);
         }
     }
 }
