@@ -27,4 +27,13 @@ public class MessageHandler {
         ((TextView) child.findViewById(R.id.bubble_text_date)).setText(message.getDateString());
         parent.addView(child);
     }
+
+    public void createIn(ViewGroup parent, Message message) {
+        LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        RelativeLayout child = (RelativeLayout) inflater.inflate(R.layout.bubble_in, parent, false);
+
+        ((TextView) child.findViewById(R.id.bubble_text_content)).setText(message.getContent());
+        ((TextView) child.findViewById(R.id.bubble_text_date)).setText(message.getDateString());
+        parent.addView(child);
+    }
 }

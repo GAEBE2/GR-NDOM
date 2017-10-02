@@ -1,5 +1,6 @@
 package com.groendom_chat.groep_technologies.ClientServer.Server;
 
+import com.groendom_chat.groep_technologies.ClientServer.Client.Consumer;
 import com.groendom_chat.groep_technologies.ClientServer.Client.UserGroups.User;
 import com.groendom_chat.groep_technologies.ClientServer.Operations.Authentication;
 import com.groendom_chat.groep_technologies.ClientServer.Operations.MessageToSend;
@@ -15,7 +16,6 @@ import java.security.PublicKey;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-import java.util.function.Consumer;
 
 public class Handler extends Thread {
     private User user;

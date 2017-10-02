@@ -1,5 +1,6 @@
 package com.groendom_chat.groep_technologies.ClientServer.Server;
 
+import com.groendom_chat.groep_technologies.ClientServer.Client.Consumer;
 import com.groendom_chat.groep_technologies.ClientServer.Client.UserGroups.User;
 import com.groendom_chat.groep_technologies.ClientServer.Operations.MessageToSend;
 import com.groendom_chat.groep_technologies.ClientServer.Operations.Security;
@@ -33,7 +34,8 @@ public class ServerFunctions {
 
     public static void main(String[] args) throws IOException {
         LOG.setLevel(Level.ALL);
-        //set custom port and public/private key dir
+        //set custom port and public/private key dir razin99
+
         for (String string : args) {
             if(NumberUtils.isParsable(string)) {
                 port = Integer.parseInt(string);
@@ -44,7 +46,12 @@ public class ServerFunctions {
         log("The chat server is running on port: " + port);
         try (ServerSocket listener = new ServerSocket(port)) {
             while (open) {
-                Handler handler = new Handler(listener.accept(), pair, roomList, userList, handler1 -> handlerList.remove(handler1));
+                Handler handler = new Handler(listener.accept(), pair, roomList, userList, new Consumer<Handler>() {
+                    @Override
+                    public void accept(Handler handler) {
+                        handlerList.remove(handler);
+                    }
+                });
                 handlerList.add(handler);
                 handler.start();
             }

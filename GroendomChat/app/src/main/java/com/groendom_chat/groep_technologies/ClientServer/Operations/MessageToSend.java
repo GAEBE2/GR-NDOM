@@ -66,7 +66,9 @@ public class MessageToSend implements Serializable{
     public MessageToSend(List<User> userList) {
         this();
         this.userList = new ArrayList<>();
-        userList.forEach(user -> this.userList.add(new ClientUser(user)));
+        for(User user : userList) {
+            this.userList.add(new ClientUser(user));
+        }
         messageType = MessageType.USER_LIST;
     }
 

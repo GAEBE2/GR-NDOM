@@ -1,11 +1,12 @@
 package com.groendom_chat.groep_technologies.ClientServer.Client;
 
+import android.os.AsyncTask;
+
 import com.groendom_chat.groep_technologies.ClientServer.Client.UserGroups.ClientUser;
 import com.groendom_chat.groep_technologies.ClientServer.Client.UserGroups.User;
 import com.groendom_chat.groep_technologies.ClientServer.Operations.Authentication;
 import com.groendom_chat.groep_technologies.ClientServer.Operations.MessageToSend;
 import com.groendom_chat.groep_technologies.ClientServer.Operations.Security;
-import com.groendom_chat.groep_technologies.groendomchat.model.Message;
 
 import java.io.EOFException;
 import java.io.IOException;
@@ -18,9 +19,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.function.Consumer;
 
-import static com.groendom_chat.groep_technologies.ClientServer.Operations.MessageToSend.MessageType;
+import static android.R.attr.port;
 
 /**
  * Created by serge on 20-Mar-17.
@@ -77,11 +77,12 @@ public class ClientFunctions {
         this.passiveUserAdder = passiveUserAdder;
     }
 
-    public void setActiveConsumers(Consumer<MessageToSend> messageConsumer){
+    public void setActiveConsumers(Consumer<MessageToSend> messageConsumer) {
         activeMessageReceiver = messageConsumer;
     }
 
-    public ClientFunctions(Consumer<Message> consumer) {
+    public ClientFunctions(Consumer<MessageToSend> consumer) {
+        passiveMessageReceiver = consumer;
         active = false;
     }
 
@@ -90,49 +91,24 @@ public class ClientFunctions {
     }
 
     public void sendMessage(String messageToSend) throws IOException {
-        outputStream.writeObject(new MessageToSend(Security.encrypt(messageToSend, publicServerKey) , clientUser.getName(), clientUser.getPublicKey()));
+        new SendTask().execute(messageToSend);
     }
 
 
     /**
-     *
      * @param address address where the server lies
      * @return null if a connection could be established,
      * empty string if he tried to connect to an already connected server
      * otherwise return a String with the reason
      */
-    public String openConnection (String address, ClientUser user) {
-        return openConnection(address, user, PORT);
+    public String openConnection(String address, ClientUser user) {
+        this.clientUser = user;
+        OpenConnectionBackgroundTask task = new OpenConnectionBackgroundTask(address);
+        task.execute();
+        return ""; //TODO: return result of doInBackground!!!!!
     }
 
-    public String openConnection (String address, ClientUser user, int port) {
-        if(!address.equals(oldAddress) || oldPort != port) { //one should not be able to connect to a server twice
-            closeConnection();
-            oldAddress = address;
-            oldPort = port;
-            connected = false;
-            users = new ArrayList<>();
-            messages = new LinkedList<>();
-            try {
-                socket = new Socket(address, port); //opens the connection
-                outputStream = new ObjectOutputStream(socket.getOutputStream());
-                inputStream = new ObjectInputStream(socket.getInputStream());
-                this.clientUser = user;
-                if (outputStream != null && inputStream != null) {
-                    authenticate();
-                    outputStream.writeObject(new MessageToSend(clientUser));
-                    connected = true;
-                    return null;
-                }
-            } catch (IOException | IllegalArgumentException e) {
-                return e.getClass().getSimpleName(); //gets the exception and turns it into an error message
-            }
-            return "unknown Error"; //if there is an unkown error
-        }
-        return "";
-    }
-
-    public String reOpenConnection(ClientUser user){
+    public String reOpenConnection(ClientUser user) {
         //openConnection(oldAddress, user, oldPort);
         //utputStream.writeObject(new MessageToSend(user.getPublicKey()));
         //TODO: implement
@@ -141,7 +117,7 @@ public class ClientFunctions {
 
 
     public void closeConnection() {
-        if(socket != null) {
+        if (socket != null) {
             try {
                 socket.close();
             } catch (IOException e) {
@@ -156,7 +132,7 @@ public class ClientFunctions {
     /**
      * @return 0 if it got disconnected, 1 if the server disconnected
      */
-    public int waitForMessages () {
+    public int waitForMessages() {
         while (connected) {
             try {
                 Object object = inputStream.readObject();
@@ -189,28 +165,28 @@ public class ClientFunctions {
                             break;
                     }
                 }
-            } catch (EOFException | SocketException e){
-                if(connected) {
+            } catch (EOFException | SocketException e) {
+                if (connected) {
                     connected = false;
                     return 1;
                 }
                 return 0;
-            }catch (IOException e) {
+            } catch (IOException e) {
                 connected = false;
                 return 0;
-            }catch (ClassNotFoundException e) {
+            } catch (ClassNotFoundException e) {
                 e.printStackTrace();
             }
         }
         return 0;
     }
 
-    public boolean isConnected(){
+    public boolean isConnected() {
         return connected;
     }
 
     private void authenticate() {
-        if(clientUser != null) {
+        if (clientUser != null) {
             Authentication auth;
             Object input;
             boolean inProgress = true;
@@ -219,12 +195,12 @@ public class ClientFunctions {
                 try {
                     input = inputStream.readObject();
                     if (input instanceof Authentication) {
-                         auth = ((Authentication) input);
-                         publicServerKey = auth.getPublicKey();
-                         auth.setPublicKey(clientUser.getPublicKey());
-                         auth.setEncryptedMessage(Security.encrypt(auth.getOriginalMessage(), clientUser.getPrivateKey()));
-                         outputStream.writeObject(auth);
-                         inProgress = false;
+                        auth = ((Authentication) input);
+                        publicServerKey = auth.getPublicKey();
+                        auth.setPublicKey(clientUser.getPublicKey());
+                        auth.setEncryptedMessage(Security.encrypt(auth.getOriginalMessage(), clientUser.getPrivateKey()));
+                        outputStream.writeObject(auth);
+                        inProgress = false;
                     }
 
                 } catch (IOException | ClassNotFoundException e) {
@@ -268,32 +244,34 @@ public class ClientFunctions {
 
     /**
      * chooses active or passive consumer based on boolean active
+     *
      * @param passiveConsumer
-     * @param activeConsumer which
-     * @param consumable what should be consumed
+     * @param activeConsumer  which
+     * @param consumable      what should be consumed
      */
     private void chooseActiveOrPassiveConsumer(Consumer passiveConsumer, Consumer activeConsumer, Object consumable) {
-        if(active){
+        if (active) {
             activeConsumer.accept(consumable);
-        }else {
-            if(passiveConsumer != null) {
+        } else {
+            if (passiveConsumer != null) {
                 passiveConsumer.accept(consumable);
             }
         }
     }
 
-    public void addActiveConsumers (Consumer<MessageToSend> activeMessageReceiver, Consumer<String> activeUserRemover, Consumer<List<ClientUser>> activeUserAdder) {
-        addActiveConsumers(activeMessageReceiver, activeUserRemover, activeUserAdder, user -> {});
+    public void addActiveConsumers(Consumer<MessageToSend> activeMessageReceiver, Consumer<String> activeUserRemover, Consumer<List<ClientUser>> activeUserAdder) {
+        addActiveConsumers(activeMessageReceiver, activeUserRemover, activeUserAdder, null);
+        //null was before: user -> {});
     }
 
-    public void addActiveConsumers (Consumer<MessageToSend> activeMessageReceiver, Consumer<String> activeUserRemover, Consumer<List<ClientUser>> activeUserAdder, Consumer<ClientUser> activeChangeUsername) {
+    public void addActiveConsumers(Consumer<MessageToSend> activeMessageReceiver, Consumer<String> activeUserRemover, Consumer<List<ClientUser>> activeUserAdder, Consumer<ClientUser> activeChangeUsername) {
         this.activeMessageReceiver = activeMessageReceiver;
         this.activeUserRemover = activeUserRemover;
         this.activeUserAdder = activeUserAdder;
         this.active = true;
     }
 
-    public void removeActiveConsumers (){
+    public void removeActiveConsumers() {
         this.activeMessageReceiver = null;
         this.activeUserRemover = null;
         this.activeUserAdder = null;
@@ -314,8 +292,68 @@ public class ClientFunctions {
 
     private User getUserFromList(User userKey) {
         final User[] result = {userKey};
-        users.stream().filter(clientUser -> clientUser.equals(userKey)).forEach(clientUser1 -> result[0] = clientUser1);
-        users.forEach(clientUser -> {});
+        for (User clientUser : users) {
+            if (clientUser.equals(userKey)) {
+                result[0] = clientUser;
+            }
+        }
         return result[0];
+    }
+
+    private class OpenConnectionBackgroundTask extends AsyncTask<String, Void, String> {
+        private String address;
+
+        OpenConnectionBackgroundTask(String address) {
+            this.address = address;
+        }
+
+        protected String doInBackground(String... params) {
+            if (!address.equals(oldAddress) || oldPort != PORT) { //one should not be able to connect to a server twice
+                closeConnection();
+                oldAddress = address;
+                oldPort = port;
+                connected = false;
+                users = new ArrayList<>();
+                messages = new LinkedList<>();
+                try {
+                    socket = new Socket(address, PORT); //opens the connection
+                    outputStream = new ObjectOutputStream(socket.getOutputStream());
+                    inputStream = new ObjectInputStream(socket.getInputStream());
+                    if (outputStream != null) {
+                        authenticate();
+                        outputStream.writeObject(new MessageToSend(clientUser));
+                        connected = true;
+                        return null;
+                    }
+                } catch (IOException | IllegalArgumentException e) {
+                    e.printStackTrace();
+                    return e.getClass().getSimpleName(); //gets the exception and turns it into an error message
+                }
+                return "unknown Error"; //if there is an unkown error
+            }
+            return "";
+        }
+
+        protected void onPostExecute(String feed) {
+            //when task is finished
+            // TODO: check this.exception
+            // TODO: do something with the feed
+        }
+    }
+
+    private class SendTask extends AsyncTask<String, Void, Void>{
+
+        @Override
+        protected Void doInBackground(String... params) {
+            for (String messageToSend : params) {
+                try {
+                    outputStream.writeObject(new MessageToSend(Security.encrypt(messageToSend, publicServerKey), clientUser.getName(), clientUser.getPublicKey()));
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+            return null;
+        }
+
     }
 }
