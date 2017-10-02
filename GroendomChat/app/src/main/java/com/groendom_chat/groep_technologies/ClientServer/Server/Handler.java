@@ -43,7 +43,8 @@ public class Handler extends Thread {
         try {
             outputStream = new ObjectOutputStream(socket.getOutputStream());
             inputStream = new ObjectInputStream(socket.getInputStream());
-            PublicKey publicKey = getPublicKeyFromClient();
+            //PublicKey publicKey = getPublicKeyFromClient();
+            PublicKey publicKey = null;
             user = getUserFromClient();
 
             userList.add(user);
@@ -110,9 +111,9 @@ public class Handler extends Thread {
                 Object object = inputStream.readObject();
                 if(object != null && object instanceof Authentication
                         && ((Authentication) object).getOriginalMessage().equals(authentication.getOriginalMessage())
-                        && Objects.equals(Security.decrypt(((Authentication) object).getEncryptedMessage(),((Authentication) object).getPublicKey()),
+                        && Objects.equals(Security.decrypt(((Authentication) object).getEncryptedMessage(),Security.byteArrToPublicKey(((Authentication) object).getPublicKey())),
                         ((Authentication) object).getOriginalMessage())) {
-                    result = ((Authentication) object).getPublicKey();
+                    result = Security.byteArrToPublicKey (((Authentication) object).getPublicKey());
                 }
             } catch (ClassNotFoundException e) {
                 e.printStackTrace();

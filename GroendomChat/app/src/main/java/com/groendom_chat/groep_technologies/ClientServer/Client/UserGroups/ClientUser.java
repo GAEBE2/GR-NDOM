@@ -21,8 +21,8 @@ public class ClientUser extends User{
         this.privateKey = privateKey;
     }
     public ClientUser(KeyPair pair){
-        super(pair);
-        this.privateKey = pair.getPrivate();
+        //super(pair);
+        //this.privateKey = pair.getPrivate();
         setName("test");
     }
 

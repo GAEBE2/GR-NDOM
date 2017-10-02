@@ -82,7 +82,7 @@ public class ChatActivity extends Activity {
 
         for (int i = 1; i < 10; i++) {
             //Sent Message
-            messageHandler.createOut(layout, new Message("Hallo " + i));
+            messageHandler.createOut(layout, new Message(" asd\\xF0\\x9F\\x98\\x81 " + i));
 
             //Incoming Message
             messageHandler.createIn(layout, new Message("Guten Morgen " + i));
@@ -101,7 +101,7 @@ public class ChatActivity extends Activity {
                 System.out.println(obj.getMessage());
             }
         });
-        functions.openConnection("192.168.0.71", clientUser);
+        functions.openConnection("10.71.194.69", clientUser);
         new ReceiveTask().execute();
     }
 

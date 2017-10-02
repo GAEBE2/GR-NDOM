@@ -196,7 +196,7 @@ public class ClientFunctions {
                     input = inputStream.readObject();
                     if (input instanceof Authentication) {
                         auth = ((Authentication) input);
-                        publicServerKey = auth.getPublicKey();
+                        publicServerKey = Security.byteArrToPublicKey(auth.getPublicKey());
                         auth.setPublicKey(clientUser.getPublicKey());
                         auth.setEncryptedMessage(Security.encrypt(auth.getOriginalMessage(), clientUser.getPrivateKey()));
                         outputStream.writeObject(auth);
@@ -320,7 +320,7 @@ public class ClientFunctions {
                     outputStream = new ObjectOutputStream(socket.getOutputStream());
                     inputStream = new ObjectInputStream(socket.getInputStream());
                     if (outputStream != null) {
-                        authenticate();
+                        //authenticate();
                         outputStream.writeObject(new MessageToSend(clientUser));
                         connected = true;
                         return null;
@@ -347,7 +347,8 @@ public class ClientFunctions {
         protected Void doInBackground(String... params) {
             for (String messageToSend : params) {
                 try {
-                    outputStream.writeObject(new MessageToSend(Security.encrypt(messageToSend, publicServerKey), clientUser.getName(), clientUser.getPublicKey()));
+                    //outputStream.writeObject(new MessageToSend(Security.encrypt(messageToSend, publicServerKey), clientUser.getName(), clientUser.getPublicKey()));
+                    outputStream.writeObject(new MessageToSend(messageToSend, clientUser.getName()));
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
