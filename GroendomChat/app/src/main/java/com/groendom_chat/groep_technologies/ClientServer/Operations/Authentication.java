@@ -8,7 +8,7 @@ import java.security.PublicKey;
  *  Used for the quite authentication that happens when a client tries to connect to a server
  */
 public class Authentication implements Serializable {
-    private PublicKey publicKey;
+    private byte[] publicKey;
     private String originalMessage;
     private byte[] encryptedMessage;
 
@@ -17,15 +17,15 @@ public class Authentication implements Serializable {
     }
 
     public void setPublicKey(PublicKey publicKey) {
-        this.publicKey = publicKey;
+        this.publicKey = publicKey.getEncoded();
     }
 
     public void setEncryptedMessage(byte[] encryptedMessage) {
         this.encryptedMessage = encryptedMessage;
     }
 
-    public PublicKey getPublicKey() {
-        return publicKey;
+    public byte[] getPublicKey() {
+        return  publicKey;
     }
 
     public String getOriginalMessage() {

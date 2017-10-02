@@ -10,7 +10,7 @@ import java.security.NoSuchProviderException;
 import java.util.List;
 
 public class ConsoleTest {
-    public static void main(String[] args) throws NoSuchProviderException, NoSuchAlgorithmException, IOException {
+    public static void main(String[] args) throws NoSuchProviderException, NoSuchAlgorithmException, IOException, InterruptedException {
         final ClientFunctions functions = new ClientFunctions(new Consumer<MessageToSend>() {
             @Override
             public void accept(MessageToSend obj) {
@@ -44,9 +44,10 @@ public class ConsoleTest {
             }
         });
         thread.start();
-
-        while (true){
+        for (int i = 0; i < 1000; i++) {
+            System.out.println(i);
             functions.sendMessage("test");
+            Thread.sleep(500);
         }
     }
 }

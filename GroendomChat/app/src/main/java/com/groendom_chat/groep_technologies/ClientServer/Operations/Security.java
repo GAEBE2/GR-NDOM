@@ -132,7 +132,14 @@ public class Security {
         encodedKey = Base64.decode(string, Base64.DEFAULT);
         return isPublic ? factory.generatePublic(new X509EncodedKeySpec(encodedKey)) : factory.generatePrivate(new PKCS8EncodedKeySpec(encodedKey));
     }
-
+    public static PublicKey byteArrToPublicKey(byte[] arr){
+        try {
+            return  getFactory().generatePublic(new X509EncodedKeySpec(arr));
+        } catch (InvalidKeySpecException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
     /*
     /**
      *
