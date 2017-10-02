@@ -103,7 +103,7 @@ public class ClientFunctions {
      */
     public String openConnection(String address, ClientUser user) {
         this.clientUser = user;
-        OpenConnectionBackgroundTask task = new OpenConnectionBackgroundTask(address);
+        OpenConnectionTask task = new OpenConnectionTask(address);
         task.execute();
         return ""; //TODO: return result of doInBackground!!!!!
     }
@@ -300,10 +300,10 @@ public class ClientFunctions {
         return result[0];
     }
 
-    private class OpenConnectionBackgroundTask extends AsyncTask<String, Void, String> {
+    private class OpenConnectionTask extends AsyncTask<String, Void, String> {
         private String address;
 
-        OpenConnectionBackgroundTask(String address) {
+        OpenConnectionTask(String address) {
             this.address = address;
         }
 

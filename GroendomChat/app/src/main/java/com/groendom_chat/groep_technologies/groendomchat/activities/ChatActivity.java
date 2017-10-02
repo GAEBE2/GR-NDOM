@@ -6,8 +6,9 @@ import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
+import android.widget.ArrayAdapter;
 import android.widget.EditText;
-import android.widget.LinearLayout;
+import android.widget.ListView;
 
 import com.groendom_chat.groep_technologies.ClientServer.Client.ClientFunctions;
 import com.groendom_chat.groep_technologies.ClientServer.Client.Consumer;
@@ -15,13 +16,13 @@ import com.groendom_chat.groep_technologies.ClientServer.Client.UserGroups.Clien
 import com.groendom_chat.groep_technologies.ClientServer.Operations.MessageToSend;
 import com.groendom_chat.groep_technologies.ClientServer.Operations.Security;
 import com.groendom_chat.groep_technologies.groendomchat.R;
+import com.groendom_chat.groep_technologies.groendomchat.layout.ListViewAdapter;
 import com.groendom_chat.groep_technologies.groendomchat.model.Message;
-import com.groendom_chat.groep_technologies.groendomchat.model.MessageHandler;
 
 import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
-import java.util.Calendar;
+import java.util.ArrayList;
 import java.util.List;
 
 public class ChatActivity extends Activity {
@@ -61,9 +62,19 @@ public class ChatActivity extends Activity {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         toolbar.setTitle("HIIOOO");
 
+        final ArrayList<Message> items = new ArrayList<>();
+        for (int i = 1; i < 10; i++) {
+            //Sent Message
+            items.add(new Message("Hallo " + i));
+
+            //Incoming Message
+            items.add(new Message("Guten Morgen " + i, false));
+        }
+        final ArrayAdapter<Message> itemsAdapter = new ListViewAdapter(this, items);
+
         final EditText editText = (EditText) findViewById(R.id.edit_text_message);
-        MessageHandler messageHandler = new MessageHandler(getApplicationContext());
-        LinearLayout layout = (LinearLayout) findViewById(R.id.chat_activity_content);
+        final ListView listView = (ListView) findViewById(R.id.chat_activity_content);
+        listView.setAdapter(itemsAdapter);
         FloatingActionButton sendButton = (FloatingActionButton) findViewById(R.id.button_send);
         sendButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -72,26 +83,29 @@ public class ChatActivity extends Activity {
                 if (!text.equals("")) {
                     try {
                         functions.sendMessage(text);
+                        items.add(new Message(text));
+                        editText.setText("");
+                        listView.post(new Runnable() {
+                            @Override
+                            public void run() {
+                                // Select the last row so it will scroll into view...
+                                listView.setSelection(itemsAdapter.getCount() - 1);
+                            }
+                        });
+
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
                 }
             }
         });
-
-
-        for (int i = 1; i < 10; i++) {
-            //Sent Message
-            messageHandler.createOut(layout, new Message("Hallo " + i));
-
-            //Incoming Message
-            messageHandler.createIn(layout, new Message("Guten Morgen " + i));
-        }
-
-
-        final Calendar cal = Calendar.getInstance();
-        cal.add(Calendar.DATE, -1);
-        messageHandler.createOut(layout, new Message("HIOOOooooooooooooooooooooooooooooooooooooo", cal.getTime()));
+        listView.post(new Runnable() {
+            @Override
+            public void run() {
+                // Select the last row so it will scroll into view...
+                listView.setSelection(itemsAdapter.getCount() - 1);
+            }
+        });
     }
 
     private void openChat() throws NoSuchProviderException, NoSuchAlgorithmException {
@@ -101,7 +115,7 @@ public class ChatActivity extends Activity {
                 System.out.println(obj.getMessage());
             }
         });
-        functions.openConnection("192.168.0.71", clientUser);
+        functions.openConnection("10.4.57.106", clientUser);
         new ReceiveTask().execute();
     }
 

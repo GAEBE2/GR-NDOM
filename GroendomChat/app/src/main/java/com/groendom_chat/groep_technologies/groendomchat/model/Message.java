@@ -12,23 +12,29 @@ public class Message {
     private SimpleDateFormat dateFormat;
     private String content;
     private Date date;
+    private boolean isOutgoing;
 
     public Message(String content) {
-        this(content, new Date(), null);
+        this(content, new Date(), null, true);
     }
 
-    public Message(String content, Date date) {
-        this(content, date, null);
+    public Message(String content, boolean isOutgoing) {
+        this(content, new Date(), null, isOutgoing);
     }
 
-    public Message(String content, SimpleDateFormat dateFormat) {
-        this(content, new Date(), dateFormat);
+    public Message(String content, Date date, boolean isOutgoing) {
+        this(content, date, null, isOutgoing);
     }
 
-    public Message(String content, Date date, SimpleDateFormat dateFormat) {
+    public Message(String content, SimpleDateFormat dateFormat, boolean isOutgoing) {
+        this(content, new Date(), dateFormat, isOutgoing);
+    }
+
+    public Message(String content, Date date, SimpleDateFormat dateFormat, boolean isOutgoing) {
         this.setContent(content);
         this.setDate(date);
         this.setDateFormat(dateFormat);
+        this.setOutgoing(isOutgoing);
     }
 
     public String getContent() {
@@ -76,5 +82,13 @@ public class Message {
         c.set(Calendar.MILLISECOND, 0);
 
         return c.getTime();
+    }
+
+    public boolean isOutgoing() {
+        return isOutgoing;
+    }
+
+    public void setOutgoing(boolean outgoing) {
+        isOutgoing = outgoing;
     }
 }

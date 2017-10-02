@@ -5,7 +5,6 @@ import com.groendom_chat.groep_technologies.ClientServer.Client.UserGroups.User;
 import com.groendom_chat.groep_technologies.ClientServer.Operations.MessageToSend;
 import com.groendom_chat.groep_technologies.ClientServer.Operations.Security;
 
-
 import org.apache.commons.lang3.math.NumberUtils;
 
 import java.io.*;

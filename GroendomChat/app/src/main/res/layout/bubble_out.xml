@@ -1,22 +1,28 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="wrap_content"
-    android:layout_height="wrap_content"
-    android:background="@drawable/bubble_in"
-    android:padding="8dp"
-    android:layout_margin="8dp">
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
 
-    <TextView
-        android:id="@+id/bubble_text_content"
+
+    <RelativeLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="4dp" />
+        android:layout_alignParentEnd="true"
+        android:layout_margin="8dp"
+        android:background="@drawable/bubble_in"
+        android:padding="8dp">
 
-    <TextView
-        android:id="@+id/bubble_text_date"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignEnd="@id/bubble_text_content"
-        android:layout_alignRight="@id/bubble_text_content"
-        android:layout_below="@id/bubble_text_content" />
+        <TextView
+            android:id="@+id/bubble_text_content"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="4dp" />
+
+        <TextView
+            android:id="@+id/bubble_text_date"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignEnd="@id/bubble_text_content"
+            android:layout_below="@id/bubble_text_content" />
+    </RelativeLayout>
 </RelativeLayout>

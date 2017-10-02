@@ -37,7 +37,7 @@
                 android:text="@string/find_chat"
                 android:textAlignment="center"
                 android:textAppearance="?android:attr/textAppearanceMedium"
-                android:textColor="@color/accentTextColor"
+                android:textColor="@color/primaryTextColor"
                 android:textSize="48sp" />
         </FrameLayout>
     </android.support.constraint.ConstraintLayout>
