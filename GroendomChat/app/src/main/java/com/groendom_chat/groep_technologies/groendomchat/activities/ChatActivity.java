@@ -64,6 +64,13 @@ public class ChatActivity extends Activity {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         toolbar.setTitle("Chat partner 1");
 
+        toolbar.setNavigationOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                finish();
+            }
+        });
+
         final ArrayList<Message> items = new ArrayList<>();
         for (int i = 1; i < 10; i++) {
             //Sent Message

@@ -5,4 +5,5 @@
     <color name="primaryColorLight">#80CBC4</color>
     <color name="primaryTextColor">#fafafa</color>
     <color name="accentTextColor">#212121</color>
+    <color name="colorLight">#F5F5F5</color>
 </resources>
