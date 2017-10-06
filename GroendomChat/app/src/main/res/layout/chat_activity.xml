@@ -1,33 +1,33 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    tools:context="com.groendom_chat.groep_technologies.groendomchat.activities.ChatActivity">
+                xmlns:app="http://schemas.android.com/apk/res-auto"
+                xmlns:tools="http://schemas.android.com/tools"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                tools:context="com.groendom_chat.groep_technologies.groendomchat.activities.ChatActivity">
 
-    <include layout="@layout/appbar_layout" />
+    <include layout="@layout/appbar_layout"/>
 
 
     <ListView
         android:id="@+id/chat_activity_content"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="64dp"
+        android:layout_above="@+id/chat_activity_bottom"
         android:layout_marginEnd="@dimen/layout_inset"
         android:layout_marginStart="@dimen/layout_inset"
         android:layout_marginTop="?attr/actionBarSize"
         android:divider="@android:color/transparent"
         android:dividerHeight="8dp"
-        android:orientation="vertical" />
+        android:listSelector="@android:color/transparent"
+        android:orientation="vertical"/>
 
     <RelativeLayout
         android:id="@+id/chat_activity_bottom"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
-        android:padding="16dp"
-        tools:showIn="@layout/chat_activity">
+        android:padding="16dp">
 
         <EditText
             android:id="@+id/edit_text_message"
@@ -38,7 +38,7 @@
             android:ems="10"
             android:hint="@string/type_message"
             android:inputType="textMultiLine|textShortMessage"
-            android:scrollbars="vertical" />
+            android:scrollbars="vertical"/>
 
         <android.support.design.widget.FloatingActionButton
             android:id="@+id/button_send"
@@ -49,7 +49,7 @@
             android:layout_marginStart="16dp"
             android:clickable="true"
             app:fabSize="mini"
-            app:srcCompat="@drawable/ic_send" />
+            app:srcCompat="@drawable/ic_send"/>
 
     </RelativeLayout>
 </RelativeLayout>

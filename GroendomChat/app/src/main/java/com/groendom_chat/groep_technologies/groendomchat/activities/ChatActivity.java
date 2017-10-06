@@ -32,6 +32,8 @@ public class ChatActivity extends Activity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+
         functions = new ClientFunctions(new Consumer<MessageToSend>() {
             @Override
             public void accept(MessageToSend obj) {
@@ -60,7 +62,7 @@ public class ChatActivity extends Activity {
         setContentView(R.layout.chat_activity);
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        toolbar.setTitle("HIIOOO");
+        toolbar.setTitle("Chat partner 1");
 
         final ArrayList<Message> items = new ArrayList<>();
         for (int i = 1; i < 10; i++) {
