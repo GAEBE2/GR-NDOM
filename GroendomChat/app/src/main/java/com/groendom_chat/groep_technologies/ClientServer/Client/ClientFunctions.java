@@ -19,6 +19,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
 
 import static android.R.attr.port;
 
@@ -100,12 +101,17 @@ public class ClientFunctions {
      * @return null if a connection could be established,
      * empty string if he tried to connect to an already connected server
      * otherwise return a String with the reason
+     * curActivity is used to create a toast on connection error/success - null if not used in activity
      */
     public String openConnection(String address, ClientUser user) {
         this.clientUser = user;
-        OpenConnectionTask task = new OpenConnectionTask(address);
-        task.execute();
-        return ""; //TODO: return result of doInBackground!!!!!
+        OpenConnectionTask task = new OpenConnectionTask();
+        try {
+            return task.execute(new String[]{address}).get();
+        } catch (InterruptedException | ExecutionException e) {
+            e.printStackTrace();
+            return "InterruptedException | ExecutionException";
+        }
     }
 
     public String reOpenConnection(ClientUser user) {
@@ -301,13 +307,8 @@ public class ClientFunctions {
     }
 
     private class OpenConnectionTask extends AsyncTask<String, Void, String> {
-        private String address;
-
-        OpenConnectionTask(String address) {
-            this.address = address;
-        }
-
         protected String doInBackground(String... params) {
+            String address = params[0];
             if (!address.equals(oldAddress) || oldPort != PORT) { //one should not be able to connect to a server twice
                 closeConnection();
                 oldAddress = address;
@@ -323,7 +324,6 @@ public class ClientFunctions {
                         //authenticate();
                         outputStream.writeObject(new MessageToSend(clientUser));
                         connected = true;
-                        return null;
                     }
                 } catch (IOException | IllegalArgumentException e) {
                     e.printStackTrace();
@@ -342,7 +342,6 @@ public class ClientFunctions {
     }
 
     private class SendTask extends AsyncTask<String, Void, Void>{
-
         @Override
         protected Void doInBackground(String... params) {
             for (String messageToSend : params) {
@@ -355,6 +354,5 @@ public class ClientFunctions {
             }
             return null;
         }
-
     }
 }

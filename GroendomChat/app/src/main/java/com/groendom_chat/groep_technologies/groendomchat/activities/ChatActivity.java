@@ -68,6 +68,7 @@ public class ChatActivity extends Activity {
             @Override
             public void onClick(View v) {
                 finish();
+                functions.closeConnection();
             }
         });
 
@@ -117,6 +118,11 @@ public class ChatActivity extends Activity {
         });
     }
 
+    protected void onStop() {
+        super.onStop();
+        functions.closeConnection();
+    }
+
     private void openChat() throws NoSuchProviderException, NoSuchAlgorithmException {
         functions.setActiveConsumers(new Consumer<MessageToSend>() {
             @Override
@@ -124,7 +130,7 @@ public class ChatActivity extends Activity {
                 System.out.println(obj.getMessage());
             }
         });
-        functions.openConnection("10.4.57.106", clientUser);
+        functions.openConnection("192.168.0.71", clientUser);
         new ReceiveTask().execute();
     }
 
