@@ -9,6 +9,7 @@ import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.ListView;
+import android.widget.Toast;
 
 import com.groendom_chat.groep_technologies.ClientServer.Client.ClientFunctions;
 import com.groendom_chat.groep_technologies.ClientServer.Client.Consumer;
@@ -17,7 +18,6 @@ import com.groendom_chat.groep_technologies.ClientServer.Operations.MessageToSen
 import com.groendom_chat.groep_technologies.ClientServer.Operations.Security;
 import com.groendom_chat.groep_technologies.groendomchat.R;
 import com.groendom_chat.groep_technologies.groendomchat.layout.ListViewAdapter;
-import com.groendom_chat.groep_technologies.groendomchat.model.Message;
 
 import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
@@ -28,6 +28,8 @@ import java.util.List;
 public class ChatActivity extends Activity {
     private ClientFunctions functions;
     private ClientUser clientUser;
+    private final ArrayList<MessageToSend> items = new ArrayList<>();
+    private ArrayAdapter<MessageToSend> itemsAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -36,19 +38,26 @@ public class ChatActivity extends Activity {
 
         functions = new ClientFunctions(new Consumer<MessageToSend>() {
             @Override
-            public void accept(MessageToSend obj) {
-                System.out.println(obj.getMessage());
+            public void accept(final MessageToSend message) {
+                if(itemsAdapter != null) {
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            itemsAdapter.add(message);
+                        }
+                    });
+                }
             }
         }, new Consumer<String>() {
             @Override
             public void accept(String obj) {
-                System.out.println(obj);
+                System.out.println("Removed user:" + obj);
             }
         }, new Consumer<List<ClientUser>>() {
             @Override
             public void accept(List<ClientUser> obj) {
                 for (ClientUser user : obj) {
-                    System.out.println(user);
+                    System.out.println("Users:" + user);
                 }
             }
         });
@@ -72,16 +81,7 @@ public class ChatActivity extends Activity {
             }
         });
 
-        final ArrayList<Message> items = new ArrayList<>();
-        for (int i = 1; i < 10; i++) {
-            //Sent Message
-            items.add(new Message("Hallo " + i));
-
-            //Incoming Message
-            items.add(new Message("Guten Morgen " + i, false));
-        }
-        final ArrayAdapter<Message> itemsAdapter = new ListViewAdapter(this, items);
-
+        itemsAdapter = new ListViewAdapter(this, items, clientUser);
         final EditText editText = (EditText) findViewById(R.id.edit_text_message);
         final ListView listView = (ListView) findViewById(R.id.chat_activity_content);
         listView.setAdapter(itemsAdapter);
@@ -92,28 +92,17 @@ public class ChatActivity extends Activity {
                 String text = editText.getText().toString();
                 if (!text.equals("")) {
                     try {
-                        functions.sendMessage(text);
-                        items.add(new Message(text));
-                        editText.setText("");
-                        listView.post(new Runnable() {
-                            @Override
-                            public void run() {
-                                // Select the last row so it will scroll into view...
-                                listView.setSelection(itemsAdapter.getCount() - 1);
-                            }
-                        });
+                        if(functions.sendMessage(text)) {
+                            //items.add(new MessageToSend(text, clientUser.getName()));
+                            editText.setText("");
 
+                        } else {
+                            Toast.makeText(getApplicationContext(), "Failed to send message :(", Toast.LENGTH_LONG).show();
+                        }
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
                 }
-            }
-        });
-        listView.post(new Runnable() {
-            @Override
-            public void run() {
-                // Select the last row so it will scroll into view...
-                listView.setSelection(itemsAdapter.getCount() - 1);
             }
         });
     }
@@ -126,8 +115,15 @@ public class ChatActivity extends Activity {
     private void openChat() throws NoSuchProviderException, NoSuchAlgorithmException {
         functions.setActiveConsumers(new Consumer<MessageToSend>() {
             @Override
-            public void accept(MessageToSend obj) {
-                System.out.println(obj.getMessage());
+            public void accept(final MessageToSend message) {
+                if(itemsAdapter != null) {
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            itemsAdapter.add(message);
+                        }
+                    });
+                }
             }
         });
         functions.openConnection("192.168.0.71", clientUser);
@@ -135,12 +131,10 @@ public class ChatActivity extends Activity {
     }
 
     private class ReceiveTask extends AsyncTask<Void, Void, Void> {
-
         @Override
         protected Void doInBackground(Void... params) {
             functions.waitForMessages();
             return null;
         }
-
     }
 }

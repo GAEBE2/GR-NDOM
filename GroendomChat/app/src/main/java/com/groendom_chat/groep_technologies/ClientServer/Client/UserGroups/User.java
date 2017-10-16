@@ -72,7 +72,7 @@ public class User implements Serializable{
         this.connection = connection;
     }
 
-    @Override
+    /*@Override
     public boolean equals(Object objectToCompare) {
         boolean result = false;
         if(objectToCompare instanceof User && ((User) objectToCompare).getPublicKey().equals(this.getPublicKey())) {
@@ -80,5 +80,5 @@ public class User implements Serializable{
         }
 
         return result;
-    }
+    }*/
 }

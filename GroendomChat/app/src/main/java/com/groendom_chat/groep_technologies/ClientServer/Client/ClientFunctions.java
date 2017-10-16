@@ -91,8 +91,16 @@ public class ClientFunctions {
         outputStream.writeObject(new MessageToSend(user.getUuid(), user.getPublicKey()));
     }
 
-    public void sendMessage(String messageToSend) throws IOException {
-        new SendTask().execute(messageToSend);
+    public boolean sendMessage(String messageToSend) throws IOException {
+        SendTask task = new SendTask();
+        try {
+            return task.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, messageToSend).get();
+
+        } catch (InterruptedException | ExecutionException e1) {
+            e1.printStackTrace();
+            return false;
+            //return task.execute().get();
+        }
     }
 
 
@@ -107,7 +115,7 @@ public class ClientFunctions {
         this.clientUser = user;
         OpenConnectionTask task = new OpenConnectionTask();
         try {
-            return task.execute(new String[]{address}).get();
+            return task.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, address).get();
         } catch (InterruptedException | ExecutionException e) {
             e.printStackTrace();
             return "InterruptedException | ExecutionException";
@@ -142,7 +150,7 @@ public class ClientFunctions {
         while (connected) {
             try {
                 Object object = inputStream.readObject();
-                if(object != null && object instanceof MessageToSend) {
+                if (object != null && object instanceof MessageToSend) {
                     MessageToSend message = ((MessageToSend) object);
                     switch (message.getMessageType()) {
                         case ENCRYPTED_TEXT:
@@ -341,18 +349,18 @@ public class ClientFunctions {
         }
     }
 
-    private class SendTask extends AsyncTask<String, Void, Void>{
-        @Override
-        protected Void doInBackground(String... params) {
+    private class SendTask extends AsyncTask<String, Void, Boolean> {
+        protected Boolean doInBackground(String... params) {
             for (String messageToSend : params) {
                 try {
                     //outputStream.writeObject(new MessageToSend(Security.encrypt(messageToSend, publicServerKey), clientUser.getName(), clientUser.getPublicKey()));
                     outputStream.writeObject(new MessageToSend(messageToSend, clientUser.getName()));
                 } catch (IOException e) {
                     e.printStackTrace();
+                    return false;
                 }
             }
-            return null;
+            return true;
         }
     }
 }

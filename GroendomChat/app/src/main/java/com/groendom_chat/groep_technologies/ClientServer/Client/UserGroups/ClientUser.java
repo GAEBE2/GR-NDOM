@@ -3,6 +3,7 @@ package com.groendom_chat.groep_technologies.ClientServer.Client.UserGroups;
 import java.security.KeyPair;
 import java.security.PrivateKey;
 import java.security.PublicKey;
+import java.util.UUID;
 
 /**
  * Created by tkr6u on 20.04.2017.
@@ -23,7 +24,8 @@ public class ClientUser extends User{
     public ClientUser(KeyPair pair){
         //super(pair);
         //this.privateKey = pair.getPrivate();
-        setName("test");
+        //setName("test");
+        setName(UUID.randomUUID().toString()); //TODO: change this to normal name??
     }
 
     public String getOriginalName() {
@@ -64,13 +66,13 @@ public class ClientUser extends User{
      * @param objectToCompare needs to be instanceOf User
      * @return if the the public key are the same returns true
      */
-    @Override
+    /*@Override
     public boolean equals(Object objectToCompare) {
         boolean result = false;
         if(objectToCompare instanceof User && ((User) objectToCompare).getPublicKey().equals(this.getPublicKey())) {
             result = true;
         }
         return result;
-    }
+    }*/
 
 }

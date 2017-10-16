@@ -6,7 +6,9 @@ import com.groendom_chat.groep_technologies.ClientServer.Server.Handler;
 
 import java.io.Serializable;
 import java.security.PublicKey;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
@@ -15,9 +17,9 @@ import java.util.UUID;
  * Created by serge on 20-Mar-17.
  * Used to send all diffrent types of message in one object to avoid 10 else if with instance ofs
  */
-public class MessageToSend implements Serializable{
+public class MessageToSend implements Serializable {
 
-    public enum MessageType{
+    public enum MessageType {
         TEXT, IMAGE, USER_ADD, USER_LIST, LOGIN, USER_REMOVE, ENCRYPTED_TEXT, NEXT, RECONNECT
     }
 
@@ -36,14 +38,13 @@ public class MessageToSend implements Serializable{
     //private String author;
     private User author;
 
-    private MessageToSend(){
+    private MessageToSend() {
         author = new User();
         this.timeSend = new Date();
     }
 
 
-
-    public MessageToSend(UUID userID, PublicKey publicKey){
+    public MessageToSend(UUID userID, PublicKey publicKey) {
         this();
         messageType = MessageType.NEXT;
         author = new User(userID, publicKey);
@@ -63,20 +64,43 @@ public class MessageToSend implements Serializable{
         author = user;
     }
 
+    /**
+     * Format date string
+     * @return formatted date string
+     */
+    public String getDateString() {
+        if (getTimeSend().before(getToday())) {
+            return new SimpleDateFormat("dd.MM.yyyy HH:mm", java.util.Locale.getDefault()).format(getTimeSend());
+        } else {
+            return new SimpleDateFormat("HH:mm", java.util.Locale.getDefault()).format(getTimeSend());
+        }
+    }
+
+    private Date getToday() {
+        Calendar c = Calendar.getInstance();
+
+        c.set(Calendar.HOUR_OF_DAY, 0);
+        c.set(Calendar.MINUTE, 0);
+        c.set(Calendar.SECOND, 0);
+        c.set(Calendar.MILLISECOND, 0);
+
+        return c.getTime();
+    }
+
     public MessageToSend(List<User> userList) {
         this();
         this.userList = new ArrayList<>();
-        for(User user : userList) {
+        for (User user : userList) {
             this.userList.add(new ClientUser(user));
         }
         messageType = MessageType.USER_LIST;
     }
 
-    public MessageToSend(Handler[] users){
+    public MessageToSend(Handler[] users) {
         this();
         this.userList = new ArrayList<>();
         for (Handler handler : users) {
-            if(handler != null) {
+            if (handler != null) {
                 userList.add(handler.getUser());
             }
         }
@@ -134,7 +158,7 @@ public class MessageToSend implements Serializable{
     }
 
     public String getUsername() {
-        if(messageType == MessageType.USER_ADD || messageType == MessageType.LOGIN && author != null) {
+        if (messageType == MessageType.USER_ADD || messageType == MessageType.LOGIN && author != null) {
             return author.getName();
         }
         return null;
@@ -156,7 +180,7 @@ public class MessageToSend implements Serializable{
         this.timeSend = timeSend;
     }
 
-    public boolean hasImage(){
+    public boolean hasImage() {
         return file != null && file.length > 0;
     }
 
@@ -167,6 +191,7 @@ public class MessageToSend implements Serializable{
     public MessageType getMessageType() {
         return messageType;
     }
+
     public void setMessageType(MessageType messageType) {
         this.messageType = messageType;
     }
@@ -207,7 +232,7 @@ public class MessageToSend implements Serializable{
         return encryptedMessage;
     }
 
-    public static MessageToSend getReconnectMessage(User user, int arrNumber){
+    public static MessageToSend getReconnectMessage(User user, int arrNumber) {
         MessageToSend messageToSend = new MessageToSend(user);
         messageToSend.messageType = MessageType.RECONNECT;
         messageToSend.port = arrNumber;

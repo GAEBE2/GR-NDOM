@@ -55,7 +55,7 @@ public class Handler extends Thread {
 
             //send new user to active users
             for (Handler handler : roomList.get(roomIndex).getHandlers()) {
-                if(handler != null && handler != this) {
+                if (handler != null && handler != this) {
                     handler.outputStream.writeObject(new MessageToSend(user));
                 }
             }
@@ -64,7 +64,7 @@ public class Handler extends Thread {
             String originalMessage;
             for (MessageToSend messageToSend : roomList.get(roomIndex).getMessages()) {
                 originalMessage = messageToSend.getMessage();
-                if(originalMessage != null) {
+                if (originalMessage != null) {
                     messageToSend.setEncryptedMessage(Security.encrypt(originalMessage, publicKey));
                     messageToSend.setMessage(null);
                     messageToSend.setMessageType(MessageToSend.MessageType.ENCRYPTED_TEXT);
@@ -84,13 +84,13 @@ public class Handler extends Thread {
         }
     }
 
-    public int insetIntoRoom(){
-        if(roomList == null){
+    public int insetIntoRoom() {
+        if (roomList == null) {
             roomList = new ArrayList<>();
         }
-        if(roomList.size() != 0 && roomList.get(roomList.size() - 1).isSearching()){
+        if (roomList.size() != 0 && roomList.get(roomList.size() - 1).isSearching()) {
             roomList.get(roomList.size() - 1).addHandler(this);
-        }else {
+        } else {
             roomList.add(new ChatRoom(this));
         }
         return roomList.size() - 1;
@@ -98,6 +98,7 @@ public class Handler extends Thread {
 
     /**
      * get public key from client and checks whether or not it's valid key and the client processes the fitting private key
+     *
      * @return public key
      * @throws IOException
      */
@@ -106,14 +107,14 @@ public class Handler extends Thread {
         Authentication authentication = new Authentication(Security.randomlyGenerateAString());
         authentication.setPublicKey(keyPair.getPublic());
         outputStream.writeObject(authentication);
-        while (result == null){
+        while (result == null) {
             try {
                 Object object = inputStream.readObject();
-                if(object != null && object instanceof Authentication
+                if (object != null && object instanceof Authentication
                         && ((Authentication) object).getOriginalMessage().equals(authentication.getOriginalMessage())
-                        && Objects.equals(Security.decrypt(((Authentication) object).getEncryptedMessage(),Security.byteArrToPublicKey(((Authentication) object).getPublicKey())),
+                        && Objects.equals(Security.decrypt(((Authentication) object).getEncryptedMessage(), Security.byteArrToPublicKey(((Authentication) object).getPublicKey())),
                         ((Authentication) object).getOriginalMessage())) {
-                    result = Security.byteArrToPublicKey (((Authentication) object).getPublicKey());
+                    result = Security.byteArrToPublicKey(((Authentication) object).getPublicKey());
                 }
             } catch (ClassNotFoundException e) {
                 e.printStackTrace();
@@ -123,7 +124,6 @@ public class Handler extends Thread {
     }
 
     /**
-     *
      * @return username from user
      * @throws IOException
      */
@@ -132,7 +132,7 @@ public class Handler extends Thread {
         while (result == null) {
             try {
                 Object object = inputStream.readObject();
-                if(object != null) {
+                if (object != null) {
                     MessageToSend messageToSend = ((MessageToSend) object);
                     result = messageToSend.getAuthor();
                 }
@@ -145,6 +145,7 @@ public class Handler extends Thread {
 
     /**
      * receives messages and forwards them to the other clients, with the right encryption
+     *
      * @throws IOException
      */
     public void receiveMessagesAndForwardThem() throws IOException {
@@ -152,27 +153,28 @@ public class Handler extends Thread {
             try {
                 Object object = inputStream.readObject();
                 System.out.println(object);
-                if(object != null && object instanceof MessageToSend) {
+                if (object != null && object instanceof MessageToSend) {
                     MessageToSend messageToSend = ((MessageToSend) object);
                     roomList.get(roomIndex).addMessage(messageToSend);
                     sendMessageToEveryone(messageToSend);
                     ServerFunctions.log("messageToSend: " + messageToSend.getMessage() + " author: " + messageToSend.getAuthor().getName() + "|| Send to: " + roomList.get(roomIndex).getHandlers().length + " clients");
                 }
             } catch (ClassNotFoundException e) {
+                e.printStackTrace();
             }
         }
     }
 
     public void handleDisconnect() {
         try {
-            if(userList != null) {
+            if (userList != null) {
                 userList.remove(user);
                 disconnect.accept(this);
                 //tell everyone that user left the channel
                 sendMessageToEveryone(MessageToSend.createLogoutMessage(user));
             }
             ServerFunctions.log("client disconnected; IP: ");
-            if(socket.getRemoteSocketAddress() != null && user != null) {
+            if (socket.getRemoteSocketAddress() != null && user != null) {
                 ServerFunctions.log(socket.getRemoteSocketAddress().toString() + " | username: " + user.getName());
             }
             socket.close();
@@ -183,25 +185,26 @@ public class Handler extends Thread {
 
     /**
      * send a messageToSend to all active users
+     *
      * @param messageToSend messageToSend to send
      * @throws IOException
      */
-    public void sendMessageToEveryone(MessageToSend messageToSend) throws IOException{
+    public void sendMessageToEveryone(MessageToSend messageToSend) throws IOException {
         String decryptedMessage = "";
-        if(messageToSend.getEncryptedMessage() != null) {
+        if (messageToSend.getEncryptedMessage() != null) {
             decryptedMessage = Security.decrypt(messageToSend.getEncryptedMessage(), keyPair.getPrivate());
         }
 
-        if(roomList.size() != 0) {
+        if (roomList.size() != 0) {
             for (Handler handler : roomList.get(roomIndex).getHandlers()) {
                 try {
-                    if (handler != null){
+                    if (handler != null) {
                         if (messageToSend.getMessageType() == MessageToSend.MessageType.ENCRYPTED_TEXT) {
                             messageToSend.setEncryptedMessage(Security.encrypt(decryptedMessage, handler.user.getPublicKey()));
                         }
                         handler.outputStream.writeObject(messageToSend);
                     }
-                } catch (SocketException ignored) { //ignores disconnection
+                } catch (SocketException e) {
 
                 }
             }
@@ -209,7 +212,7 @@ public class Handler extends Thread {
         }
     }
 
-    public User getUser(){
+    public User getUser() {
         return user;
     }
 
