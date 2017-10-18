@@ -42,7 +42,7 @@ public class ClientFunctions {
 
     private boolean active;
 
-    private List<User> users = new ArrayList<>();
+    private User otherUser = null;
 
     public List<MessageToSend> getMessages() {
         return messages;
@@ -110,8 +110,6 @@ public class ClientFunctions {
             closeConnection();
             oldAddress = address;
             oldPort = port;
-            connected = false;
-            users = new ArrayList<>();
             messages = new LinkedList<>();
             try {
                 socket = new Socket(address, port); //opens the connection
@@ -149,7 +147,7 @@ public class ClientFunctions {
             }
         }
         messages = new LinkedList<>();
-        users = new LinkedList<>();
+        otherUser = null;
         connected = false;
     }
 
@@ -167,22 +165,17 @@ public class ClientFunctions {
                             String decryptedMessage = Security.decrypt(message.getEncryptedMessage(), clientUser.getPrivateKey());
                             message.setMessage(decryptedMessage);
                         case TEXT:
-                            message.setAuthor(getUserFromList(message.getAuthor()));
+                            message.setAuthor(otherUser);
                             messages.add(message);
                             chooseActiveOrPassiveConsumer(passiveMessageReceiver, activeMessageReceiver, message);
                             break;
                         case USER_ADD:
                             ClientUser user = new ClientUser(new ClientUser(message.getAuthor()));
-                            users.add(user);
+                            otherUser = user;
                             chooseActiveOrPassiveConsumer(passiveUserAdder, activeUserAdder, Collections.singletonList(user));
                             break;
-                        case USER_LIST:
-                            List<User> usernameList = message.getUserList();
-                            getUsers().addAll(usernameList);
-                            chooseActiveOrPassiveConsumer(passiveUserAdder, activeUserAdder, usernameList);
-                            break;
                         case USER_REMOVE:
-                            this.users.remove(getUserFromList(message.getAuthor()));
+                            otherUser = null;
                             chooseActiveOrPassiveConsumer(passiveUserRemover, activeUserRemover, message.getAuthor().getName());
                             break;
                         default:
@@ -242,12 +235,12 @@ public class ClientFunctions {
         this.PORT = PORT;
     }
 
-    public List<User> getUsers() {
-        return users;
+    public User getOtherUser() {
+        return otherUser;
     }
 
-    public void setUsers(List<User> users) {
-        this.users = users;
+    public void setOtherUser(User otherUser) {
+        this.otherUser = otherUser;
     }
 
     public int getOldPort() {
@@ -312,10 +305,10 @@ public class ClientFunctions {
         this.clientUser = clientUser;
     }
 
-    private User getUserFromList(User userKey) {
-        final User[] result = {userKey};
-        users.stream().filter(clientUser -> clientUser.equals(userKey)).forEach(clientUser1 -> result[0] = clientUser1);
-        users.forEach(clientUser -> {});
-        return result[0];
-    }
+
+
+
+
+
+
 }

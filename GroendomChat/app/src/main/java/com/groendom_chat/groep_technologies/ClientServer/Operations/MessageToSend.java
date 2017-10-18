@@ -18,7 +18,7 @@ import java.util.UUID;
 public class MessageToSend implements Serializable{
 
     public enum MessageType{
-        TEXT, IMAGE, USER_ADD, USER_LIST, LOGIN, USER_REMOVE, ENCRYPTED_TEXT, NEXT, RECONNECT
+        TEXT, IMAGE, USER_ADD, LOGIN, USER_REMOVE, ENCRYPTED_TEXT, NEXT, RECONNECT
     }
 
     private MessageType messageType;
@@ -61,24 +61,6 @@ public class MessageToSend implements Serializable{
         this();
         messageType = MessageType.USER_ADD;
         author = user;
-    }
-
-    public MessageToSend(List<User> userList) {
-        this();
-        this.userList = new ArrayList<>();
-        userList.forEach(user -> this.userList.add(new ClientUser(user)));
-        messageType = MessageType.USER_LIST;
-    }
-
-    public MessageToSend(Handler[] users){
-        this();
-        this.userList = new ArrayList<>();
-        for (Handler handler : users) {
-            if(handler != null) {
-                userList.add(handler.getUser());
-            }
-        }
-        messageType = MessageType.USER_LIST;
     }
 
     public MessageToSend(String message, String author) {
