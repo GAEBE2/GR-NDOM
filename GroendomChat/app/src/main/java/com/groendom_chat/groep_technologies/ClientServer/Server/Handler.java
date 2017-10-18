@@ -54,7 +54,7 @@ public class Handler extends Thread {
 
             //send new user to active users
             for (Handler handler : roomList.get(roomIndex).getHandlers()) {
-                if(handler != null) {
+                if(handler != null && handler != this) {
                     handler.outputStream.writeObject(new MessageToSend(user));
                 }
             }
@@ -78,7 +78,6 @@ public class Handler extends Thread {
             ServerFunctions.log("client connected; IP: " + socket.getRemoteSocketAddress().toString() + " | username: " + user.getName());
             receiveMessagesAndForwardThem();
         } catch (IOException e) {
-            e.printStackTrace();
         } finally {
             handleDisconnect();
         }
@@ -151,13 +150,13 @@ public class Handler extends Thread {
         while (true) {
             try {
                 Object object = inputStream.readObject();
-                if(object == null){
-                    return;
+                System.out.println(object);
+                if(object != null && object instanceof MessageToSend) {
+                    MessageToSend messageToSend = ((MessageToSend) object);
+                    roomList.get(roomIndex).addMessage(messageToSend);
+                    sendMessageToEveryone(messageToSend);
+                    ServerFunctions.log("messageToSend: " + messageToSend.getMessage() + " author: " + messageToSend.getAuthor().getName() + "|| Send to: " + roomList.get(roomIndex).getHandlers().length + " clients");
                 }
-                MessageToSend messageToSend = ((MessageToSend) object);
-                roomList.get(roomIndex).addMessage(messageToSend);
-                sendMessageToEveryone(messageToSend);
-                ServerFunctions.log("messageToSend: " + messageToSend.getMessage() + " author: " + messageToSend.getAuthor() + "|| Send to: " + userList.size() + " clients");
             } catch (ClassNotFoundException e) {
             }
         }

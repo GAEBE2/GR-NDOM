@@ -40,7 +40,7 @@ public class ClientFunctions {
 
     private int oldPort;
 
-    private boolean active;
+    private boolean active = false;
 
     private User otherUser = null;
 
@@ -158,7 +158,7 @@ public class ClientFunctions {
         while (connected) {
             try {
                 Object object = inputStream.readObject();
-                if(object != null && object instanceof Message) {
+                if(object != null && object instanceof MessageToSend) {
                     MessageToSend message = ((MessageToSend) object);
                     switch (message.getMessageType()) {
                         case ENCRYPTED_TEXT:
