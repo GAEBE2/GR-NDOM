@@ -87,8 +87,8 @@ public class ClientFunctions {
         active = false;
     }
 
-    public void sendNextMessage(ClientUser user) throws IOException {
-        outputStream.writeObject(new MessageToSend(user.getUuid(), user.getPublicKey()));
+    public void sendNextMessage(ClientUser client) throws IOException {
+        outputStream.writeObject(new MessageToSend(client.getUser().getUuid(), client.getUser().getPublicKey()));
     }
 
     public boolean sendMessage(String messageToSend) throws IOException {
@@ -111,8 +111,8 @@ public class ClientFunctions {
      * otherwise return a String with the reason
      * curActivity is used to create a toast on connection error/success - null if not used in activity
      */
-    public String openConnection(String address, ClientUser user) {
-        this.clientUser = user;
+    public String openConnection(String address, ClientUser client) {
+        this.clientUser = client;
         OpenConnectionTask task = new OpenConnectionTask();
         try {
             return task.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, address).get();
@@ -122,7 +122,7 @@ public class ClientFunctions {
         }
     }
 
-    public String reOpenConnection(ClientUser user) {
+    public String reOpenConnection(ClientUser client) {
         //openConnection(oldAddress, user, oldPort);
         //utputStream.writeObject(new MessageToSend(user.getPublicKey()));
         //TODO: implement
@@ -162,14 +162,9 @@ public class ClientFunctions {
                             chooseActiveOrPassiveConsumer(passiveMessageReceiver, activeMessageReceiver, message);
                             break;
                         case USER_ADD:
-                            ClientUser user = new ClientUser(new ClientUser(message.getAuthor()));
-                            users.add(user);
+                            ClientUser user = new ClientUser(message.getAuthor());
+                            users.add(user.getUser());
                             chooseActiveOrPassiveConsumer(passiveUserAdder, activeUserAdder, Collections.singletonList(user));
-                            break;
-                        case USER_LIST:
-                            List<User> usernameList = message.getUserList();
-                            getUsers().addAll(usernameList);
-                            chooseActiveOrPassiveConsumer(passiveUserAdder, activeUserAdder, usernameList);
                             break;
                         case USER_REMOVE:
                             this.users.remove(getUserFromList(message.getAuthor()));
@@ -190,6 +185,7 @@ public class ClientFunctions {
                 return 0;
             } catch (ClassNotFoundException e) {
                 e.printStackTrace();
+                return 1;
             }
         }
         return 0;
@@ -211,7 +207,7 @@ public class ClientFunctions {
                     if (input instanceof Authentication) {
                         auth = ((Authentication) input);
                         publicServerKey = Security.byteArrToPublicKey(auth.getPublicKey());
-                        auth.setPublicKey(clientUser.getPublicKey());
+                        auth.setPublicKey(clientUser.getUser().getPublicKey());
                         auth.setEncryptedMessage(Security.encrypt(auth.getOriginalMessage(), clientUser.getPrivateKey()));
                         outputStream.writeObject(auth);
                         inProgress = false;
@@ -320,7 +316,7 @@ public class ClientFunctions {
             if (!address.equals(oldAddress) || oldPort != PORT) { //one should not be able to connect to a server twice
                 closeConnection();
                 oldAddress = address;
-                oldPort = port;
+                oldPort = PORT;
                 connected = false;
                 users = new ArrayList<>();
                 messages = new LinkedList<>();
@@ -330,7 +326,7 @@ public class ClientFunctions {
                     inputStream = new ObjectInputStream(socket.getInputStream());
                     if (outputStream != null) {
                         //authenticate();
-                        outputStream.writeObject(new MessageToSend(clientUser));
+                        outputStream.writeObject(new MessageToSend(clientUser.getUser()));
                         connected = true;
                     }
                 } catch (IOException | IllegalArgumentException e) {
@@ -354,7 +350,7 @@ public class ClientFunctions {
             for (String messageToSend : params) {
                 try {
                     //outputStream.writeObject(new MessageToSend(Security.encrypt(messageToSend, publicServerKey), clientUser.getName(), clientUser.getPublicKey()));
-                    outputStream.writeObject(new MessageToSend(messageToSend, clientUser.getName()));
+                    outputStream.writeObject(new MessageToSend(messageToSend, clientUser.getUser()));
                 } catch (IOException e) {
                     e.printStackTrace();
                     return false;

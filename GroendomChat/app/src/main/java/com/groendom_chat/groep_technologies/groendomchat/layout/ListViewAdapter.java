@@ -29,7 +29,7 @@ public class ListViewAdapter extends ArrayAdapter<MessageToSend> {
     public View getView(int position, View convertView, ViewGroup parent) {
         MessageToSend message = values.get(position);
         View rowView;
-        if (message.getAuthor().getName().equals(curUser.getName())) {
+        if (message.getAuthor().getUuid().equals(curUser.getUuid())) {
             rowView = inflater.inflate(R.layout.bubble_out, parent, false);
         } else {
             rowView = inflater.inflate(R.layout.bubble_in, parent, false);
