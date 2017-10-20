@@ -51,9 +51,17 @@ public class ServerFunctions {
         }
     }
 
+    public static int insetIntoRoom(Handler newHand){
+        if(roomList == null){
+            roomList = new ArrayList<>();
+        }
+        if(roomList.size() == 0 || !roomList.get(roomList.size() - 1).addHandler(newHand)){
+            roomList.add(new ChatRoom(newHand));
+        }
+        return roomList.size() - 1;
+    }
 
-
-    public static void log(String msg) {
+    static void log(String msg) {
         if(LOG == null){
             LOG =  Logger.getLogger("");
         }

@@ -8,36 +8,33 @@ import java.security.PublicKey;
  * Created by tkr6u on 20.04.2017.
  * User specific to the client, used to save a custom name or a private key, should not be send!!
  */
-public class ClientUser extends User{
+public class ClientUser { //no longer extends User, so that it cannot be send!!
     private PrivateKey privateKey;
     private String customName;
+    private User user;
 
     public ClientUser(User user) {
-        super(user.getName(), user.getPublicKey());
+        this.user = user;
     }
 
     public ClientUser(String name, PublicKey publicKey, PrivateKey privateKey) {
-        super(name, publicKey);
+        user = new User(name, publicKey);
         this.privateKey = privateKey;
     }
     public ClientUser(KeyPair pair){
-        super(pair);
+        user = new User(pair);
         this.privateKey = pair.getPrivate();
-        setName("test");
+        user.setName("test");
     }
 
     public String getOriginalName() {
-        return super.getName();
+        return user.getName();
     }
 
-    /**
-     *
-     * @return custom name if set
-     */
-    @Override
+
     public String getName() {
         if(customName == null){
-            return super.getName();
+            return user.getName();
         }else {
             return customName;
         }
@@ -59,18 +56,19 @@ public class ClientUser extends User{
         this.privateKey = privateKey;
     }
 
+    public User getUser(){
+        return user;
+    }
+
     /**
      *
-     * @param objectToCompare needs to be instanceOf User
+     * @param oToCom needs to be instanceOf User
      * @return if the the public key are the same returns true
      */
     @Override
-    public boolean equals(Object objectToCompare) {
-        boolean result = false;
-        if(objectToCompare instanceof User && ((User) objectToCompare).getPublicKey().equals(this.getPublicKey())) {
-            result = true;
-        }
-        return result;
+    public boolean equals(Object oToCom) {
+        return (oToCom instanceof User && ((User) oToCom).getPublicKey().equals(user.getPublicKey())) ||
+                (oToCom instanceof ClientUser && ((ClientUser) oToCom).getUser().getPublicKey().equals(user.getPublicKey()));
     }
 
 }

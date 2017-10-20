@@ -16,9 +16,9 @@ public class User implements Serializable{
     private int connection;
 
     public User(ClientUser user) {
-        uuid = user.getUuid();
-        publicKey = user.getPublicKey();
-        connection = user.getConnection();
+        uuid = user.getUser().getUuid();
+        publicKey = user.getUser().getPublicKey();
+        connection = user.getUser().getConnection();
         name = user.getName();
     }
 
