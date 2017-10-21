@@ -122,7 +122,7 @@ public class Handler extends Thread {
 
     /**
      * @return username from user
-     * @throws IOEccccvcxception
+     * @throws IOException
      */
     public User getUserFromClient() throws IOException {
         User result = null;

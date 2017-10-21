@@ -80,6 +80,7 @@ public class ClientFunctions {
 
     public void setActiveConsumers(Consumer<MessageToSend> messageConsumer) {
         activeMessageReceiver = messageConsumer;
+        active = true;
     }
 
     public ClientFunctions(Consumer<MessageToSend> consumer) {
@@ -157,7 +158,7 @@ public class ClientFunctions {
                             String decryptedMessage = Security.decrypt(message.getEncryptedMessage(), clientUser.getPrivateKey());
                             message.setMessage(decryptedMessage);
                         case TEXT:
-                            message.setAuthor(getUserFromList(message.getAuthor()));
+                            //message.setAuthor(getUserFromList(message.getAuthor()));
                             messages.add(message);
                             chooseActiveOrPassiveConsumer(passiveMessageReceiver, activeMessageReceiver, message);
                             break;
