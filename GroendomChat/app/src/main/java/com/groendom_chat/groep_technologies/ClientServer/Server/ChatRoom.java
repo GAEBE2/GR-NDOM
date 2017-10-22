@@ -14,8 +14,8 @@ public class ChatRoom {
         handlers[0] = user;
     }
 
-    public boolean addHandler(Handler user){
-        if(searching){
+    public boolean addHandler(Handler user) {
+        if (searching) {
             handlers[1] = user;
             searching = false;
             return true;
@@ -23,11 +23,11 @@ public class ChatRoom {
         return false;
     }
 
-    public void addMessage(MessageToSend message){
+    public void addMessage(MessageToSend message) {
         messageList.add(message);
     }
 
-    public Handler[] getHandlers(){
+    public Handler[] getHandlers() {
         return handlers;
     }
 
@@ -35,7 +35,7 @@ public class ChatRoom {
         return searching;
     }
 
-    public List<MessageToSend> getMessages(){
+    public List<MessageToSend> getMessages() {
         return messageList;
     }
 }

@@ -31,7 +31,6 @@ public class Security implements Serializable {
     private static KeyPairGenerator keyPairGenerator;
 
     /**
-     *
      * @return a new Factory should only be used to initialize the variable
      */
     private static KeyFactory getNewFactory() {
@@ -44,7 +43,6 @@ public class Security implements Serializable {
     }
 
     /**
-     *
      * @return a new KeyPair with the factory method defined above
      * @throws NoSuchAlgorithmException
      * @throws NoSuchProviderException
@@ -56,7 +54,7 @@ public class Security implements Serializable {
         return keyPairGenerator.genKeyPair();
     }
 
-    public static  Cipher getSingingCipher() throws NoSuchPaddingException, NoSuchAlgorithmException {
+    public static Cipher getSingingCipher() throws NoSuchPaddingException, NoSuchAlgorithmException {
         return Cipher.getInstance("RSA");
     }
 
@@ -65,9 +63,8 @@ public class Security implements Serializable {
     }
 
     /**
-     *
      * @param text message to encrypt
-     * @param key key to be used
+     * @param key  key to be used
      * @return encrypted message
      */
     public static byte[] encrypt(String text, Key key) {
@@ -83,15 +80,14 @@ public class Security implements Serializable {
     }
 
     /**
-     *
      * @param encryptedText text that has been encrypted
-     * @param key to use to decrypt encryptedText
+     * @param key           to use to decrypt encryptedText
      * @return decrypted text
      */
     public static String decrypt(byte[] encryptedText, Key key) {
         byte[] decryptedText = null;
         try {
-            Cipher cipher = key instanceof PublicKey ? getSingingCipher() :  getCipher();
+            Cipher cipher = key instanceof PublicKey ? getSingingCipher() : getCipher();
             cipher.init(Cipher.DECRYPT_MODE, key);
             decryptedText = cipher.doFinal(encryptedText);
 
@@ -103,6 +99,7 @@ public class Security implements Serializable {
 
     /**
      * uses secure random
+     *
      * @return to generate a random string, should be used for authentication
      */
     public static String randomlyGenerateAString() {
@@ -122,7 +119,8 @@ public class Security implements Serializable {
 
     /**
      * should be used if one wants to handle exception thyself
-     * @param string key
+     *
+     * @param string   key
      * @param isPublic whether it's a public or private key
      * @return key
      * @throws IOException
@@ -133,9 +131,10 @@ public class Security implements Serializable {
         encodedKey = Base64.decode(string, Base64.DEFAULT);
         return isPublic ? factory.generatePublic(new X509EncodedKeySpec(encodedKey)) : factory.generatePrivate(new PKCS8EncodedKeySpec(encodedKey));
     }
-    public static PublicKey byteArrToPublicKey(byte[] arr){
+
+    public static PublicKey byteArrToPublicKey(byte[] arr) {
         try {
-            return  getFactory().generatePublic(new X509EncodedKeySpec(arr));
+            return getFactory().generatePublic(new X509EncodedKeySpec(arr));
         } catch (InvalidKeySpecException e) {
             e.printStackTrace();
         }

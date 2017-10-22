@@ -33,7 +33,7 @@ public class ChatActivity extends Activity {
         ClientUser clientUser = (ClientUser) getIntent().getSerializableExtra(getString(R.string.client_user_value));
         functions = (ClientFunctions) getIntent().getSerializableExtra(getString(R.string.client_functions_value));
 
-        if(clientUser == null || functions == null) {
+        if (clientUser == null || functions == null) {
             Toast.makeText(getApplicationContext(), "Failed pass data between the activities", Toast.LENGTH_LONG).show();
             finish();
         }

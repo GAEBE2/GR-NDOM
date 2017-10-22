@@ -49,7 +49,7 @@ public class MainActivity extends AppCompatActivity {
                     openChat(new Callback() {
                         @Override
                         public void onFinish(Object param) {
-                            if(param == null) {
+                            if (param == null) {
                                 //Open connection was successful
                                 Intent chatActivityIntent = new Intent(MainActivity.this, ChatActivity.class);
                                 chatActivityIntent.putExtra(getString(R.string.client_functions_value), functions);

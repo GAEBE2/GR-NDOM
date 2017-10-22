@@ -24,8 +24,6 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
-import static android.R.attr.port;
-
 /**
  * Created by serge on 20-Mar-17.
  * All the backend functions that one can use in the different front ends
@@ -48,29 +46,14 @@ public class ClientFunctions implements Serializable {
     private boolean active = false;
 
     private List<User> users = new ArrayList<>();
-
-    public List<MessageToSend> getMessages() {
-        return messages;
-    }
-
-    public List<MessageToSend> getNewMessages(int oldAmount) {
-        return messages.subList(oldAmount, messages.size());
-    }
-
-    public void setMessages(List<MessageToSend> messages) {
-        this.messages = messages;
-    }
-
     private List<MessageToSend> messages = new LinkedList<>();
     private ObjectOutputStream outputStream;
     private ObjectInputStream inputStream;
     private boolean connected = false;
-
     //Consumers which are used when this active == true
     private Consumer<MessageToSend> activeMessageReceiver;
     private Consumer<String> activeUserRemover;
     private Consumer<List<ClientUser>> activeUserAdder;
-
     //Consumers which are used when this active == false
     private Consumer<MessageToSend> passiveMessageReceiver;
     private Consumer<String> passiveUserRemover;
@@ -82,14 +65,26 @@ public class ClientFunctions implements Serializable {
         this.passiveUserAdder = passiveUserAdder;
     }
 
-    public void setActiveConsumers(Consumer<MessageToSend> messageConsumer) {
-        activeMessageReceiver = messageConsumer;
-        active = true;
-    }
-
     public ClientFunctions(Consumer<MessageToSend> consumer) {
         passiveMessageReceiver = consumer;
         active = false;
+    }
+
+    public List<MessageToSend> getMessages() {
+        return messages;
+    }
+
+    public void setMessages(List<MessageToSend> messages) {
+        this.messages = messages;
+    }
+
+    public List<MessageToSend> getNewMessages(int oldAmount) {
+        return messages.subList(oldAmount, messages.size());
+    }
+
+    public void setActiveConsumers(Consumer<MessageToSend> messageConsumer) {
+        activeMessageReceiver = messageConsumer;
+        active = true;
     }
 
     public void sendNextMessage(ClientUser client) throws IOException {
@@ -115,7 +110,7 @@ public class ClientFunctions implements Serializable {
      * otherwise return a String with the reason
      * curActivity is used to create a toast on connection error/success - null if not used in activity
      */
-    public void openConnection(String address, ClientUser client) {
+    public void openConnection(String address, ClientUser client, Callback cb) {
         this.clientUser = client;
         OpenConnectionTask task = new OpenConnectionTask();
         try {
@@ -344,7 +339,7 @@ public class ClientFunctions implements Serializable {
                 }
             }
 
-            if(cb != null) {
+            if (cb != null) {
                 cb.onFinish(new Exception("Same address or same port used or address is null"));
             }
             return null;

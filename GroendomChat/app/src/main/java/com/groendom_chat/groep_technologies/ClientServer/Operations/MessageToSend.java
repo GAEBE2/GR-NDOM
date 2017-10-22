@@ -1,16 +1,12 @@
 package com.groendom_chat.groep_technologies.ClientServer.Operations;
 
-import com.groendom_chat.groep_technologies.ClientServer.Client.UserGroups.ClientUser;
 import com.groendom_chat.groep_technologies.ClientServer.Client.UserGroups.User;
-import com.groendom_chat.groep_technologies.ClientServer.Server.Handler;
 
 import java.io.Serializable;
 import java.security.PublicKey;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.List;
 import java.util.UUID;
 
 /**
@@ -19,15 +15,9 @@ import java.util.UUID;
  */
 public class MessageToSend implements Serializable {
 
-    public enum MessageType {
-        TEXT, IMAGE, USER_ADD, LOGIN, USER_REMOVE, ENCRYPTED_TEXT, NEXT, RECONNECT
-    }
-
-    private MessageType messageType;
-
     //default port
     private static final int PORT = 9001;
-
+    private MessageType messageType;
     private int port;
     private byte[] encryptedMessage;
     private String message;
@@ -40,12 +30,12 @@ public class MessageToSend implements Serializable {
         this.timeSend = new Date();
     }
 
-
     public MessageToSend(UUID userID, PublicKey publicKey) {
         this();
         messageType = MessageType.NEXT;
         author = new User(userID, publicKey);
     }
+
 
     public MessageToSend(String loginUName, String address, int port) {
         this();
@@ -59,29 +49,6 @@ public class MessageToSend implements Serializable {
         this();
         messageType = MessageType.USER_ADD;
         author = user;
-    }
-
-    /**
-     * Format date string
-     * @return formatted date string
-     */
-    public String getDateString() {
-        if (getTimeSend().before(getToday())) {
-            return new SimpleDateFormat("dd.MM.yyyy HH:mm", java.util.Locale.getDefault()).format(getTimeSend());
-        } else {
-            return new SimpleDateFormat("HH:mm", java.util.Locale.getDefault()).format(getTimeSend());
-        }
-    }
-
-    private Date getToday() {
-        Calendar c = Calendar.getInstance();
-
-        c.set(Calendar.HOUR_OF_DAY, 0);
-        c.set(Calendar.MINUTE, 0);
-        c.set(Calendar.SECOND, 0);
-        c.set(Calendar.MILLISECOND, 0);
-
-        return c.getTime();
     }
 
     public MessageToSend(String message, User author) {
@@ -114,6 +81,42 @@ public class MessageToSend implements Serializable {
         MessageToSend res = new MessageToSend(user);
         res.setMessageType(MessageType.USER_REMOVE);
         return res;
+    }
+
+    public static int getPORT() {
+        return PORT;
+    }
+
+    public static MessageToSend getReconnectMessage(User user, int arrNumber) {
+        MessageToSend messageToSend = new MessageToSend(user);
+        messageToSend.messageType = MessageType.RECONNECT;
+        messageToSend.port = arrNumber;
+
+        return messageToSend;
+    }
+
+    /**
+     * Format date string
+     *
+     * @return formatted date string
+     */
+    public String getDateString() {
+        if (getTimeSend().before(getToday())) {
+            return new SimpleDateFormat("dd.MM.yyyy HH:mm", java.util.Locale.getDefault()).format(getTimeSend());
+        } else {
+            return new SimpleDateFormat("HH:mm", java.util.Locale.getDefault()).format(getTimeSend());
+        }
+    }
+
+    private Date getToday() {
+        Calendar c = Calendar.getInstance();
+
+        c.set(Calendar.HOUR_OF_DAY, 0);
+        c.set(Calendar.MINUTE, 0);
+        c.set(Calendar.SECOND, 0);
+        c.set(Calendar.MILLISECOND, 0);
+
+        return c.getTime();
     }
 
     @Override
@@ -156,10 +159,6 @@ public class MessageToSend implements Serializable {
         return file != null && file.length > 0;
     }
 
-    public static int getPORT() {
-        return PORT;
-    }
-
     public MessageType getMessageType() {
         return messageType;
     }
@@ -188,19 +187,15 @@ public class MessageToSend implements Serializable {
         this.author.setPublicKey(publicKey);
     }
 
-    public void setEncryptedMessage(byte[] message) {
-        this.encryptedMessage = message;
-    }
-
     public byte[] getEncryptedMessage() {
         return encryptedMessage;
     }
 
-    public static MessageToSend getReconnectMessage(User user, int arrNumber) {
-        MessageToSend messageToSend = new MessageToSend(user);
-        messageToSend.messageType = MessageType.RECONNECT;
-        messageToSend.port = arrNumber;
+    public void setEncryptedMessage(byte[] message) {
+        this.encryptedMessage = message;
+    }
 
-        return messageToSend;
+    public enum MessageType {
+        TEXT, IMAGE, USER_ADD, LOGIN, USER_REMOVE, ENCRYPTED_TEXT, NEXT, RECONNECT
     }
 }

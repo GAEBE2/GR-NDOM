@@ -77,6 +77,6 @@ public class User implements Serializable {
 
     @Override
     public boolean equals(Object objToCom) {
-        return objToCom instanceof User &&(uuid != null && (uuid.equals(((User) objToCom).uuid) || publicKey != null && publicKey.equals(((User) objToCom).publicKey)));
+        return objToCom instanceof User && (uuid != null && (uuid.equals(((User) objToCom).uuid) || publicKey != null && publicKey.equals(((User) objToCom).publicKey)));
     }
 }

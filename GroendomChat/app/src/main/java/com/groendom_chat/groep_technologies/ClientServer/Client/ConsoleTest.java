@@ -24,7 +24,7 @@ public class ConsoleTest {
         }, new Consumer<List<ClientUser>>() {
             @Override
             public void accept(List<ClientUser> obj) {
-                for(ClientUser user : obj) {
+                for (ClientUser user : obj) {
                     System.out.println(user);
                 }
             }
