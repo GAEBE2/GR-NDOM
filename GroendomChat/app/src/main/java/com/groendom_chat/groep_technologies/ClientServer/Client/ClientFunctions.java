@@ -12,6 +12,7 @@ import java.io.EOFException;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.io.Serializable;
 import java.net.Socket;
 import java.net.SocketException;
 import java.security.PublicKey;
@@ -20,14 +21,17 @@ import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 
 import static android.R.attr.port;
 
 /**
  * Created by serge on 20-Mar-17.
  * All the backend functions that one can use in the different front ends
+ * Needs serializable to get transferred between activities
  */
-public class ClientFunctions {
+public class ClientFunctions implements Serializable {
 
     private ClientUser clientUser;
 
@@ -94,10 +98,9 @@ public class ClientFunctions {
     public boolean sendMessage(String messageToSend) throws IOException {
         SendTask task = new SendTask();
         try {
-            return task.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, messageToSend).get();
-
-        } catch (InterruptedException | ExecutionException e1) {
-            e1.printStackTrace();
+            return task.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, messageToSend).get(3, TimeUnit.SECONDS);
+        } catch (InterruptedException | ExecutionException | TimeoutException e) {
+            e.printStackTrace();
             return false;
             //return task.execute().get();
         }
@@ -111,14 +114,13 @@ public class ClientFunctions {
      * otherwise return a String with the reason
      * curActivity is used to create a toast on connection error/success - null if not used in activity
      */
-    public String openConnection(String address, ClientUser user) {
+    public void openConnection(String address, ClientUser user, Callback cb) {
         this.clientUser = user;
         OpenConnectionTask task = new OpenConnectionTask();
         try {
-            return task.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, address).get();
-        } catch (InterruptedException | ExecutionException e) {
+            task.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, address, cb).get(3, TimeUnit.SECONDS);
+        } catch (InterruptedException | ExecutionException | TimeoutException e) {
             e.printStackTrace();
-            return "InterruptedException | ExecutionException";
         }
     }
 
@@ -314,10 +316,11 @@ public class ClientFunctions {
         return result[0];
     }
 
-    private class OpenConnectionTask extends AsyncTask<String, Void, String> {
-        protected String doInBackground(String... params) {
-            String address = params[0];
-            if (!address.equals(oldAddress) || oldPort != PORT) { //one should not be able to connect to a server twice
+    private class OpenConnectionTask extends AsyncTask<Object, Void, Void> implements Serializable {
+        protected Void doInBackground(Object... params) {
+            String address = (String) params[0];
+            Callback cb = (Callback) params[1];
+            if (address != null && !address.equals(oldAddress) || oldPort != PORT) { //one should not be able to connect to a server twice
                 closeConnection();
                 oldAddress = address;
                 oldPort = port;
@@ -331,25 +334,27 @@ public class ClientFunctions {
                     if (outputStream != null) {
                         //authenticate();
                         outputStream.writeObject(new MessageToSend(clientUser));
+                        if (cb != null) {
+                            cb.onFinish(null);
+                        }
                         connected = true;
                     }
                 } catch (IOException | IllegalArgumentException e) {
                     e.printStackTrace();
-                    return e.getClass().getSimpleName(); //gets the exception and turns it into an error message
+                    if (cb != null) {
+                        cb.onFinish(e);
+                    }
                 }
-                return "unknown Error"; //if there is an unkown error
             }
-            return "";
-        }
 
-        protected void onPostExecute(String feed) {
-            //when task is finished
-            // TODO: check this.exception
-            // TODO: do something with the feed
+            if(cb != null) {
+                cb.onFinish(new Exception("Same address or same port used or address is null"));
+            }
+            return null;
         }
     }
 
-    private class SendTask extends AsyncTask<String, Void, Boolean> {
+    private class SendTask extends AsyncTask<String, Void, Boolean> implements Serializable {
         protected Boolean doInBackground(String... params) {
             for (String messageToSend : params) {
                 try {

@@ -35,7 +35,7 @@ public class ConsoleTest {
                 System.out.println(obj.getMessage());
             }
         });
-        functions.openConnection("localhost", new ClientUser(Security.generateKeyPair()));
+        functions.openConnection("localhost", new ClientUser(Security.generateKeyPair()), null);
         //functions.sendMessage("hay§");
         Thread thread = new Thread(new Runnable() {
             @Override

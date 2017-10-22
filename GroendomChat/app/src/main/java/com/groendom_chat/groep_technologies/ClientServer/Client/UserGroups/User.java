@@ -1,4 +1,5 @@
 package com.groendom_chat.groep_technologies.ClientServer.Client.UserGroups;
+
 import java.io.Serializable;
 import java.security.KeyPair;
 import java.security.PublicKey;
@@ -8,7 +9,7 @@ import java.util.UUID;
  * Created by tkr6u on 21.04.2017.
  * a plain user object with only the public key
  */
-public class User implements Serializable{
+public class User implements Serializable {
 
     private PublicKey publicKey;
     private String name;
@@ -22,16 +23,16 @@ public class User implements Serializable{
         name = user.getName();
     }
 
-    public User(){
+    public User() {
         uuid = UUID.randomUUID();
     }
 
-    public User(KeyPair key){
+    public User(KeyPair key) {
         this();
         this.publicKey = key.getPublic();
     }
 
-    public User(UUID uuid, PublicKey key){
+    public User(UUID uuid, PublicKey key) {
         this.uuid = uuid;
         this.publicKey = key;
     }
@@ -39,6 +40,7 @@ public class User implements Serializable{
     public User(String name) {
         this.name = name;
     }
+
     public User(String name, PublicKey key) {
         this.name = name;
         this.publicKey = key;

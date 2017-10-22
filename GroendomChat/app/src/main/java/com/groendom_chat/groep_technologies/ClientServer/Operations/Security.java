@@ -3,6 +3,7 @@ package com.groendom_chat.groep_technologies.ClientServer.Operations;
 import android.util.Base64;
 
 import java.io.IOException;
+import java.io.Serializable;
 import java.math.BigInteger;
 import java.security.Key;
 import java.security.KeyFactory;
@@ -23,7 +24,7 @@ import javax.crypto.NoSuchPaddingException;
 /**
  * Created by tkr6u on 20.04.2017.
  */
-public class Security {
+public class Security implements Serializable {
 
     private static SecureRandom random = new SecureRandom();
     private static KeyFactory factory = getNewFactory();

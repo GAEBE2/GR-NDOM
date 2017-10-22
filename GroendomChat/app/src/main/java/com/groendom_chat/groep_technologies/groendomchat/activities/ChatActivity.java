@@ -15,31 +15,33 @@ import com.groendom_chat.groep_technologies.ClientServer.Client.ClientFunctions;
 import com.groendom_chat.groep_technologies.ClientServer.Client.Consumer;
 import com.groendom_chat.groep_technologies.ClientServer.Client.UserGroups.ClientUser;
 import com.groendom_chat.groep_technologies.ClientServer.Operations.MessageToSend;
-import com.groendom_chat.groep_technologies.ClientServer.Operations.Security;
 import com.groendom_chat.groep_technologies.groendomchat.R;
 import com.groendom_chat.groep_technologies.groendomchat.layout.ListViewAdapter;
 
 import java.io.IOException;
-import java.security.NoSuchAlgorithmException;
-import java.security.NoSuchProviderException;
 import java.util.ArrayList;
-import java.util.List;
 
 public class ChatActivity extends Activity {
-    private ClientFunctions functions;
-    private ClientUser clientUser;
     private final ArrayList<MessageToSend> items = new ArrayList<>();
     private ArrayAdapter<MessageToSend> itemsAdapter;
+    private ClientFunctions functions;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        ClientUser clientUser = (ClientUser) getIntent().getSerializableExtra(getString(R.string.client_user_value));
+        functions = (ClientFunctions) getIntent().getSerializableExtra(getString(R.string.client_functions_value));
 
-        functions = new ClientFunctions(new Consumer<MessageToSend>() {
+        if(clientUser == null || functions == null) {
+            Toast.makeText(getApplicationContext(), "Failed pass data between the activities", Toast.LENGTH_LONG).show();
+            finish();
+        }
+
+        functions.setPassiveMessageReceiver(new Consumer<MessageToSend>() {
             @Override
             public void accept(final MessageToSend message) {
-                if(itemsAdapter != null) {
+                if (itemsAdapter != null) {
                     runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
@@ -48,25 +50,23 @@ public class ChatActivity extends Activity {
                     });
                 }
             }
-        }, new Consumer<String>() {
+        });
+
+        functions.setActiveConsumers(new Consumer<MessageToSend>() {
             @Override
-            public void accept(String obj) {
-                System.out.println("Removed user:" + obj);
-            }
-        }, new Consumer<List<ClientUser>>() {
-            @Override
-            public void accept(List<ClientUser> obj) {
-                for (ClientUser user : obj) {
-                    System.out.println("Users:" + user);
+            public void accept(final MessageToSend message) {
+                if (itemsAdapter != null) {
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            itemsAdapter.add(message);
+                        }
+                    });
                 }
             }
         });
-        try {
-            clientUser = new ClientUser(Security.generateKeyPair());
-            this.openChat();
-        } catch (NoSuchAlgorithmException | NoSuchProviderException e) {
-            e.printStackTrace();
-        }
+
+        new ReceiveTask().execute();
 
         setContentView(R.layout.chat_activity);
 
@@ -92,7 +92,7 @@ public class ChatActivity extends Activity {
                 String text = editText.getText().toString();
                 if (!text.equals("")) {
                     try {
-                        if(functions.sendMessage(text)) {
+                        if (functions.sendMessage(text)) {
                             //items.add(new MessageToSend(text, clientUser.getName()));
                             editText.setText("");
 
@@ -110,24 +110,6 @@ public class ChatActivity extends Activity {
     protected void onStop() {
         super.onStop();
         functions.closeConnection();
-    }
-
-    private void openChat() throws NoSuchProviderException, NoSuchAlgorithmException {
-        functions.setActiveConsumers(new Consumer<MessageToSend>() {
-            @Override
-            public void accept(final MessageToSend message) {
-                if(itemsAdapter != null) {
-                    runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            itemsAdapter.add(message);
-                        }
-                    });
-                }
-            }
-        });
-        functions.openConnection("192.168.0.71", clientUser);
-        new ReceiveTask().execute();
     }
 
     private class ReceiveTask extends AsyncTask<Void, Void, Void> {

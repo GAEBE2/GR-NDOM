@@ -9,7 +9,7 @@ import java.util.UUID;
  * Created by tkr6u on 20.04.2017.
  * User specific to the client, used to save a custom name or a private key, should not be send!!
  */
-public class ClientUser extends User{
+public class ClientUser extends User {
     private PrivateKey privateKey;
     private String customName;
 
@@ -21,7 +21,8 @@ public class ClientUser extends User{
         super(name, publicKey);
         this.privateKey = privateKey;
     }
-    public ClientUser(KeyPair pair){
+
+    public ClientUser(KeyPair pair) {
         //super(pair);
         //this.privateKey = pair.getPrivate();
         //setName("test");
@@ -33,14 +34,13 @@ public class ClientUser extends User{
     }
 
     /**
-     *
      * @return custom name if set
      */
     @Override
     public String getName() {
-        if(customName == null){
+        if (customName == null) {
             return super.getName();
-        }else {
+        } else {
             return customName;
         }
     }
