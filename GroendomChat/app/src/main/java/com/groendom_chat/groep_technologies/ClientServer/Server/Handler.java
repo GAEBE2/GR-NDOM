@@ -50,9 +50,6 @@ public class Handler extends Thread {
             userList.add(user);
             roomIndex = insetIntoRoom();
 
-            //send active users on server to user
-            outputStream.writeObject(new MessageToSend(roomList.get(roomIndex).getHandlers()));
-
             //send new user to active users
             for (Handler handler : roomList.get(roomIndex).getHandlers()) {
                 if (handler != null && handler != this) {

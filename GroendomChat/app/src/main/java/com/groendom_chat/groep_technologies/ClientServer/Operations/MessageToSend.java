@@ -20,7 +20,7 @@ import java.util.UUID;
 public class MessageToSend implements Serializable {
 
     public enum MessageType {
-        TEXT, IMAGE, USER_ADD, USER_LIST, LOGIN, USER_REMOVE, ENCRYPTED_TEXT, NEXT, RECONNECT
+        TEXT, IMAGE, USER_ADD, LOGIN, USER_REMOVE, ENCRYPTED_TEXT, NEXT, RECONNECT
     }
 
     private MessageType messageType;
@@ -28,14 +28,11 @@ public class MessageToSend implements Serializable {
     //default port
     private static final int PORT = 9001;
 
-    private List<User> userList;
     private int port;
     private byte[] encryptedMessage;
     private String message;
     private Date timeSend;
     private byte[] file;
-    //private PublicKey publicKey;
-    //private String author;
     private User author;
 
     private MessageToSend() {
@@ -87,53 +84,28 @@ public class MessageToSend implements Serializable {
         return c.getTime();
     }
 
-    public MessageToSend(List<User> userList) {
-        this();
-        this.userList = new ArrayList<>();
-        for (User user : userList) {
-            this.userList.add(new ClientUser(user));
-        }
-        messageType = MessageType.USER_LIST;
-    }
-
-    public MessageToSend(Handler[] users) {
-        this();
-        this.userList = new ArrayList<>();
-        for (Handler handler : users) {
-            if (handler != null) {
-                userList.add(handler.getUser());
-            }
-        }
-        messageType = MessageType.USER_LIST;
-    }
-
-    public MessageToSend(String message, String author) {
+    public MessageToSend(String message, User author) {
         this();
         messageType = MessageType.TEXT;
         this.message = message;
-        this.author = new User(author);
+        this.author = author;
     }
 
-    public MessageToSend(byte[] encryptedMessage, String author, PublicKey publicKey) {
+    public MessageToSend(byte[] encryptedMessage, User author) {
         this();
         messageType = MessageType.ENCRYPTED_TEXT;
         this.encryptedMessage = encryptedMessage;
-        this.author = new User(author, publicKey);
+        this.author = author;
     }
 
-    public MessageToSend(byte[] encryptedMessage, String author, PublicKey publicKey, byte[] file) {
-        this(encryptedMessage, author, publicKey);
+    public MessageToSend(byte[] encryptedMessage, User author, byte[] file) {
+        this(encryptedMessage, author);
         this.file = file;
         messageType = MessageType.IMAGE;
     }
 
-    public MessageToSend(String message, String author, PublicKey publicKey) {
+    public MessageToSend(String message, User author, byte[] file) {
         this(message, author);
-        this.author.setPublicKey(publicKey);
-    }
-
-    public MessageToSend(String message, String author, PublicKey publicKey, byte[] file) {
-        this(message, author, publicKey);
         this.file = file;
         messageType = MessageType.IMAGE;
     }
@@ -202,14 +174,6 @@ public class MessageToSend implements Serializable {
 
     public void setFile(byte[] file) {
         this.file = file;
-    }
-
-    public List<User> getUserList() {
-        return userList;
-    }
-
-    public void setUserList(List<User> userList) {
-        this.userList = userList;
     }
 
     public int getPort() {

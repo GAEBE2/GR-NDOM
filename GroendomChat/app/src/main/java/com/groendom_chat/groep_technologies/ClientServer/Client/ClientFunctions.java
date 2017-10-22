@@ -84,6 +84,7 @@ public class ClientFunctions implements Serializable {
 
     public void setActiveConsumers(Consumer<MessageToSend> messageConsumer) {
         activeMessageReceiver = messageConsumer;
+        active = true;
     }
 
     public ClientFunctions(Consumer<MessageToSend> consumer) {
@@ -91,8 +92,8 @@ public class ClientFunctions implements Serializable {
         active = false;
     }
 
-    public void sendNextMessage(ClientUser user) throws IOException {
-        outputStream.writeObject(new MessageToSend(user.getUuid(), user.getPublicKey()));
+    public void sendNextMessage(ClientUser client) throws IOException {
+        outputStream.writeObject(new MessageToSend(client.getUser().getUuid(), client.getUser().getPublicKey()));
     }
 
     public boolean sendMessage(String messageToSend) throws IOException {
@@ -114,8 +115,8 @@ public class ClientFunctions implements Serializable {
      * otherwise return a String with the reason
      * curActivity is used to create a toast on connection error/success - null if not used in activity
      */
-    public void openConnection(String address, ClientUser user, Callback cb) {
-        this.clientUser = user;
+    public void openConnection(String address, ClientUser client) {
+        this.clientUser = client;
         OpenConnectionTask task = new OpenConnectionTask();
         try {
             task.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, address, cb).get(3, TimeUnit.SECONDS);
@@ -124,7 +125,7 @@ public class ClientFunctions implements Serializable {
         }
     }
 
-    public String reOpenConnection(ClientUser user) {
+    public String reOpenConnection(ClientUser client) {
         //openConnection(oldAddress, user, oldPort);
         //utputStream.writeObject(new MessageToSend(user.getPublicKey()));
         //TODO: implement
@@ -159,19 +160,14 @@ public class ClientFunctions implements Serializable {
                             String decryptedMessage = Security.decrypt(message.getEncryptedMessage(), clientUser.getPrivateKey());
                             message.setMessage(decryptedMessage);
                         case TEXT:
-                            message.setAuthor(getUserFromList(message.getAuthor()));
+                            //message.setAuthor(getUserFromList(message.getAuthor()));
                             messages.add(message);
                             chooseActiveOrPassiveConsumer(passiveMessageReceiver, activeMessageReceiver, message);
                             break;
                         case USER_ADD:
-                            ClientUser user = new ClientUser(new ClientUser(message.getAuthor()));
-                            users.add(user);
+                            ClientUser user = new ClientUser(message.getAuthor());
+                            users.add(user.getUser());
                             chooseActiveOrPassiveConsumer(passiveUserAdder, activeUserAdder, Collections.singletonList(user));
-                            break;
-                        case USER_LIST:
-                            List<User> usernameList = message.getUserList();
-                            getUsers().addAll(usernameList);
-                            chooseActiveOrPassiveConsumer(passiveUserAdder, activeUserAdder, usernameList);
                             break;
                         case USER_REMOVE:
                             this.users.remove(getUserFromList(message.getAuthor()));
@@ -192,6 +188,7 @@ public class ClientFunctions implements Serializable {
                 return 0;
             } catch (ClassNotFoundException e) {
                 e.printStackTrace();
+                return 1;
             }
         }
         return 0;
@@ -213,7 +210,7 @@ public class ClientFunctions implements Serializable {
                     if (input instanceof Authentication) {
                         auth = ((Authentication) input);
                         publicServerKey = Security.byteArrToPublicKey(auth.getPublicKey());
-                        auth.setPublicKey(clientUser.getPublicKey());
+                        auth.setPublicKey(clientUser.getUser().getPublicKey());
                         auth.setEncryptedMessage(Security.encrypt(auth.getOriginalMessage(), clientUser.getPrivateKey()));
                         outputStream.writeObject(auth);
                         inProgress = false;
@@ -323,7 +320,7 @@ public class ClientFunctions implements Serializable {
             if (address != null && !address.equals(oldAddress) || oldPort != PORT) { //one should not be able to connect to a server twice
                 closeConnection();
                 oldAddress = address;
-                oldPort = port;
+                oldPort = PORT;
                 connected = false;
                 users = new ArrayList<>();
                 messages = new LinkedList<>();
@@ -333,7 +330,7 @@ public class ClientFunctions implements Serializable {
                     inputStream = new ObjectInputStream(socket.getInputStream());
                     if (outputStream != null) {
                         //authenticate();
-                        outputStream.writeObject(new MessageToSend(clientUser));
+                        outputStream.writeObject(new MessageToSend(clientUser.getUser()));
                         if (cb != null) {
                             cb.onFinish(null);
                         }
@@ -359,7 +356,7 @@ public class ClientFunctions implements Serializable {
             for (String messageToSend : params) {
                 try {
                     //outputStream.writeObject(new MessageToSend(Security.encrypt(messageToSend, publicServerKey), clientUser.getName(), clientUser.getPublicKey()));
-                    outputStream.writeObject(new MessageToSend(messageToSend, clientUser.getName()));
+                    outputStream.writeObject(new MessageToSend(messageToSend, clientUser.getUser()));
                 } catch (IOException e) {
                     e.printStackTrace();
                     return false;

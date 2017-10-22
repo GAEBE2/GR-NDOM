@@ -81,7 +81,7 @@ public class ChatActivity extends Activity {
             }
         });
 
-        itemsAdapter = new ListViewAdapter(this, items, clientUser);
+        itemsAdapter = new ListViewAdapter(this, items, clientUser.getUser());
         final EditText editText = (EditText) findViewById(R.id.edit_text_message);
         final ListView listView = (ListView) findViewById(R.id.chat_activity_content);
         listView.setAdapter(itemsAdapter);
