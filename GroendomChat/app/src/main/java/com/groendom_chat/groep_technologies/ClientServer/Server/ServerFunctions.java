@@ -36,12 +36,12 @@ public class ServerFunctions {
         //set custom port and public/private key dir razin99
 
         for (String string : args) {
-            if(NumberUtils.isParsable(string)) {
+            if (NumberUtils.isParsable(string)) {
                 port = Integer.parseInt(string);
             }
         }
         generateNewKeysIfNecessary();
-        
+
         log("The chat server is running on port: " + port);
         try (ServerSocket listener = new ServerSocket(port)) {
             while (open) {
@@ -58,10 +58,9 @@ public class ServerFunctions {
     }
 
 
-
     public static void log(String msg) {
-        if(LOG == null){
-            LOG =  Logger.getLogger("");
+        if (LOG == null) {
+            LOG = Logger.getLogger("");
         }
         LOG.log(Level.ALL, msg);
         System.out.println(msg);
@@ -71,7 +70,7 @@ public class ServerFunctions {
      * generates a new keypair for the server
      */
     private static void generateNewKeysIfNecessary() {
-        if(pair == null) {
+        if (pair == null) {
             try {
                 pair = Security.generateKeyPair();
             } catch (NoSuchAlgorithmException | NoSuchProviderException e) {
