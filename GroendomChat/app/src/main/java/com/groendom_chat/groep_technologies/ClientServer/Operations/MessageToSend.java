@@ -1,11 +1,15 @@
-import UserGroups.ClientUser;
-import UserGroups.User;
+package com.groendom_chat.groep_technologies.ClientServer.Operations;
+
+import com.groendom_chat.groep_technologies.ClientServer.Client.UserGroups.ClientUser;
+import com.groendom_chat.groep_technologies.ClientServer.Client.UserGroups.User;
+import com.groendom_chat.groep_technologies.ClientServer.Server.Handler;
 
 import java.io.Serializable;
 import java.security.PublicKey;
-import java.time.LocalDateTime;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
@@ -13,10 +17,10 @@ import java.util.UUID;
  * Created by serge on 20-Mar-17.
  * Used to send all diffrent types of message in one object to avoid 10 else if with instance ofs
  */
-public class Message implements Serializable{
+public class MessageToSend implements Serializable {
 
-    public enum MessageType{
-        TEXT, IMAGE, USER_ADD, USER_LIST, LOGIN, USER_REMOVE, ENCRYPTED_TEXT, NEXT, RECONNECT
+    public enum MessageType {
+        TEXT, IMAGE, USER_ADD, LOGIN, USER_REMOVE, ENCRYPTED_TEXT, NEXT, RECONNECT
     }
 
     private MessageType messageType;
@@ -24,30 +28,26 @@ public class Message implements Serializable{
     //default port
     private static final int PORT = 9001;
 
-    private List<User> userList;
     private int port;
     private byte[] encryptedMessage;
     private String message;
-    private LocalDateTime timeSend;
+    private Date timeSend;
     private byte[] file;
-    //private PublicKey publicKey;
-    //private String author;
     private User author;
 
-    private Message(){
+    private MessageToSend() {
         author = new User();
-        this.timeSend = LocalDateTime.now();
+        this.timeSend = new Date();
     }
 
 
-
-    public Message(UUID userID, PublicKey publicKey){
+    public MessageToSend(UUID userID, PublicKey publicKey) {
         this();
         messageType = MessageType.NEXT;
         author = new User(userID, publicKey);
     }
 
-    public Message(String loginUName, String address, int port) {
+    public MessageToSend(String loginUName, String address, int port) {
         this();
         messageType = MessageType.LOGIN;
         author = new User(loginUName);
@@ -55,63 +55,63 @@ public class Message implements Serializable{
         this.port = port;
     }
 
-    public Message(User user) {
+    public MessageToSend(User user) {
         this();
         messageType = MessageType.USER_ADD;
         author = user;
     }
 
-    public Message(List<User> userList) {
-        this();
-        this.userList = new ArrayList<>();
-        userList.forEach(user -> this.userList.add(new ClientUser(user)));
-        messageType = MessageType.USER_LIST;
-    }
-
-    public Message(Handler[] users){
-        this();
-        this.userList = new ArrayList<>();
-        for (Handler handler : users) {
-            if(handler != null) {
-                userList.add(handler.getUser());
-            }
+    /**
+     * Format date string
+     * @return formatted date string
+     */
+    public String getDateString() {
+        if (getTimeSend().before(getToday())) {
+            return new SimpleDateFormat("dd.MM.yyyy HH:mm", java.util.Locale.getDefault()).format(getTimeSend());
+        } else {
+            return new SimpleDateFormat("HH:mm", java.util.Locale.getDefault()).format(getTimeSend());
         }
-        messageType = MessageType.USER_LIST;
     }
 
-    public Message(String message, String author) {
+    private Date getToday() {
+        Calendar c = Calendar.getInstance();
+
+        c.set(Calendar.HOUR_OF_DAY, 0);
+        c.set(Calendar.MINUTE, 0);
+        c.set(Calendar.SECOND, 0);
+        c.set(Calendar.MILLISECOND, 0);
+
+        return c.getTime();
+    }
+
+    public MessageToSend(String message, User author) {
         this();
         messageType = MessageType.TEXT;
         this.message = message;
-        this.author = new User(author);
+        this.author = author;
     }
 
-    public Message(byte[] encryptedMessage, String author, PublicKey publicKey) {
+    public MessageToSend(byte[] encryptedMessage, User author) {
         this();
         messageType = MessageType.ENCRYPTED_TEXT;
         this.encryptedMessage = encryptedMessage;
-        this.author = new User(author, publicKey);
+        this.author = author;
     }
 
-    public Message(byte[] encryptedMessage, String author, PublicKey publicKey, byte[] file) {
-        this(encryptedMessage, author, publicKey);
+    public MessageToSend(byte[] encryptedMessage, User author, byte[] file) {
+        this(encryptedMessage, author);
         this.file = file;
         messageType = MessageType.IMAGE;
     }
 
-    public Message(String message, String author, PublicKey publicKey) {
+    public MessageToSend(String message, User author, byte[] file) {
         this(message, author);
-        this.author.setPublicKey(publicKey);
-    }
-
-    public Message(String message, String author, PublicKey publicKey, byte[] file) {
-        this(message, author, publicKey);
         this.file = file;
         messageType = MessageType.IMAGE;
     }
 
-    static Message createLogoutMessage(User user) {
-        Message res = new Message(user);
+    public static MessageToSend createLogoutMessage(User user) {
+        MessageToSend res = new MessageToSend(user);
         res.setMessageType(MessageType.USER_REMOVE);
         return res;
     }
@@ -130,7 +130,7 @@ public class Message implements Serializable{
     }
 
     public String getUsername() {
-        if(messageType == MessageType.USER_ADD || messageType == MessageType.LOGIN && author != null) {
+        if (messageType == MessageType.USER_ADD || messageType == MessageType.LOGIN && author != null) {
             return author.getName();
         }
         return null;
@@ -144,15 +144,15 @@ public class Message implements Serializable{
         this.author = author;
     }
 
-    public LocalDateTime getTimeSend() {
+    public Date getTimeSend() {
         return timeSend;
     }
 
-    public void setTimeSend(LocalDateTime timeSend) {
+    public void setTimeSend(Date timeSend) {
         this.timeSend = timeSend;
     }
 
-    public boolean hasImage(){
+    public boolean hasImage() {
         return file != null && file.length > 0;
     }
 
@@ -163,6 +163,7 @@ public class Message implements Serializable{
     public MessageType getMessageType() {
         return messageType;
     }
+
     public void setMessageType(MessageType messageType) {
         this.messageType = messageType;
     }
@@ -173,14 +174,6 @@ public class Message implements Serializable{
 
     public void setFile(byte[] file) {
         this.file = file;
-    }
-
-    public List<User> getUserList() {
-        return userList;
-    }
-
-    public void setUserList(List<User> userList) {
-        this.userList = userList;
     }
 
     public int getPort() {
@@ -203,11 +196,11 @@ public class Message implements Serializable{
         return encryptedMessage;
     }
 
-    public static Message getReconnectMessage(User user, int arrNumber){
-        Message message = new Message(user);
-        message.messageType = MessageType.RECONNECT;
-        message.port = arrNumber;
+    public static MessageToSend getReconnectMessage(User user, int arrNumber) {
+        MessageToSend messageToSend = new MessageToSend(user);
+        messageToSend.messageType = MessageType.RECONNECT;
+        messageToSend.port = arrNumber;
 
-        return message;
+        return messageToSend;
     }
 }

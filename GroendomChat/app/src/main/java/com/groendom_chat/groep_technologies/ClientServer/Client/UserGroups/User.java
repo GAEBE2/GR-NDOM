@@ -1,5 +1,4 @@
-package UserGroups;
-
+package com.groendom_chat.groep_technologies.ClientServer.Client.UserGroups;
 import java.io.Serializable;
 import java.security.KeyPair;
 import java.security.PublicKey;
@@ -16,11 +15,11 @@ public class User implements Serializable{
     private UUID uuid;
     private int connection;
 
-    public User(ClientUser user) {
-        uuid = user.getUuid();
-        publicKey = user.getPublicKey();
-        connection = user.getConnection();
-        name = user.getName();
+    public User(ClientUser cuser) {
+        uuid = cuser.getUser().getUuid();
+        publicKey = cuser.getUser().getPublicKey();
+        connection = cuser.getUser().getConnection();
+        name = cuser.getUser().getName();
     }
 
     public User(){
@@ -38,10 +37,11 @@ public class User implements Serializable{
     }
 
     public User(String name) {
+        this();
         this.name = name;
     }
     public User(String name, PublicKey key) {
-        this.name = name;
+        this(name);
         this.publicKey = key;
     }
 
@@ -74,12 +74,7 @@ public class User implements Serializable{
     }
 
     @Override
-    public boolean equals(Object objectToCompare) {
-        boolean result = false;
-        if(objectToCompare instanceof User && ((User) objectToCompare).getPublicKey().equals(this.getPublicKey())) {
-            result = true;
-        }
-
-        return result;
+    public boolean equals(Object objToCom) {
+        return objToCom instanceof User &&(uuid != null && (uuid.equals(((User) objToCom).uuid) || publicKey != null && publicKey.equals(((User) objToCom).publicKey)));
     }
 }

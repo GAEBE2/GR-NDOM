@@ -64,3 +64,23 @@ Scrum Master: Yvo Keller
 ## Gabriel
 - git-Probleme behoben
 - Smileys eingebaut
+
+# Daily Scrum 25.09.2017
+##Gabriel:
+- Heute: mit Senden von Emojis auseinandersetzen
+- Dokumentation geschrieben
+- Design erstellt
+
+##Serge
+- Heute: Backend und GUI zusammenfügen
+- Weitere Methoden auf dem Backend zur Verfügung gestellt
+- Public und private keys auf dem Backend
+
+##Yvo
+- Heute: ChatBubbles weiterarbeiten
+- Projekt läuft jetzt
+- Design erstellt
+
+##Patrick
+- Heute: App mit Backend verbinden
+- Design vom App realisiert
