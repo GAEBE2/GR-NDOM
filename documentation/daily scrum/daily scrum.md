@@ -1,4 +1,4 @@
-﻿# Daily Scrum 04.09.2017
+# Daily Scrum 04.09.2017
 ## Serge:
 - Backend Programmiert und eingerichtet
 - Zugriff App auf Client ermöglicht mit Functions Klasse
@@ -16,7 +16,12 @@
 - Android Studio Projekt lokal aufgesetzt
 
 ## Weiteres
-Scrum Master: Yvo Keller
+Product Owner: Yvo Keller
+
+
+# Daily Scrum 11.09.2017
+## Knabenschiessen
+
 
 # Daily Scrum 18.09.2017
 ## Serge:
@@ -36,24 +41,36 @@ Scrum Master: Yvo Keller
 - Android Studio Projekt lokal aufgesetzt
 
 ## Weiteres
-Scrum Master: Yvo Keller
+Product Owner: Serge Roth
+
 
 # Daily Scrum 25.09.2017
-## Serge
-- Backend erste FUnktionalitäten fertigstellen und testen
-##Patrick
--UI weiter erweitern
-- git probleme beheben
-##Yvo
-- git probleme beheben
-##Gabriel
-- git probleme beheben
-- Chat Icons einfügen
+## Gabriel:
+- Heute: mit Senden von Emojis auseinandersetzen
+- Dokumentation geschrieben
+- Design erstellt
 
-# Daily Sccrum 02.10.2017
+## Serge
+- Heute: Backend und GUI zusammenfügen
+- Weitere Methoden auf dem Backend zur Verfügung gestellt
+- Public und private keys auf dem Backend
 
 ## Yvo
-- Abwesend
+- Heute: ChatBubbles weiterarbeiten
+- Projekt läuft jetzt
+- Design erstellt
+
+## Patrick
+- Heute: App mit Backend verbinden
+- Design vom App realisiert
+
+## Weiteres
+Product Owner: Patrick Wissiak
+
+
+# Daily Scrum 02.10.2017
+## Yvo
+- Abwesend (Urlaubsgesuch)
 
 ## Serge
 - Applikation in Android-Java umsetzen (Sockets anpassen)
@@ -62,25 +79,36 @@ Scrum Master: Yvo Keller
 - Client/Server-Verbindung aufgestellt
 
 ## Gabriel
-- git-Probleme behoben
+- Git-Probleme behoben
 - Smileys eingebaut
 
-# Daily Scrum 25.09.2017
-##Gabriel:
-- Heute: mit Senden von Emojis auseinandersetzen
-- Dokumentation geschrieben
-- Design erstellt
+## Weiteres
+Product Owner: Gabruek Meier
 
-##Serge
-- Heute: Backend und GUI zusammenfügen
-- Weitere Methoden auf dem Backend zur Verfügung gestellt
-- Public und private keys auf dem Backend
 
-##Yvo
-- Heute: ChatBubbles weiterarbeiten
-- Projekt läuft jetzt
-- Design erstellt
+# Daily Scrum 09.10.2017
+## Herbstferien
 
-##Patrick
-- Heute: App mit Backend verbinden
-- Design vom App realisiert
+
+# Daily Scrum 16.10.2017
+## Herbstferien
+
+
+# Daily Scrum 23.10.2017
+## Aktueller Stand
+- Die App funktioniert, es können Nachrichten inkl. Emojis versendet und empfangen werden.
+- Serge hatte bei sich Probleme mit einem App Crash ohne Fehlermeldung, tritt bei Patrick jedoch nicht auf.
+
+## Serge
+- Find new Chatpartner Funktion serverseitig implementieren
+
+## Patrick
+- Find new Chatpartner Funktion im App implementieren
+
+## Yvo
+- Dokumentation schreiben, über Bewertung informieren
+- Releases der Applikation auf GitHub erstellen
+
+## Gabriel
+- Codekonvention prüfen und wenn nötig anpassen (wir verwenden Camel Case)
+- Continous Integration auf GitHub implementieren
