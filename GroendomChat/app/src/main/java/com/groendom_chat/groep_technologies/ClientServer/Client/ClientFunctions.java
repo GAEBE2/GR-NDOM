@@ -88,10 +88,6 @@ public class ClientFunctions {
         active = false;
     }
 
-    public void sendNextMessage(ClientUser client) throws IOException {
-        outputStream.writeObject(new MessageToSend(client.getUser().getUuid(), client.getUser().getPublicKey()));
-    }
-
     public boolean sendMessage(String messageToSend) throws IOException {
         SendTask task = new SendTask();
         try {
@@ -104,6 +100,17 @@ public class ClientFunctions {
         }
     }
 
+    public boolean requestNewRoom(){
+        NewRoomTask task = new NewRoomTask();
+        try {
+            return task.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR).get();
+
+        } catch (InterruptedException | ExecutionException e1) {
+            e1.printStackTrace();
+            return false;
+            //return task.execute().get();
+        }
+    }
 
     /**
      * @param address address where the server lies
@@ -356,6 +363,19 @@ public class ClientFunctions {
                     e.printStackTrace();
                     return false;
                 }
+            }
+            return true;
+        }
+    }
+
+    private class NewRoomTask extends AsyncTask<String, Void, Boolean> {
+        protected Boolean doInBackground(String... params) {
+            try {
+                //outputStream.writeObject(new MessageToSend(Security.encrypt(messageToSend, publicServerKey), clientUser.getName(), clientUser.getPublicKey()));
+                outputStream.writeObject(new MessageToSend(MessageToSend.MessageType.NEW_ROOM));
+            } catch (IOException e) {
+                e.printStackTrace();
+                return false;
             }
             return true;
         }

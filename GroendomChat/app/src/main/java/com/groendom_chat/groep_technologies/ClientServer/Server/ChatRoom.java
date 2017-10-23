@@ -9,18 +9,39 @@ public class ChatRoom {
     private Handler[] handlers = new Handler[2];
     private List<MessageToSend> messageList = new LinkedList<>();
     private boolean searching = true;
+    int freePlace;
 
     public ChatRoom(Handler user) {
         handlers[0] = user;
+        freePlace = 1;
     }
 
     public boolean addHandler(Handler user) {
         if (searching) {
-            handlers[1] = user;
+            handlers[freePlace] = user;
             searching = false;
             return true;
         }
         return false;
+    }
+
+    public void removeHandler(Handler handler){
+        for (int i = 0; i < handlers.length; i++) {
+            if(handlers[i].equals(handler)){
+                removeHandler(i);
+            }
+        }
+    }
+
+    public void removeHandler(int index){
+        switch (index){
+            case 0:
+            case 1:
+                handlers[index] = null;
+                searching = true;
+                break;
+        }
+        freePlace = index;
     }
 
     public void addMessage(MessageToSend message) {

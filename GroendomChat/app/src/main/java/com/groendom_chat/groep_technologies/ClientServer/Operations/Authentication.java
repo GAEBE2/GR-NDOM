@@ -5,7 +5,7 @@ import java.security.PublicKey;
 
 /**
  * Created by serge on 23-Apr-17.
- *  Used for the quite authentication that happens when a client tries to connect to a server
+ * Used for the quite authentication that happens when a client tries to connect to a server
  */
 public class Authentication implements Serializable {
     private byte[] publicKey;
@@ -25,7 +25,7 @@ public class Authentication implements Serializable {
     }
 
     public byte[] getPublicKey() {
-        return  publicKey;
+        return publicKey;
     }
 
     public String getOriginalMessage() {

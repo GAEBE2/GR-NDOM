@@ -15,7 +15,7 @@ public class ClientUser { // no longer extends User so that it cannot be send
     private User user;
 
     public ClientUser(User user) {
-        user = new User(user.getName(), user.getPublicKey());
+        this.user = new User(user.getName(), user.getPublicKey());
     }
 
     public ClientUser(String name, PublicKey publicKey, PrivateKey privateKey) {
