@@ -27,4 +27,8 @@ public class MessageHandler {
         ((TextView) child.findViewById(R.id.bubble_text_date)).setText(message.getDateString());
         parent.addView(child);
     }
+
+    public void createOut(ViewGroup parent, Icon icon){
+
+    }
 }

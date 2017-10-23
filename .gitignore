@@ -1,5 +1,5 @@
 GroendomChat/.idea/
-GroendomChat/build/*
+GroendomChat/build/
 GroendomChat/local.properties
 GroendomChat/.gradle
 *.iml

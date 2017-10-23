@@ -18,7 +18,7 @@
 ## Weiteres
 Scrum Master: Yvo Keller
 
-# Daily Scrum 04.09.2017
+# Daily Scrum 18.09.2017
 ## Serge:
 - Backend Programmiert und eingerichtet
 - Zugriff App auf Client ermöglicht mit Functions Klasse
@@ -38,7 +38,7 @@ Scrum Master: Yvo Keller
 ## Weiteres
 Scrum Master: Yvo Keller
 
-# Daily Scrum 18.09.2017
+# Daily Scrum 25.09.2017
 ## Serge
 - Backend erste FUnktionalitäten fertigstellen und testen
 ##Patrick
@@ -48,3 +48,19 @@ Scrum Master: Yvo Keller
 - git probleme beheben
 ##Gabriel
 - git probleme beheben
+- Chat Icons einfügen
+
+# Daily Sccrum 02.10.2017
+
+## Yvo
+- Abwesend
+
+## Serge
+- Applikation in Android-Java umsetzen (Sockets anpassen)
+
+## Patrick
+- Client/Server-Verbindung aufgestellt
+
+## Gabriel
+- git-Probleme behoben
+- Smileys eingebaut
