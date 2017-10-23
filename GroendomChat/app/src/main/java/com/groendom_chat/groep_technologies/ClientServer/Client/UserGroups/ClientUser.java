@@ -1,5 +1,6 @@
 package com.groendom_chat.groep_technologies.ClientServer.Client.UserGroups;
 
+import java.io.Serializable;
 import java.security.KeyPair;
 import java.security.PrivateKey;
 import java.security.PublicKey;
@@ -9,7 +10,7 @@ import java.util.UUID;
  * Created by tkr6u on 20.04.2017.
  * User specific to the client, used to save a custom name or a private key, should not be send!!
  */
-public class ClientUser { // no longer extends User so that it cannot be send
+public class ClientUser implements Serializable { // no longer extends User so that it cannot be send
     private PrivateKey privateKey;
     private String customName;
     private User user;

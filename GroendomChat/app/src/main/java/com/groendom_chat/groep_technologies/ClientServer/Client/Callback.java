@@ -7,5 +7,5 @@ import java.io.Serializable;
  */
 
 public interface Callback extends Serializable {
-    void onFinish(Object param);
+    void onFinish(Object... param);
 }

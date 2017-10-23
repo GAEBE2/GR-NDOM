@@ -12,7 +12,6 @@ import java.io.EOFException;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
-import java.io.Serializable;
 import java.net.Socket;
 import java.net.SocketException;
 import java.security.PublicKey;
@@ -29,13 +28,11 @@ import java.util.concurrent.TimeoutException;
  * All the backend functions that one can use in the different front ends
  * Needs serializable to get transferred between activities
  */
-public class ClientFunctions implements Serializable {
+public class ClientFunctions {
 
     private ClientUser clientUser;
 
     private PublicKey publicServerKey;
-
-    private Socket socket;
 
     private String oldAddress;
 
@@ -45,10 +42,12 @@ public class ClientFunctions implements Serializable {
 
     private boolean active = false;
 
+    private Socket socket;
+    private ObjectInputStream inputStream;
+    private ObjectOutputStream outputStream;
+
     private List<User> users = new ArrayList<>();
     private List<MessageToSend> messages = new LinkedList<>();
-    private ObjectOutputStream outputStream;
-    private ObjectInputStream inputStream;
     private boolean connected = false;
     //Consumers which are used when this active == true
     private Consumer<MessageToSend> activeMessageReceiver;
@@ -250,6 +249,18 @@ public class ClientFunctions implements Serializable {
         return active;
     }
 
+    public void setObjectInputStream(ObjectInputStream inputStream) {
+        this.inputStream = inputStream;
+    }
+
+    public void setObjectOutputStream(ObjectOutputStream outputStream) {
+        this.outputStream = outputStream;
+    }
+
+    public void setSocket(Socket socket) {
+        this.socket = socket;
+    }
+
     /**
      * chooses active or passive consumer based on boolean active
      *
@@ -308,45 +319,41 @@ public class ClientFunctions implements Serializable {
         return result[0];
     }
 
-    private class OpenConnectionTask extends AsyncTask<Object, Void, Void> implements Serializable {
+    public void setConnected(boolean connected) {
+        this.connected = connected;
+    }
+
+    private class OpenConnectionTask extends AsyncTask<Object, Void, Void> {
         protected Void doInBackground(Object... params) {
             String address = (String) params[0];
             Callback cb = (Callback) params[1];
-            if (address != null && !address.equals(oldAddress) || oldPort != PORT) { //one should not be able to connect to a server twice
-                closeConnection();
-                oldAddress = address;
-                oldPort = PORT;
-                connected = false;
-                users = new ArrayList<>();
-                messages = new LinkedList<>();
-                try {
-                    socket = new Socket(address, PORT); //opens the connection
-                    outputStream = new ObjectOutputStream(socket.getOutputStream());
-                    inputStream = new ObjectInputStream(socket.getInputStream());
-                    if (outputStream != null) {
-                        //authenticate();
-                        outputStream.writeObject(new MessageToSend(clientUser.getUser()));
-                        if (cb != null) {
-                            cb.onFinish(null);
-                        }
-                        connected = true;
-                    }
-                } catch (IOException | IllegalArgumentException e) {
-                    e.printStackTrace();
-                    if (cb != null) {
-                        cb.onFinish(e);
-                    }
+            closeConnection();
+            oldAddress = address;
+            oldPort = PORT;
+            connected = false;
+            users = new ArrayList<>();
+            messages = new LinkedList<>();
+            try {
+                socket = new Socket(address, PORT); //opens the connection
+                outputStream = new ObjectOutputStream(socket.getOutputStream());
+                inputStream = new ObjectInputStream(socket.getInputStream());
+                //authenticate();
+                outputStream.writeObject(new MessageToSend(clientUser.getUser()));
+                if (cb != null) {
+                    cb.onFinish(socket, outputStream, inputStream);
                 }
-            }
-
-            if (cb != null) {
-                cb.onFinish(new Exception("Same address or same port used or address is null"));
+                connected = true;
+            } catch (IOException | IllegalArgumentException e) {
+                e.printStackTrace();
+                if (cb != null) {
+                    cb.onFinish(e);
+                }
             }
             return null;
         }
     }
 
-    private class SendTask extends AsyncTask<String, Void, Boolean> implements Serializable {
+    private class SendTask extends AsyncTask<String, Void, Boolean> {
         protected Boolean doInBackground(String... params) {
             for (String messageToSend : params) {
                 try {

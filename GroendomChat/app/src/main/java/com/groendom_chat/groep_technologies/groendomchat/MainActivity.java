@@ -9,10 +9,14 @@ import android.widget.Toast;
 import com.groendom_chat.groep_technologies.ClientServer.Client.Callback;
 import com.groendom_chat.groep_technologies.ClientServer.Client.ClientFunctions;
 import com.groendom_chat.groep_technologies.ClientServer.Client.Consumer;
+import com.groendom_chat.groep_technologies.ClientServer.Client.SocketHandler;
 import com.groendom_chat.groep_technologies.ClientServer.Client.UserGroups.ClientUser;
 import com.groendom_chat.groep_technologies.ClientServer.Operations.Security;
 import com.groendom_chat.groep_technologies.groendomchat.activities.ChatActivity;
 
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.net.Socket;
 import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
 import java.util.List;
@@ -20,6 +24,9 @@ import java.util.List;
 public class MainActivity extends AppCompatActivity {
     private ClientFunctions functions;
     private ClientUser clientUser;
+    private Socket socket;
+    private ObjectInputStream inputStream;
+    private ObjectOutputStream outputStream;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -48,20 +55,31 @@ public class MainActivity extends AppCompatActivity {
                     clientUser = new ClientUser(Security.generateKeyPair());
                     openChat(new Callback() {
                         @Override
-                        public void onFinish(Object param) {
-                            if (param == null) {
-                                //Open connection was successful
-                                Intent chatActivityIntent = new Intent(MainActivity.this, ChatActivity.class);
-                                chatActivityIntent.putExtra(getString(R.string.client_functions_value), functions);
-                                startActivity(chatActivityIntent);
-                            } else {
-                                runOnUiThread(new Runnable() {
-                                    @Override
-                                    public void run() {
-                                        //gets executed from the callback inside the AsyncTask
-                                        Toast.makeText(getApplicationContext(), "Failed to open connection to the server", Toast.LENGTH_LONG).show();
-                                    }
-                                });
+                        public void onFinish(Object... param) {
+                            try {
+                                if (param != null && param[0] != null && param[0] instanceof Socket &&
+                                        param[1] != null && param[1] instanceof ObjectOutputStream &&
+                                        param[2] != null && param[2] instanceof ObjectInputStream) {
+
+                                    SocketHandler.setSocket((Socket) param[0]);
+                                    SocketHandler.setOutputStream((ObjectOutputStream) param[1]);
+                                    SocketHandler.setInputStream((ObjectInputStream) param[2]);
+
+                                    //Open connection was successful
+                                    Intent chatActivityIntent = new Intent(MainActivity.this, ChatActivity.class);
+                                    chatActivityIntent.putExtra(getString(R.string.client_user_value), clientUser);
+                                    startActivity(chatActivityIntent);
+                                } else {
+                                    runOnUiThread(new Runnable() {
+                                        @Override
+                                        public void run() {
+                                            //gets executed from the callback inside the AsyncTask
+                                            Toast.makeText(getApplicationContext(), "Failed to open connection to the server", Toast.LENGTH_LONG).show();
+                                        }
+                                    });
+                                }
+                            } catch (ClassCastException e) {
+                                e.printStackTrace();
                             }
                         }
                     });
@@ -74,6 +92,6 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void openChat(Callback cb) throws NoSuchProviderException, NoSuchAlgorithmException {
-        functions.openConnection("192.168.0.71", clientUser, cb);
+        functions.openConnection("10.4.57.171", clientUser, cb);
     }
 }
