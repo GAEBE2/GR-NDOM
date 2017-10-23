@@ -45,7 +45,7 @@ public class ServerFunctions {
         log("The chat server is running on port: " + port);
         try (ServerSocket listener = new ServerSocket(port)) {
             while (open) {
-                Handler handler = new Handler(listener.accept(), pair, roomList, userList, new Consumer<Handler>() {
+                Handler handler = new Handler(listener.accept(), pair, userList, new Consumer<Handler>() {
                     @Override
                     public void accept(Handler handler) {
                         handlerList.remove(handler);
@@ -57,6 +57,17 @@ public class ServerFunctions {
         }
     }
 
+    public static int insetIntoRoom(Handler handler) {
+        if (roomList == null) {
+            roomList = new ArrayList<>();
+        }
+        if (roomList.size() != 0 && roomList.get(roomList.size() - 1).isSearching()) {
+            roomList.get(roomList.size() - 1).addHandler(handler);
+        } else {
+            roomList.add(new ChatRoom(handler));
+        }
+        return roomList.size() - 1;
+    }
 
     public static void log(String msg) {
         if (LOG == null) {

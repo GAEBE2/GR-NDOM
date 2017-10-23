@@ -24,13 +24,11 @@ public class Handler extends Thread {
     private ObjectInputStream inputStream;
     private int roomIndex;
     private KeyPair keyPair;
-    private List<ChatRoom> roomList;
     private List<User> userList;
     private Consumer<Handler> disconnect;
 
-    public Handler(Socket socket, KeyPair keyPair, List<ChatRoom> chatRooms, List<User> userList, Consumer<Handler> disconnect) {
+    public Handler(Socket socket, KeyPair keyPair, List<User> userList, Consumer<Handler> disconnect) {
         this.socket = socket;
-        this.roomList = chatRooms;
         this.userList = userList;
         this.keyPair = keyPair;
         this.disconnect = disconnect;
@@ -48,10 +46,10 @@ public class Handler extends Thread {
             user = getUserFromClient();
 
             userList.add(user);
-            roomIndex = insetIntoRoom();
+            roomIndex = ServerFunctions.insetIntoRoom(this);
 
             //send new user to active users
-            for (Handler handler : roomList.get(roomIndex).getHandlers()) {
+            for (Handler handler : ServerFunctions.roomList.get(roomIndex).getHandlers()) {
                 if (handler != null && handler != this) {
                     handler.outputStream.writeObject(new MessageToSend(user));
                 }
@@ -59,7 +57,7 @@ public class Handler extends Thread {
 
             //send all stored messages
             String originalMessage;
-            for (MessageToSend messageToSend : roomList.get(roomIndex).getMessages()) {
+            for (MessageToSend messageToSend : ServerFunctions.roomList.get(roomIndex).getMessages()) {
                 originalMessage = messageToSend.getMessage();
                 if (originalMessage != null) {
                     messageToSend.setEncryptedMessage(Security.encrypt(originalMessage, publicKey));
@@ -81,17 +79,7 @@ public class Handler extends Thread {
         }
     }
 
-    public int insetIntoRoom() {
-        if (roomList == null) {
-            roomList = new ArrayList<>();
-        }
-        if (roomList.size() != 0 && roomList.get(roomList.size() - 1).isSearching()) {
-            roomList.get(roomList.size() - 1).addHandler(this);
-        } else {
-            roomList.add(new ChatRoom(this));
-        }
-        return roomList.size() - 1;
-    }
+
 
     /**
      * get public key from client and checks whether or not it's valid key and the client processes the fitting private key
@@ -152,9 +140,11 @@ public class Handler extends Thread {
                 System.out.println(object);
                 if (object != null && object instanceof MessageToSend) {
                     MessageToSend messageToSend = ((MessageToSend) object);
-                    roomList.get(roomIndex).addMessage(messageToSend);
+                    ServerFunctions.roomList.get(roomIndex).addMessage(messageToSend);
                     sendMessageToEveryone(messageToSend);
-                    ServerFunctions.log("messageToSend: " + messageToSend.getMessage() + " author: " + messageToSend.getAuthor().getName() + "|| Send to: " + roomList.get(roomIndex).getHandlers().length + " clients");
+                    ServerFunctions.log("messageToSend: " + messageToSend.getMessage() + " author: "
+                            + messageToSend.getAuthor().getName() + "|| Send to: "
+                            + ServerFunctions.roomList.get(roomIndex).getHandlers().length + " clients");
                 }
             } catch (ClassNotFoundException e) {
                 e.printStackTrace();
@@ -192,8 +182,8 @@ public class Handler extends Thread {
             decryptedMessage = Security.decrypt(messageToSend.getEncryptedMessage(), keyPair.getPrivate());
         }
 
-        if (roomList.size() != 0) {
-            for (Handler handler : roomList.get(roomIndex).getHandlers()) {
+        if (ServerFunctions.roomList.size() != 0) {
+            for (Handler handler : ServerFunctions.roomList.get(roomIndex).getHandlers()) {
                 try {
                     if (handler != null) {
                         if (messageToSend.getMessageType() == MessageToSend.MessageType.ENCRYPTED_TEXT) {
