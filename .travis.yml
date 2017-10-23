@@ -2,7 +2,7 @@ language: android
 
 script:
     - cd GroendomChat
-    - gradle build connectedCheck
+    - gradle build connectedCheck --stacktrace
 
 android:
   components:
