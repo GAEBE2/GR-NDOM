@@ -88,6 +88,12 @@ public class ClientFunctions {
         active = false;
     }
 
+    /**
+     * sends message in another thread
+     * @param messageToSend string that want's be send
+     * @return if successfully
+     * @throws IOException
+     */
     public boolean sendMessage(String messageToSend) throws IOException {
         SendTask task = new SendTask();
         try {
@@ -100,7 +106,11 @@ public class ClientFunctions {
         }
     }
 
-    public boolean requestNewRoom(){
+    /**
+     * sends a request to be put in a new room, to the server, in an other task
+     * @return if successfully
+     */
+    public boolean requestNewRoom() {
         NewRoomTask task = new NewRoomTask();
         try {
             return task.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR).get();
@@ -130,6 +140,11 @@ public class ClientFunctions {
         }
     }
 
+    /**
+     * sed to be
+     * @param client client that wants to reconnect
+     * @return message
+     */
     public String reOpenConnection(ClientUser client) {
         //openConnection(oldAddress, user, oldPort);
         //utputStream.writeObject(new MessageToSend(user.getPublicKey()));
@@ -137,7 +152,9 @@ public class ClientFunctions {
         return "";
     }
 
-
+    /**
+     * closes the connection, surprising i know
+     */
     public void closeConnection() {
         if (socket != null) {
             try {
@@ -152,6 +169,7 @@ public class ClientFunctions {
     }
 
     /**
+     * needs to be executed in a different thread !
      * @return 0 if it got disconnected, 1 if the server disconnected
      */
     public int waitForMessages() {
@@ -203,6 +221,9 @@ public class ClientFunctions {
         return connected;
     }
 
+    /**
+     * used to authenticate on server, using public/private key
+     */
     private void authenticate() {
         if (clientUser != null) {
             Authentication auth;
@@ -308,6 +329,11 @@ public class ClientFunctions {
         this.clientUser = clientUser;
     }
 
+    /**
+     *
+     * @param userKey User to be searched
+     * @return User found
+     */
     private User getUserFromList(User userKey) {
         final User[] result = {userKey};
         for (User clientUser : users) {
@@ -318,6 +344,9 @@ public class ClientFunctions {
         return result[0];
     }
 
+    /**
+     * Task to open a new connection
+     */
     private class OpenConnectionTask extends AsyncTask<String, Void, String> {
         protected String doInBackground(String... params) {
             String address = params[0];
@@ -353,6 +382,9 @@ public class ClientFunctions {
         }
     }
 
+    /**
+     * Task to send a message
+     */
     private class SendTask extends AsyncTask<String, Void, Boolean> {
         protected Boolean doInBackground(String... params) {
             for (String messageToSend : params) {
@@ -368,10 +400,12 @@ public class ClientFunctions {
         }
     }
 
+    /**
+     * Task to send a newRoomRequest
+     */
     private class NewRoomTask extends AsyncTask<String, Void, Boolean> {
         protected Boolean doInBackground(String... params) {
             try {
-                //outputStream.writeObject(new MessageToSend(Security.encrypt(messageToSend, publicServerKey), clientUser.getName(), clientUser.getPublicKey()));
                 outputStream.writeObject(new MessageToSend(MessageToSend.MessageType.NEW_ROOM));
             } catch (IOException e) {
                 e.printStackTrace();

@@ -16,6 +16,11 @@ public class ChatRoom {
         freePlace = 1;
     }
 
+    /**
+     * adds a handler if possible
+     * @param user handler to add
+     * @return if it was added
+     */
     public boolean addHandler(Handler user) {
         if (searching) {
             handlers[freePlace] = user;

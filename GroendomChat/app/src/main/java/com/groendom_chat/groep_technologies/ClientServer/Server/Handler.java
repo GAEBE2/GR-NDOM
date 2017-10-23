@@ -69,7 +69,9 @@ public class Handler extends Thread {
                 messageToSend.setEncryptedMessage(null);
             }
 
-            ServerFunctions.log("client connected; IP: " + socket.getRemoteSocketAddress().toString() + " | username: " + user.getName());
+            ServerFunctions.log("client connected; IP: " +
+                socket.getRemoteSocketAddress().toString() +
+                " | username: " + user.getName());
             receiveMessagesAndForwardThem();
         } catch (IOException e) {
             ServerFunctions.log("");
@@ -155,6 +157,9 @@ public class Handler extends Thread {
         }
     }
 
+    /**
+     * removes it form all lists, sends a diconnect message
+     */
     public void handleDisconnect() {
         try {
             if (ServerFunctions.userList != null) {

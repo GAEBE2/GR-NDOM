@@ -35,6 +35,10 @@ public class ClientUser { // no longer extends User so that it cannot be send
         return user.getName();
     }
 
+    /**
+     *
+     * @return username or custom name
+     */
     public String getName() {
         if (customName == null) {
             return user.getName();
