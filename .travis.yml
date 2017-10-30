@@ -25,6 +25,26 @@ android:
         - 'android-sdk-license-.+'
         - 'google-gdk-license-.+'
         - 'android-25'
+        - 'google-m2repository'
+        - 'extra-google-market_apk_expansion'
+        - 'extra-google-market_licensing'
+        - 'extra-google-play_billing'
+        - 'extra-google-simulators'
+        - 'extra-google-webdriver'
+        - 'platform-tools'
+        - 'source-14'
+        - 'source-15'
+        - 'source-16'
+        - 'source-17'
+        - 'source-18'
+        - 'source-19'
+        - 'source-20'
+        - 'source-21'
+        - 'source-22'
+        - 'source-23'
+        - 'source-24'
+        - 'source-25'
+
 #env:
  #   global:
   #      - REPO="GroendomChat"
