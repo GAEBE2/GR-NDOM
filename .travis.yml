@@ -5,7 +5,7 @@ script:
     - gradle build connectedCheck --stacktrace
 
 android:
-  components:
+    components:
         - tools
         - platform-tools
         - tools
