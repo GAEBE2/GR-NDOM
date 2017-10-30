@@ -17,8 +17,9 @@ android:
         - android-25
     
     licenses:
-        - 'android-sdk-license-25'
-        - 'google-gdk-license-25'
+        - 'android-sdk-preview-license-52d11cd2'
+        - 'android-sdk-license-.+'
+        - 'google-gdk-license-.+'
 #env:
  #   global:
   #      - REPO="GroendomChat"
