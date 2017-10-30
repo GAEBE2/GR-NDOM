@@ -83,7 +83,7 @@ Product Owner: Patrick Wissiak
 - Smileys eingebaut
 
 ## Weiteres
-Product Owner: Gabruek Meier
+Product Owner: Gabriel Meier
 
 
 # Daily Scrum 09.10.2017
@@ -112,3 +112,31 @@ Product Owner: Gabruek Meier
 ## Gabriel
 - Codekonvention prüfen und wenn nötig anpassen (wir verwenden Camel Case)
 - Continous Integration auf GitHub implementieren
+
+## Weiteres
+Product Owner: Yvo Keller
+
+
+# Daily Scrum 30.10.2017
+## Aktueller Stand
+- Die Funktion zum Benachrichtigen des Users wenn sein Chatpartner den Chat verlässt muss noch implementiert werden
+- Dokumentation: Burndown Charts für die ersten beiden Sprints sind erstellt, Dokumenation angefangen
+
+## Serge
+- Gemacht: Code kommentieren / backend Chat verlassen und in neuen gehen implementiert
+- Heute: Code überarbeiten nach Google code style
+
+## Patrick
+- Gemacht: Fehlerbehebung Chat
+- Heute: Benachrichtigung beim verlassen des Chats in App implementieren
+
+## Yvo
+- Gemacht: GitHub Releases Erstellt, Dokumentation angefangen
+- Heute: Dokumentation schreiben und Brudown Charts integrieren, Präsentation erstellen
+
+## Gabriel
+- Gemacht: Continous Integration mit Travis, noch beschäftigt damit, Lizenzprobleme
+- Heute: Continous Integration abschliessen
+
+## Weiteres
+Product Owner: Yvo Keller
