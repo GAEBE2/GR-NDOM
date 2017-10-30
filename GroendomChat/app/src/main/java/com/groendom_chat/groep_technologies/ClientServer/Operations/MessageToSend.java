@@ -1,17 +1,12 @@
 package com.groendom_chat.groep_technologies.ClientServer.Operations;
 
-import com.groendom_chat.groep_technologies.ClientServer.Client.UserGroups.ClientUser;
 import com.groendom_chat.groep_technologies.ClientServer.Client.UserGroups.User;
-import com.groendom_chat.groep_technologies.ClientServer.Server.Handler;
 
 import java.io.Serializable;
 import java.security.PublicKey;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.List;
-import java.util.UUID;
 
 /**
  * Created by serge on 20-Mar-17.
@@ -20,7 +15,7 @@ import java.util.UUID;
 public class MessageToSend implements Serializable {
 
     public enum MessageType {
-        TEXT, IMAGE, USER_ADD, LOGIN, USER_REMOVE, ENCRYPTED_TEXT, RECONNECT, NEW_ROOM
+        TEXT, IMAGE, USER_ADD, LOGIN, USER_LEFT, ENCRYPTED_TEXT, RECONNECT, NEW_ROOM
     }
 
     private MessageType messageType;
@@ -110,7 +105,7 @@ public class MessageToSend implements Serializable {
 
     public static MessageToSend createLogoutMessage(User user) {
         MessageToSend res = new MessageToSend(user);
-        res.setMessageType(MessageType.USER_REMOVE);
+        res.setMessageType(MessageType.USER_LEFT);
         return res;
     }
 

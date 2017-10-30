@@ -21,8 +21,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 
-import static android.R.attr.port;
-
 /**
  * Created by serge on 20-Mar-17.
  * All the backend functions that one can use in the different front ends
@@ -192,7 +190,7 @@ public class ClientFunctions {
                             users.add(user.getUser());
                             chooseActiveOrPassiveConsumer(passiveUserAdder, activeUserAdder, Collections.singletonList(user));
                             break;
-                        case USER_REMOVE:
+                        case USER_LEFT:
                             this.users.remove(getUserFromList(message.getAuthor()));
                             chooseActiveOrPassiveConsumer(passiveUserRemover, activeUserRemover, message.getAuthor().getName());
                             break;

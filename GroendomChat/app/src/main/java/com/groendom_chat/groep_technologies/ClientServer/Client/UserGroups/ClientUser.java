@@ -24,11 +24,12 @@ public class ClientUser { // no longer extends User so that it cannot be send
     }
 
     public ClientUser(KeyPair pair) {
+        super();
         user = new User();
         //super(pair);
         //this.privateKey = pair.getPrivate();
         //setName("test");
-        user.setName(UUID.randomUUID().toString()); //TODO: change this to normal name??
+        user.setName(UUID.randomUUID().toString());
     }
 
     public String getOriginalName() {
