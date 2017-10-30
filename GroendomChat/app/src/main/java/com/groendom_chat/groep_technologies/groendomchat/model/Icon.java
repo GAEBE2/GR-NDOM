@@ -10,17 +10,17 @@ import java.util.HashMap;
 
 public class Icon {
 
-    private static final HashMap<String, Integer> icons;
+  private static final HashMap<String, Integer> icons;
 
-    static {
-        icons = new HashMap<>();
-        icons.put("tear_laugh", R.drawable.tear_laugh_smiley);
-        icons.put("tongue_wink", R.drawable.tongue_wink_smiley);
-    }
+  static {
+    icons = new HashMap<>();
+    icons.put("tear_laugh", R.drawable.tear_laugh_smiley);
+    icons.put("tongue_wink", R.drawable.tongue_wink_smiley);
+  }
 
-    public Integer file;
+  public Integer file;
 
-    public Icon(String icon) {
-        this.file = icons.get(icon);
-    }
+  public Icon(String icon) {
+    this.file = icons.get(icon);
+  }
 }

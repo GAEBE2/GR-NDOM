@@ -26,115 +26,130 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ChatActivity extends Activity {
-    private ClientFunctions functions;
-    private ClientUser clientUser;
-    private final ArrayList<MessageToSend> items = new ArrayList<>();
-    private ArrayAdapter<MessageToSend> itemsAdapter;
+
+  private ClientFunctions functions;
+  private ClientUser clientUser;
+  private final ArrayList<MessageToSend> items = new ArrayList<>();
+  private ArrayAdapter<MessageToSend> itemsAdapter;
+
+  /**
+   * used
+   * @param savedInstanceState
+   */
+  @Override
+  protected void onCreate(Bundle savedInstanceState) {
+    super.onCreate(savedInstanceState);
+
+    functions = new ClientFunctions(new Consumer<MessageToSend>() {
+      @Override
+      public void accept(final MessageToSend message) {
+        if (itemsAdapter != null) {
+          runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+              itemsAdapter.add(message);
+            }
+          });
+        }
+      }
+    }, new Consumer<String>() {
+      @Override
+      public void accept(String obj) {
+        System.out.println("Removed user:" + obj);
+      }
+    }, new Consumer<List<ClientUser>>() {
+      @Override
+      public void accept(List<ClientUser> obj) {
+        for (ClientUser user : obj) {
+          System.out.println("Users:" + user);
+        }
+      }
+    });
+    try {
+      clientUser = new ClientUser(Security.generateKeyPair());
+      this.openChat();
+    } catch (NoSuchAlgorithmException | NoSuchProviderException e) {
+      e.printStackTrace();
+    }
+
+    setContentView(R.layout.chat_activity);
+
+    Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+    toolbar.setTitle("Chat partner 1");
+
+    toolbar.setNavigationOnClickListener(new View.OnClickListener() {
+      @Override
+      public void onClick(View v) {
+        finish();
+        functions.closeConnection();
+      }
+    });
+
+    itemsAdapter = new ListViewAdapter(this, items, clientUser.getUser());
+    final EditText editText = (EditText) findViewById(R.id.edit_text_message);
+    final ListView listView = (ListView) findViewById(R.id.chat_activity_content);
+    listView.setAdapter(itemsAdapter);
+    FloatingActionButton sendButton = (FloatingActionButton) findViewById(R.id.button_send);
+    sendButton.setOnClickListener(new View.OnClickListener() {
+      @Override
+      public void onClick(View view) {
+        String text = editText.getText().toString();
+        if (!text.equals("")) {
+          try {
+            if (functions.sendMessage(text)) {
+              //items.add(new MessageToSend(text, clientUser.getName()));
+              editText.setText("");
+
+            } else {
+              Toast
+                  .makeText(getApplicationContext(), "Failed to send message :(", Toast.LENGTH_LONG)
+                  .show();
+            }
+          } catch (IOException e) {
+            e.printStackTrace();
+          }
+        }
+      }
+    });
+  }
+
+  protected void onStop() {
+    super.onStop();
+    functions.closeConnection();
+  }
+
+  /**
+   * opens a new connection
+   * @throws NoSuchProviderException
+   * @throws NoSuchAlgorithmException
+   */
+  private void openChat() throws NoSuchProviderException, NoSuchAlgorithmException {
+    functions.setActiveConsumers(new Consumer<MessageToSend>() {
+      @Override
+      public void accept(final MessageToSend message) {
+        if (itemsAdapter != null) {
+          runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+              itemsAdapter.add(message);
+            }
+          });
+        }
+      }
+    });
+    functions.openConnection("10.71.194.67", clientUser); // needs to be manuely configured
+    new ReceiveTask().execute();
+  }
+
+  /**
+   * task for receiving messages
+   */
+  private class ReceiveTask extends AsyncTask<Void, Void, Void> {
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-
-
-        functions = new ClientFunctions(new Consumer<MessageToSend>() {
-            @Override
-            public void accept(final MessageToSend message) {
-                if (itemsAdapter != null) {
-                    runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            itemsAdapter.add(message);
-                        }
-                    });
-                }
-            }
-        }, new Consumer<String>() {
-            @Override
-            public void accept(String obj) {
-                System.out.println("Removed user:" + obj);
-            }
-        }, new Consumer<List<ClientUser>>() {
-            @Override
-            public void accept(List<ClientUser> obj) {
-                for (ClientUser user : obj) {
-                    System.out.println("Users:" + user);
-                }
-            }
-        });
-        try {
-            clientUser = new ClientUser(Security.generateKeyPair());
-            this.openChat();
-        } catch (NoSuchAlgorithmException | NoSuchProviderException e) {
-            e.printStackTrace();
-        }
-
-        setContentView(R.layout.chat_activity);
-
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        toolbar.setTitle("Chat partner 1");
-
-        toolbar.setNavigationOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                finish();
-                functions.closeConnection();
-            }
-        });
-
-        itemsAdapter = new ListViewAdapter(this, items, clientUser.getUser());
-        final EditText editText = (EditText) findViewById(R.id.edit_text_message);
-        final ListView listView = (ListView) findViewById(R.id.chat_activity_content);
-        listView.setAdapter(itemsAdapter);
-        FloatingActionButton sendButton = (FloatingActionButton) findViewById(R.id.button_send);
-        sendButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                String text = editText.getText().toString();
-                if (!text.equals("")) {
-                    try {
-                        if (functions.sendMessage(text)) {
-                            //items.add(new MessageToSend(text, clientUser.getName()));
-                            editText.setText("");
-
-                        } else {
-                            Toast.makeText(getApplicationContext(), "Failed to send message :(", Toast.LENGTH_LONG).show();
-                        }
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-                }
-            }
-        });
+    protected Void doInBackground(Void... params) {
+      functions.waitForMessages();
+      return null;
     }
-
-    protected void onStop() {
-        super.onStop();
-        functions.closeConnection();
-    }
-
-    private void openChat() throws NoSuchProviderException, NoSuchAlgorithmException {
-        functions.setActiveConsumers(new Consumer<MessageToSend>() {
-            @Override
-            public void accept(final MessageToSend message) {
-                if (itemsAdapter != null) {
-                    runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            itemsAdapter.add(message);
-                        }
-                    });
-                }
-            }
-        });
-        functions.openConnection("10.71.194.67", clientUser);
-        new ReceiveTask().execute();
-    }
-
-    private class ReceiveTask extends AsyncTask<Void, Void, Void> {
-        @Override
-        protected Void doInBackground(Void... params) {
-            functions.waitForMessages();
-            return null;
-        }
-    }
+  }
 }

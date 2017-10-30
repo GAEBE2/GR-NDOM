@@ -11,72 +11,73 @@ import java.util.UUID;
  */
 public class User implements Serializable {
 
-    private PublicKey publicKey;
-    private String name;
-    private UUID uuid;
-    private int connection;
+  private PublicKey publicKey;
+  private String name;
+  private UUID uuid;
+  private int connection;
 
-    public User(ClientUser cuser) {
-        uuid = cuser.getUser().getUuid();
-        publicKey = cuser.getUser().getPublicKey();
-        connection = cuser.getUser().getConnection();
-        name = cuser.getUser().getName();
-    }
+  public User(ClientUser cuser) {
+    uuid = cuser.getUser().getUuid();
+    publicKey = cuser.getUser().getPublicKey();
+    connection = cuser.getUser().getConnection();
+    name = cuser.getUser().getName();
+  }
 
-    public User() {
-        uuid = UUID.randomUUID();
-    }
+  public User() {
+    uuid = UUID.randomUUID();
+  }
 
-    public User(KeyPair key) {
-        this();
-        this.publicKey = key.getPublic();
-    }
+  public User(KeyPair key) {
+    this();
+    this.publicKey = key.getPublic();
+  }
 
-    public User(UUID uuid, PublicKey key) {
-        this.uuid = uuid;
-        this.publicKey = key;
-    }
+  public User(UUID uuid, PublicKey key) {
+    this.uuid = uuid;
+    this.publicKey = key;
+  }
 
-    public User(String name) {
-        this();
-        this.name = name;
-    }
+  public User(String name) {
+    this();
+    this.name = name;
+  }
 
-    public User(String name, PublicKey key) {
-        this(name);
-        this.publicKey = key;
-    }
+  public User(String name, PublicKey key) {
+    this(name);
+    this.publicKey = key;
+  }
 
-    public String getName() {
-        return name;
-    }
+  public String getName() {
+    return name;
+  }
 
-    public void setName(String name) {
-        this.name = name;
-    }
+  public void setName(String name) {
+    this.name = name;
+  }
 
-    public PublicKey getPublicKey() {
-        return publicKey;
-    }
+  public PublicKey getPublicKey() {
+    return publicKey;
+  }
 
-    public void setPublicKey(PublicKey publicKey) {
-        this.publicKey = publicKey;
-    }
+  public void setPublicKey(PublicKey publicKey) {
+    this.publicKey = publicKey;
+  }
 
-    public UUID getUuid() {
-        return uuid;
-    }
+  public UUID getUuid() {
+    return uuid;
+  }
 
-    public int getConnection() {
-        return connection;
-    }
+  public int getConnection() {
+    return connection;
+  }
 
-    public void setConnection(int connection) {
-        this.connection = connection;
-    }
+  public void setConnection(int connection) {
+    this.connection = connection;
+  }
 
-    @Override
-    public boolean equals(Object objToCom) {
-        return objToCom instanceof User && (uuid != null && (uuid.equals(((User) objToCom).uuid) || publicKey != null && publicKey.equals(((User) objToCom).publicKey)));
-    }
+  @Override
+  public boolean equals(Object objToCom) {
+    return objToCom instanceof User && (uuid != null && (uuid.equals(((User) objToCom).uuid)
+        || publicKey != null && publicKey.equals(((User) objToCom).publicKey)));
+  }
 }

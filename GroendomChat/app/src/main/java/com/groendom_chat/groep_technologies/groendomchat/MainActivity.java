@@ -11,16 +11,16 @@ import com.groendom_chat.groep_technologies.groendomchat.activities.ChatActivity
 
 public class MainActivity extends AppCompatActivity {
 
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.main_activity);
+  @Override
+  protected void onCreate(Bundle savedInstanceState) {
+    super.onCreate(savedInstanceState);
+    setContentView(R.layout.main_activity);
 
-        findViewById(R.id.fab_start).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                startActivity(new Intent(MainActivity.this, ChatActivity.class));
-            }
-        });
-    }
+    findViewById(R.id.fab_start).setOnClickListener(new View.OnClickListener() {
+      @Override
+      public void onClick(View view) {
+        startActivity(new Intent(MainActivity.this, ChatActivity.class));
+      }
+    });
+  }
 }
