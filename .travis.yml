@@ -21,6 +21,7 @@ android:
         - 'android-sdk-license-.+'
         - 'google-gdk-license-.+'
         - 'android-25'
+        - 'build-tools-26.0.1'
 #env:
  #   global:
   #      - REPO="GroendomChat"
