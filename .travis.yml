@@ -18,6 +18,7 @@ android:
     
     licenses:
         - 'build-tools-26.0.1'
+        - 'platform-tools'
         - 'android-sdk-preview-license-52d11cd2'
         - 'android-sdk-license-.+'
         - 'google-gdk-license-.+'
