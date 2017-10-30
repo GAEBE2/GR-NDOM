@@ -50,7 +50,7 @@ public class Handler extends Thread {
       //send new user to active users
       for (Handler handler : ServerFunctions.roomList.get(roomIndex).getHandlers()) {
         if (handler != null && handler != this) {
-          handler.outputStream.writeObject(new MessageToSend(user));
+          handler.outputStream.writeObject(MessageToSend.createAddUserMessage(user));
         }
       }
 

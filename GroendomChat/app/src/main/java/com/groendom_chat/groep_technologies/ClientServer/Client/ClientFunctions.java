@@ -89,7 +89,7 @@ public class ClientFunctions {
 
   public void sendNextMessage(ClientUser client) throws IOException {
     outputStream.writeObject(
-        new MessageToSend(client.getUser().getUuid(), client.getUser().getPublicKey()));
+        MessageToSend.createNextMessage(client.getUser().getUuid(), client.getUser().getPublicKey()));
   }
 
   /**
@@ -199,7 +199,7 @@ public class ClientFunctions {
               chooseActiveOrPassiveConsumer(passiveUserAdder, activeUserAdder,
                   Collections.singletonList(user));
               break;
-            case USER_REMOVE:
+            case USER_LEFT:
               this.users.remove(getUserFromList(message.getAuthor()));
               chooseActiveOrPassiveConsumer(passiveUserRemover, activeUserRemover,
                   message.getAuthor().getName());
@@ -390,7 +390,7 @@ public class ClientFunctions {
         outputStream = new ObjectOutputStream(socket.getOutputStream());
         inputStream = new ObjectInputStream(socket.getInputStream());
         //authenticate();
-        outputStream.writeObject(new MessageToSend(clientUser.getUser()));
+        outputStream.writeObject(MessageToSend.createAddUserMessage(clientUser.getUser()));
         if (cb != null) {
           cb.onFinish(socket, outputStream, inputStream);
         }
@@ -414,7 +414,7 @@ public class ClientFunctions {
       for (String messageToSend : params) {
         try {
           //outputStream.writeObject(new MessageToSend(Security.encrypt(messageToSend, publicServerKey), clientUser.getName(), clientUser.getPublicKey()));
-          outputStream.writeObject(new MessageToSend(messageToSend, clientUser.getUser()));
+          outputStream.writeObject(MessageToSend.createTextMessage(messageToSend, clientUser.getUser()));
         } catch (IOException e) {
           e.printStackTrace();
           return false;
@@ -431,7 +431,7 @@ public class ClientFunctions {
 
     protected Boolean doInBackground(String... params) {
       try {
-        outputStream.writeObject(new MessageToSend(MessageToSend.MessageType.NEW_ROOM));
+        outputStream.writeObject(MessageToSend.createSwitchRoomMessage());
       } catch (IOException e) {
         e.printStackTrace();
         return false;
