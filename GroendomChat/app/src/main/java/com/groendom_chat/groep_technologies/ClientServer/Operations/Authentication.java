@@ -8,32 +8,31 @@ import java.security.PublicKey;
  * Used for the quite authentication that happens when a client tries to connect to a server
  */
 public class Authentication implements Serializable {
+    private byte[] publicKey;
+    private String originalMessage;
+    private byte[] encryptedMessage;
 
-  private byte[] publicKey;
-  private String originalMessage;
-  private byte[] encryptedMessage;
+    public Authentication(String originalMessage) {
+        this.originalMessage = originalMessage;
+    }
 
-  public Authentication(String originalMessage) {
-    this.originalMessage = originalMessage;
-  }
+    public byte[] getPublicKey() {
+        return publicKey;
+    }
 
-  public void setPublicKey(PublicKey publicKey) {
-    this.publicKey = publicKey.getEncoded();
-  }
+    public void setPublicKey(PublicKey publicKey) {
+        this.publicKey = publicKey.getEncoded();
+    }
 
-  public void setEncryptedMessage(byte[] encryptedMessage) {
-    this.encryptedMessage = encryptedMessage;
-  }
+    public String getOriginalMessage() {
+        return originalMessage;
+    }
 
-  public byte[] getPublicKey() {
-    return publicKey;
-  }
+    public byte[] getEncryptedMessage() {
+        return encryptedMessage;
+    }
 
-  public String getOriginalMessage() {
-    return originalMessage;
-  }
-
-  public byte[] getEncryptedMessage() {
-    return encryptedMessage;
-  }
+    public void setEncryptedMessage(byte[] encryptedMessage) {
+        this.encryptedMessage = encryptedMessage;
+    }
 }

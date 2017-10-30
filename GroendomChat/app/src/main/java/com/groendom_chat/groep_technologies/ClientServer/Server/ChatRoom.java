@@ -6,64 +6,62 @@ import java.util.LinkedList;
 import java.util.List;
 
 public class ChatRoom {
+    private Handler[] handlers = new Handler[2];
+    private List<MessageToSend> messageList = new LinkedList<>();
+    private boolean searching = true;
+    int freePlace;
 
-  private Handler[] handlers = new Handler[2];
-  private List<MessageToSend> messageList = new LinkedList<>();
-  private boolean searching = true;
-  int freePlace;
-
-  public ChatRoom(Handler user) {
-    handlers[0] = user;
-    freePlace = 1;
-  }
-
-  /**
-   * adds a handler if possible
-   *
-   * @param user handler to add
-   * @return if it was added
-   */
-  public boolean addHandler(Handler user) {
-    if (searching) {
-      handlers[freePlace] = user;
-      searching = false;
-      return true;
+    public ChatRoom(Handler user) {
+        handlers[0] = user;
+        freePlace = 1;
     }
-    return false;
-  }
 
-  public void removeHandler(Handler handler) {
-    for (int i = 0; i < handlers.length; i++) {
-      if (handlers[i].equals(handler)) {
-        removeHandler(i);
-      }
+    /**
+     * adds a handler if possible
+     * @param user handler to add
+     * @return if it was added
+     */
+    public boolean addHandler(Handler user) {
+        if (searching) {
+            handlers[freePlace] = user;
+            searching = false;
+            return true;
+        }
+        return false;
     }
-  }
 
-  public void removeHandler(int index) {
-    switch (index) {
-      case 0:
-      case 1:
-        handlers[index] = null;
-        searching = true;
-        break;
+    public void removeHandler(Handler handler){
+        for (int i = 0; i < handlers.length; i++) {
+            if(handlers[i].equals(handler)){
+                removeHandler(i);
+            }
+        }
     }
-    freePlace = index;
-  }
 
-  public void addMessage(MessageToSend message) {
-    messageList.add(message);
-  }
+    public void removeHandler(int index){
+        switch (index){
+            case 0:
+            case 1:
+                handlers[index] = null;
+                searching = true;
+                break;
+        }
+        freePlace = index;
+    }
 
-  public Handler[] getHandlers() {
-    return handlers;
-  }
+    public void addMessage(MessageToSend message) {
+        messageList.add(message);
+    }
 
-  public boolean isSearching() {
-    return searching;
-  }
+    public Handler[] getHandlers(){
+        return handlers;
+    }
 
-  public List<MessageToSend> getMessages() {
-    return messageList;
-  }
+    public boolean isSearching() {
+        return searching;
+    }
+
+    public List<MessageToSend> getMessages(){
+        return messageList;
+    }
 }

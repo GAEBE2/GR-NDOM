@@ -13,143 +13,132 @@ import android.widget.Toast;
 
 import com.groendom_chat.groep_technologies.ClientServer.Client.ClientFunctions;
 import com.groendom_chat.groep_technologies.ClientServer.Client.Consumer;
+import com.groendom_chat.groep_technologies.ClientServer.Client.SocketHandler;
 import com.groendom_chat.groep_technologies.ClientServer.Client.UserGroups.ClientUser;
 import com.groendom_chat.groep_technologies.ClientServer.Operations.MessageToSend;
-import com.groendom_chat.groep_technologies.ClientServer.Operations.Security;
+import com.groendom_chat.groep_technologies.groendomchat.MainActivity;
 import com.groendom_chat.groep_technologies.groendomchat.R;
 import com.groendom_chat.groep_technologies.groendomchat.layout.ListViewAdapter;
 
 import java.io.IOException;
-import java.security.NoSuchAlgorithmException;
-import java.security.NoSuchProviderException;
+import java.net.Socket;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 public class ChatActivity extends Activity {
-
-  private ClientFunctions functions;
-  private ClientUser clientUser;
-  private final ArrayList<MessageToSend> items = new ArrayList<>();
-  private ArrayAdapter<MessageToSend> itemsAdapter;
-
-  /**
-   * used
-   * @param savedInstanceState
-   */
-  @Override
-  protected void onCreate(Bundle savedInstanceState) {
-    super.onCreate(savedInstanceState);
-
-    functions = new ClientFunctions(new Consumer<MessageToSend>() {
-      @Override
-      public void accept(final MessageToSend message) {
-        if (itemsAdapter != null) {
-          runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-              itemsAdapter.add(message);
-            }
-          });
-        }
-      }
-    }, new Consumer<String>() {
-      @Override
-      public void accept(String obj) {
-        System.out.println("Removed user:" + obj);
-      }
-    }, new Consumer<List<ClientUser>>() {
-      @Override
-      public void accept(List<ClientUser> obj) {
-        for (ClientUser user : obj) {
-          System.out.println("Users:" + user);
-        }
-      }
-    });
-    try {
-      clientUser = new ClientUser(Security.generateKeyPair());
-      this.openChat();
-    } catch (NoSuchAlgorithmException | NoSuchProviderException e) {
-      e.printStackTrace();
-    }
-
-    setContentView(R.layout.chat_activity);
-
-    Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-    toolbar.setTitle("Chat partner 1");
-
-    toolbar.setNavigationOnClickListener(new View.OnClickListener() {
-      @Override
-      public void onClick(View v) {
-        finish();
-        functions.closeConnection();
-      }
-    });
-
-    itemsAdapter = new ListViewAdapter(this, items, clientUser.getUser());
-    final EditText editText = (EditText) findViewById(R.id.edit_text_message);
-    final ListView listView = (ListView) findViewById(R.id.chat_activity_content);
-    listView.setAdapter(itemsAdapter);
-    FloatingActionButton sendButton = (FloatingActionButton) findViewById(R.id.button_send);
-    sendButton.setOnClickListener(new View.OnClickListener() {
-      @Override
-      public void onClick(View view) {
-        String text = editText.getText().toString();
-        if (!text.equals("")) {
-          try {
-            if (functions.sendMessage(text)) {
-              //items.add(new MessageToSend(text, clientUser.getName()));
-              editText.setText("");
-
-            } else {
-              Toast
-                  .makeText(getApplicationContext(), "Failed to send message :(", Toast.LENGTH_LONG)
-                  .show();
-            }
-          } catch (IOException e) {
-            e.printStackTrace();
-          }
-        }
-      }
-    });
-  }
-
-  protected void onStop() {
-    super.onStop();
-    functions.closeConnection();
-  }
-
-  /**
-   * opens a new connection
-   * @throws NoSuchProviderException
-   * @throws NoSuchAlgorithmException
-   */
-  private void openChat() throws NoSuchProviderException, NoSuchAlgorithmException {
-    functions.setActiveConsumers(new Consumer<MessageToSend>() {
-      @Override
-      public void accept(final MessageToSend message) {
-        if (itemsAdapter != null) {
-          runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-              itemsAdapter.add(message);
-            }
-          });
-        }
-      }
-    });
-    functions.openConnection("10.71.194.67", clientUser); // needs to be manuely configured
-    new ReceiveTask().execute();
-  }
-
-  /**
-   * task for receiving messages
-   */
-  private class ReceiveTask extends AsyncTask<Void, Void, Void> {
+    private final ArrayList<MessageToSend> items = new ArrayList<>();
+    private ArrayAdapter<MessageToSend> itemsAdapter;
+    private ClientFunctions functions;
 
     @Override
-    protected Void doInBackground(Void... params) {
-      functions.waitForMessages();
-      return null;
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.chat_activity);
+
+        ClientUser clientUser = (ClientUser) getIntent().getSerializableExtra(getString(R.string.client_user_value));
+
+        itemsAdapter = new ListViewAdapter(this, items, clientUser.getUser());
+        final EditText editText = (EditText) findViewById(R.id.edit_text_message);
+        final ListView listView = (ListView) findViewById(R.id.chat_activity_content);
+        listView.setAdapter(itemsAdapter);
+
+        if (clientUser == null) {
+            Toast.makeText(getApplicationContext(), "Failed pass data between the activities", Toast.LENGTH_LONG).show();
+            finish();
+        } else {
+            functions = new ClientFunctions(new Consumer<MessageToSend>() {
+                @Override
+                public void accept(final MessageToSend message) {
+                    if (itemsAdapter != null) {
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                itemsAdapter.add(message);
+                                runOnUiThread(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        listView.setSelection(itemsAdapter.getCount() - 1);
+                                    }
+                                });
+                            }
+                        });
+                    }
+                }
+            }, new Consumer<String>() {
+                @Override
+                public void accept(String obj) {
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            Toast.makeText(getApplicationContext(), "Other user left the chat room...", Toast.LENGTH_LONG).show();
+                        }
+                    });
+                }
+            }, new Consumer<List<ClientUser>>() {
+                @Override
+                public void accept(List<ClientUser> obj) {
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            Toast.makeText(getApplicationContext(), "New user has joined the chat room...", Toast.LENGTH_LONG).show();
+                        }
+                    });
+                }
+            });
+
+            functions.setSocket(SocketHandler.getSocket());
+            functions.setObjectInputStream(SocketHandler.getInputStream());
+            functions.setObjectOutputStream(SocketHandler.getOutputStream());
+            functions.setClientUser(clientUser);
+            functions.setConnected(true);
+
+            new ReceiveTask().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+
+            Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+            toolbar.setTitle("Chatroom");
+
+            toolbar.setNavigationOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    finish();
+                    functions.closeConnection();
+                }
+            });
+
+            FloatingActionButton sendButton = (FloatingActionButton) findViewById(R.id.button_send);
+            sendButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    String text = editText.getText().toString();
+                    if (!text.equals("")) {
+                        try {
+                            if (functions.sendMessage(text)) {
+                                //items.add(new MessageToSend(text, clientUser.getName()));
+                                editText.setText("");
+
+                            } else {
+                                Toast.makeText(getApplicationContext(), "Failed to send message :(", Toast.LENGTH_LONG).show();
+                            }
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }
+            });
+        }
     }
-  }
+
+    protected void onStop() {
+        super.onStop();
+        functions.closeConnection();
+    }
+
+    private class ReceiveTask extends AsyncTask<Void, Void, Void> {
+        @Override
+        protected Void doInBackground(Void... params) {
+            functions.waitForMessages();
+            return null;
+        }
+    }
 }

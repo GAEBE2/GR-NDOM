@@ -4,7 +4,9 @@ package com.groendom_chat.groep_technologies.groendomchat.connection;
  * Created by P on 18.09.2017.
  */
 
-import com.loopj.android.http.*;
+import com.loopj.android.http.AsyncHttpClient;
+import com.loopj.android.http.AsyncHttpResponseHandler;
+import com.loopj.android.http.RequestParams;
 
 class BasicRestClient {
 
