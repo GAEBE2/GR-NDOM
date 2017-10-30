@@ -39,7 +39,7 @@ public class ChatActivity extends Activity {
         functions = new ClientFunctions(new Consumer<MessageToSend>() {
             @Override
             public void accept(final MessageToSend message) {
-                if(itemsAdapter != null) {
+                if (itemsAdapter != null) {
                     runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
@@ -92,7 +92,7 @@ public class ChatActivity extends Activity {
                 String text = editText.getText().toString();
                 if (!text.equals("")) {
                     try {
-                        if(functions.sendMessage(text)) {
+                        if (functions.sendMessage(text)) {
                             //items.add(new MessageToSend(text, clientUser.getName()));
                             editText.setText("");
 
@@ -116,7 +116,7 @@ public class ChatActivity extends Activity {
         functions.setActiveConsumers(new Consumer<MessageToSend>() {
             @Override
             public void accept(final MessageToSend message) {
-                if(itemsAdapter != null) {
+                if (itemsAdapter != null) {
                     runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
@@ -126,7 +126,7 @@ public class ChatActivity extends Activity {
                 }
             }
         });
-        functions.openConnection("192.168.178.45", clientUser);
+        functions.openConnection("10.71.194.67", clientUser);
         new ReceiveTask().execute();
     }
 

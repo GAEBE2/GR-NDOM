@@ -6,6 +6,7 @@ import android.view.ViewGroup;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import com.groendom_chat.groep_technologies.ClientServer.Operations.MessageToSend;
 import com.groendom_chat.groep_technologies.groendomchat.R;
 
 /**
@@ -19,11 +20,11 @@ public class MessageHandler {
         this.context = context;
     }
 
-    public void createOut(ViewGroup parent, Message message) {
+    public void createOut(ViewGroup parent, MessageToSend message) {
         LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         RelativeLayout child = (RelativeLayout) inflater.inflate(R.layout.bubble_out, parent, false);
 
-        ((TextView) child.findViewById(R.id.bubble_text_content)).setText(message.getContent());
+        ((TextView) child.findViewById(R.id.bubble_text_content)).setText(message.getMessage());
         ((TextView) child.findViewById(R.id.bubble_text_date)).setText(message.getDateString());
         parent.addView(child);
     }

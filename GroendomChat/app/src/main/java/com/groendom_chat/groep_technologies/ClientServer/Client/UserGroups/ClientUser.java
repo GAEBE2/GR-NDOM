@@ -9,20 +9,21 @@ import java.util.UUID;
  * Created by tkr6u on 20.04.2017.
  * User specific to the client, used to save a custom name or a private key, should not be send!!
  */
-public class ClientUser{ // no longer extends User so that it cannot be send
+public class ClientUser { // no longer extends User so that it cannot be send
     private PrivateKey privateKey;
     private String customName;
     private User user;
 
     public ClientUser(User user) {
-        user = new User(user.getName(), user.getPublicKey());
+        this.user = new User(user.getName(), user.getPublicKey());
     }
 
     public ClientUser(String name, PublicKey publicKey, PrivateKey privateKey) {
         user = new User(name, publicKey);
         this.privateKey = privateKey;
     }
-    public ClientUser(KeyPair pair){
+
+    public ClientUser(KeyPair pair) {
         user = new User();
         //super(pair);
         //this.privateKey = pair.getPrivate();
@@ -34,10 +35,14 @@ public class ClientUser{ // no longer extends User so that it cannot be send
         return user.getName();
     }
 
+    /**
+     *
+     * @return username or custom name
+     */
     public String getName() {
-        if(customName == null){
+        if (customName == null) {
             return user.getName();
-        }else {
+        } else {
             return customName;
         }
     }
@@ -58,7 +63,7 @@ public class ClientUser{ // no longer extends User so that it cannot be send
         this.privateKey = privateKey;
     }
 
-    public User getUser(){
+    public User getUser() {
         return user;
     }
 

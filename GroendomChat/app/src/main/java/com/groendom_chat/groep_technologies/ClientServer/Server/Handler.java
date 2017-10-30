@@ -24,14 +24,10 @@ public class Handler extends Thread {
     private ObjectInputStream inputStream;
     private int roomIndex;
     private KeyPair keyPair;
-    private List<ChatRoom> roomList;
-    private List<User> userList;
     private Consumer<Handler> disconnect;
 
-    public Handler(Socket socket, KeyPair keyPair, List<ChatRoom> chatRooms, List<User> userList, Consumer<Handler> disconnect) {
+    public Handler(Socket socket, KeyPair keyPair, Consumer<Handler> disconnect) {
         this.socket = socket;
-        this.roomList = chatRooms;
-        this.userList = userList;
         this.keyPair = keyPair;
         this.disconnect = disconnect;
     }
@@ -47,11 +43,11 @@ public class Handler extends Thread {
             PublicKey publicKey = null;
             user = getUserFromClient();
 
-            userList.add(user);
-            roomIndex = insetIntoRoom();
+            ServerFunctions.userList.add(user);
+            roomIndex = ServerFunctions.insetIntoRoom(this);
 
             //send new user to active users
-            for (Handler handler : roomList.get(roomIndex).getHandlers()) {
+            for (Handler handler : ServerFunctions.roomList.get(roomIndex).getHandlers()) {
                 if (handler != null && handler != this) {
                     handler.outputStream.writeObject(new MessageToSend(user));
                 }
@@ -59,7 +55,7 @@ public class Handler extends Thread {
 
             //send all stored messages
             String originalMessage;
-            for (MessageToSend messageToSend : roomList.get(roomIndex).getMessages()) {
+            for (MessageToSend messageToSend : ServerFunctions.roomList.get(roomIndex).getMessages()) {
                 originalMessage = messageToSend.getMessage();
                 if (originalMessage != null) {
                     messageToSend.setEncryptedMessage(Security.encrypt(originalMessage, publicKey));
@@ -73,25 +69,18 @@ public class Handler extends Thread {
                 messageToSend.setEncryptedMessage(null);
             }
 
-            ServerFunctions.log("client connected; IP: " + socket.getRemoteSocketAddress().toString() + " | username: " + user.getName());
+            ServerFunctions.log("client connected; IP: " +
+                socket.getRemoteSocketAddress().toString() +
+                " | username: " + user.getName());
             receiveMessagesAndForwardThem();
         } catch (IOException e) {
+            ServerFunctions.log("");
         } finally {
             handleDisconnect();
         }
     }
 
-    public int insetIntoRoom() {
-        if (roomList == null) {
-            roomList = new ArrayList<>();
-        }
-        if (roomList.size() != 0 && roomList.get(roomList.size() - 1).isSearching()) {
-            roomList.get(roomList.size() - 1).addHandler(this);
-        } else {
-            roomList.add(new ChatRoom(this));
-        }
-        return roomList.size() - 1;
-    }
+
 
     /**
      * get public key from client and checks whether or not it's valid key and the client processes the fitting private key
@@ -152,9 +141,15 @@ public class Handler extends Thread {
                 System.out.println(object);
                 if (object != null && object instanceof MessageToSend) {
                     MessageToSend messageToSend = ((MessageToSend) object);
-                    roomList.get(roomIndex).addMessage(messageToSend);
-                    sendMessageToEveryone(messageToSend);
-                    ServerFunctions.log("messageToSend: " + messageToSend.getMessage() + " author: " + messageToSend.getAuthor().getName() + "|| Send to: " + roomList.get(roomIndex).getHandlers().length + " clients");
+                    if(messageToSend.getMessageType() == MessageToSend.MessageType.NEW_ROOM){
+                        ServerFunctions.insertIntoNewRoom(this);
+                    }else {
+
+                        ServerFunctions.roomList.get(roomIndex).addMessage(messageToSend);
+                        sendMessageToEveryone(messageToSend);
+                        ServerFunctions.log("message: " + messageToSend.getMessage() + " author: "
+                                + messageToSend.getAuthor().getName() + " | Send to room index: " + roomIndex);
+                    }
                 }
             } catch (ClassNotFoundException e) {
                 e.printStackTrace();
@@ -162,10 +157,13 @@ public class Handler extends Thread {
         }
     }
 
+    /**
+     * removes it form all lists, sends a diconnect message
+     */
     public void handleDisconnect() {
         try {
-            if (userList != null) {
-                userList.remove(user);
+            if (ServerFunctions.userList != null) {
+                ServerFunctions.userList.remove(user);
                 disconnect.accept(this);
                 //tell everyone that user left the channel
                 sendMessageToEveryone(MessageToSend.createLogoutMessage(user));
@@ -192,8 +190,8 @@ public class Handler extends Thread {
             decryptedMessage = Security.decrypt(messageToSend.getEncryptedMessage(), keyPair.getPrivate());
         }
 
-        if (roomList.size() != 0) {
-            for (Handler handler : roomList.get(roomIndex).getHandlers()) {
+        if (ServerFunctions.roomList.size() != 0) {
+            for (Handler handler : ServerFunctions.roomList.get(roomIndex).getHandlers()) {
                 try {
                     if (handler != null) {
                         if (messageToSend.getMessageType() == MessageToSend.MessageType.ENCRYPTED_TEXT) {
@@ -202,11 +200,15 @@ public class Handler extends Thread {
                         handler.outputStream.writeObject(messageToSend);
                     }
                 } catch (SocketException e) {
-
+                    System.err.println("message formation or handling error");
                 }
             }
             messageToSend.setMessage("".equals(decryptedMessage) ? messageToSend.getMessage() : decryptedMessage);
         }
+    }
+
+    public int getRoomIndex(){
+        return roomIndex;
     }
 
     public User getUser() {
