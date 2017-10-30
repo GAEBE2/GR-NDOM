@@ -27,389 +27,403 @@ import java.util.concurrent.ExecutionException;
  */
 public class ClientFunctions {
 
-    private ClientUser clientUser;
+  private ClientUser clientUser;
 
-    private PublicKey publicServerKey;
+  private PublicKey publicServerKey;
 
-    private Socket socket;
+  private Socket socket;
 
-    private String oldAddress;
+  private String oldAddress;
 
-    private int PORT = MessageToSend.getPORT();
+  private int PORT = MessageToSend.getPORT();
 
-    private int oldPort;
+  private int oldPort;
 
-    private boolean active = false;
+  private boolean active = false;
 
-    private List<User> users = new ArrayList<>();
+  private List<User> users = new ArrayList<>();
 
-    public List<MessageToSend> getMessages() {
-        return messages;
+  public List<MessageToSend> getMessages() {
+    return messages;
+  }
+
+  public List<MessageToSend> getNewMessages(int oldAmount) {
+    return messages.subList(oldAmount, messages.size());
+  }
+
+  public void setMessages(List<MessageToSend> messages) {
+    this.messages = messages;
+  }
+
+  private List<MessageToSend> messages = new LinkedList<>();
+  private ObjectOutputStream outputStream;
+  private ObjectInputStream inputStream;
+  private boolean connected = false;
+
+  //Consumers which are used when this active == true
+  private Consumer<MessageToSend> activeMessageReceiver;
+  private Consumer<String> activeUserRemover;
+  private Consumer<List<ClientUser>> activeUserAdder;
+
+  //Consumers which are used when this active == false
+  private Consumer<MessageToSend> passiveMessageReceiver;
+  private Consumer<String> passiveUserRemover;
+  private Consumer<List<ClientUser>> passiveUserAdder;
+
+  public ClientFunctions(Consumer<MessageToSend> passiveMessageReceiver,
+      Consumer<String> passiveUserRemover, Consumer<List<ClientUser>> passiveUserAdder) {
+    this.passiveMessageReceiver = passiveMessageReceiver;
+    this.passiveUserRemover = passiveUserRemover;
+    this.passiveUserAdder = passiveUserAdder;
+  }
+
+  public void setActiveConsumers(Consumer<MessageToSend> messageConsumer) {
+    activeMessageReceiver = messageConsumer;
+    active = true;
+  }
+
+  public ClientFunctions(Consumer<MessageToSend> consumer) {
+    passiveMessageReceiver = consumer;
+    active = false;
+  }
+
+  /**
+   * sends message in another thread
+   *
+   * @param messageToSend string that want's be send
+   * @return if successfully
+   */
+  public boolean sendMessage(String messageToSend) throws IOException {
+    SendTask task = new SendTask();
+    try {
+      return task.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, messageToSend).get();
+
+    } catch (InterruptedException | ExecutionException e1) {
+      e1.printStackTrace();
+      return false;
+      //return task.execute().get();
     }
+  }
 
-    public List<MessageToSend> getNewMessages(int oldAmount) {
-        return messages.subList(oldAmount, messages.size());
+  /**
+   * sends a request to be put in a new room, to the server, in an other task
+   *
+   * @return if successfully
+   */
+  public boolean requestNewRoom() {
+    NewRoomTask task = new NewRoomTask();
+    try {
+      return task.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR).get();
+
+    } catch (InterruptedException | ExecutionException e1) {
+      e1.printStackTrace();
+      return false;
+      //return task.execute().get();
     }
+  }
 
-    public void setMessages(List<MessageToSend> messages) {
-        this.messages = messages;
+  /**
+   * @param address address where the server lies
+   * @return null if a connection could be established, empty string if he tried to connect to an
+   * already connected server otherwise return a String with the reason curActivity is used to
+   * create a toast on connection error/success - null if not used in activity
+   */
+  public String openConnection(String address, ClientUser client) {
+    this.clientUser = client;
+    OpenConnectionTask task = new OpenConnectionTask();
+    try {
+      return task.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, address).get();
+    } catch (InterruptedException | ExecutionException e) {
+      e.printStackTrace();
+      return "InterruptedException | ExecutionException";
     }
+  }
 
-    private List<MessageToSend> messages = new LinkedList<>();
-    private ObjectOutputStream outputStream;
-    private ObjectInputStream inputStream;
-    private boolean connected = false;
+  /**
+   * sed to be
+   *
+   * @param client client that wants to reconnect
+   * @return message
+   */
+  public String reOpenConnection(ClientUser client) {
+    //openConnection(oldAddress, user, oldPort);
+    //utputStream.writeObject(new MessageToSend(user.getPublicKey()));
+    //TODO: implement
+    return "";
+  }
 
-    //Consumers which are used when this active == true
-    private Consumer<MessageToSend> activeMessageReceiver;
-    private Consumer<String> activeUserRemover;
-    private Consumer<List<ClientUser>> activeUserAdder;
-
-    //Consumers which are used when this active == false
-    private Consumer<MessageToSend> passiveMessageReceiver;
-    private Consumer<String> passiveUserRemover;
-    private Consumer<List<ClientUser>> passiveUserAdder;
-
-    public ClientFunctions(Consumer<MessageToSend> passiveMessageReceiver, Consumer<String> passiveUserRemover, Consumer<List<ClientUser>> passiveUserAdder) {
-        this.passiveMessageReceiver = passiveMessageReceiver;
-        this.passiveUserRemover = passiveUserRemover;
-        this.passiveUserAdder = passiveUserAdder;
+  /**
+   * closes the connection, surprising i know
+   */
+  public void closeConnection() {
+    if (socket != null) {
+      try {
+        socket.close();
+      } catch (IOException e) {
+        e.printStackTrace();
+      }
     }
+    messages = new LinkedList<>();
+    users = new LinkedList<>();
+    connected = false;
+  }
 
-    public void setActiveConsumers(Consumer<MessageToSend> messageConsumer) {
-        activeMessageReceiver = messageConsumer;
-        active = true;
-    }
-
-    public ClientFunctions(Consumer<MessageToSend> consumer) {
-        passiveMessageReceiver = consumer;
-        active = false;
-    }
-
-    /**
-     * sends message in another thread
-     * @param messageToSend string that want's be send
-     * @return if successfully
-     * @throws IOException
-     */
-    public boolean sendMessage(String messageToSend) throws IOException {
-        SendTask task = new SendTask();
-        try {
-            return task.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, messageToSend).get();
-
-        } catch (InterruptedException | ExecutionException e1) {
-            e1.printStackTrace();
-            return false;
-            //return task.execute().get();
+  /**
+   * needs to be executed in a different thread !
+   *
+   * @return 0 if it got disconnected, 1 if the server disconnected
+   */
+  public int waitForMessages() {
+    while (connected) {
+      try {
+        Object object = inputStream.readObject();
+        if (object != null && object instanceof MessageToSend) {
+          MessageToSend message = ((MessageToSend) object);
+          switch (message.getMessageType()) {
+            case ENCRYPTED_TEXT:
+              String decryptedMessage = Security
+                  .decrypt(message.getEncryptedMessage(), clientUser.getPrivateKey());
+              message.setMessage(decryptedMessage);
+            case TEXT:
+              //message.setAuthor(getUserFromList(message.getAuthor()));
+              messages.add(message);
+              chooseActiveOrPassiveConsumer(passiveMessageReceiver, activeMessageReceiver, message);
+              break;
+            case USER_ADD:
+              ClientUser user = new ClientUser(message.getAuthor());
+              users.add(user.getUser());
+              chooseActiveOrPassiveConsumer(passiveUserAdder, activeUserAdder,
+                  Collections.singletonList(user));
+              break;
+            case USER_LEFT:
+              this.users.remove(getUserFromList(message.getAuthor()));
+              chooseActiveOrPassiveConsumer(passiveUserRemover, activeUserRemover,
+                  message.getAuthor().getName());
+              break;
+            default:
+              break;
+          }
         }
-    }
-
-    /**
-     * sends a request to be put in a new room, to the server, in an other task
-     * @return if successfully
-     */
-    public boolean requestNewRoom() {
-        NewRoomTask task = new NewRoomTask();
-        try {
-            return task.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR).get();
-
-        } catch (InterruptedException | ExecutionException e1) {
-            e1.printStackTrace();
-            return false;
-            //return task.execute().get();
-        }
-    }
-
-    /**
-     * @param address address where the server lies
-     * @return null if a connection could be established,
-     * empty string if he tried to connect to an already connected server
-     * otherwise return a String with the reason
-     * curActivity is used to create a toast on connection error/success - null if not used in activity
-     */
-    public String openConnection(String address, ClientUser client) {
-        this.clientUser = client;
-        OpenConnectionTask task = new OpenConnectionTask();
-        try {
-            return task.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, address).get();
-        } catch (InterruptedException | ExecutionException e) {
-            e.printStackTrace();
-            return "InterruptedException | ExecutionException";
-        }
-    }
-
-    /**
-     * sed to be
-     * @param client client that wants to reconnect
-     * @return message
-     */
-    public String reOpenConnection(ClientUser client) {
-        //openConnection(oldAddress, user, oldPort);
-        //utputStream.writeObject(new MessageToSend(user.getPublicKey()));
-        //TODO: implement
-        return "";
-    }
-
-    /**
-     * closes the connection, surprising i know
-     */
-    public void closeConnection() {
-        if (socket != null) {
-            try {
-                socket.close();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-        messages = new LinkedList<>();
-        users = new LinkedList<>();
-        connected = false;
-    }
-
-    /**
-     * needs to be executed in a different thread !
-     * @return 0 if it got disconnected, 1 if the server disconnected
-     */
-    public int waitForMessages() {
-        while (connected) {
-            try {
-                Object object = inputStream.readObject();
-                if (object != null && object instanceof MessageToSend) {
-                    MessageToSend message = ((MessageToSend) object);
-                    switch (message.getMessageType()) {
-                        case ENCRYPTED_TEXT:
-                            String decryptedMessage = Security.decrypt(message.getEncryptedMessage(), clientUser.getPrivateKey());
-                            message.setMessage(decryptedMessage);
-                        case TEXT:
-                            //message.setAuthor(getUserFromList(message.getAuthor()));
-                            messages.add(message);
-                            chooseActiveOrPassiveConsumer(passiveMessageReceiver, activeMessageReceiver, message);
-                            break;
-                        case USER_ADD:
-                            ClientUser user = new ClientUser(message.getAuthor());
-                            users.add(user.getUser());
-                            chooseActiveOrPassiveConsumer(passiveUserAdder, activeUserAdder, Collections.singletonList(user));
-                            break;
-                        case USER_LEFT:
-                            this.users.remove(getUserFromList(message.getAuthor()));
-                            chooseActiveOrPassiveConsumer(passiveUserRemover, activeUserRemover, message.getAuthor().getName());
-                            break;
-                        default:
-                            break;
-                    }
-                }
-            } catch (EOFException | SocketException e) {
-                if (connected) {
-                    connected = false;
-                    return 1;
-                }
-                return 0;
-            } catch (IOException e) {
-                connected = false;
-                return 0;
-            } catch (ClassNotFoundException e) {
-                e.printStackTrace();
-                return 1;
-            }
+      } catch (EOFException | SocketException e) {
+        if (connected) {
+          connected = false;
+          return 1;
         }
         return 0;
+      } catch (IOException e) {
+        connected = false;
+        return 0;
+      } catch (ClassNotFoundException e) {
+        e.printStackTrace();
+        return 1;
+      }
     }
+    return 0;
+  }
 
-    public boolean isConnected() {
-        return connected;
-    }
+  public boolean isConnected() {
+    return connected;
+  }
 
-    /**
-     * used to authenticate on server, using public/private key
-     */
-    private void authenticate() {
-        if (clientUser != null) {
-            Authentication auth;
-            Object input;
-            boolean inProgress = true;
+  /**
+   * used to authenticate on server, using public/private key
+   */
+  private void authenticate() {
+    if (clientUser != null) {
+      Authentication auth;
+      Object input;
+      boolean inProgress = true;
 
-            while (inProgress) {
-                try {
-                    input = inputStream.readObject();
-                    if (input instanceof Authentication) {
-                        auth = ((Authentication) input);
-                        publicServerKey = Security.byteArrToPublicKey(auth.getPublicKey());
-                        auth.setPublicKey(clientUser.getUser().getPublicKey());
-                        auth.setEncryptedMessage(Security.encrypt(auth.getOriginalMessage(), clientUser.getPrivateKey()));
-                        outputStream.writeObject(auth);
-                        inProgress = false;
-                    }
+      while (inProgress) {
+        try {
+          input = inputStream.readObject();
+          if (input instanceof Authentication) {
+            auth = ((Authentication) input);
+            publicServerKey = Security.byteArrToPublicKey(auth.getPublicKey());
+            auth.setPublicKey(clientUser.getUser().getPublicKey());
+            auth.setEncryptedMessage(
+                Security.encrypt(auth.getOriginalMessage(), clientUser.getPrivateKey()));
+            outputStream.writeObject(auth);
+            inProgress = false;
+          }
 
-                } catch (IOException | ClassNotFoundException e) {
-                    e.printStackTrace();
-                }
-            }
+        } catch (IOException | ClassNotFoundException e) {
+          e.printStackTrace();
         }
+      }
     }
+  }
 
-    public int getPORT() {
-        return PORT;
+  public int getPORT() {
+    return PORT;
+  }
+
+  public void setPORT(int PORT) {
+    this.PORT = PORT;
+  }
+
+  public List<User> getUsers() {
+    return users;
+  }
+
+  public void setUsers(List<User> users) {
+    this.users = users;
+  }
+
+  public int getOldPort() {
+    return oldPort;
+  }
+
+  public void setOldPort(int oldPort) {
+    this.oldPort = oldPort;
+  }
+
+  public String getAddress() {
+    return oldAddress;
+  }
+
+  public boolean isActive() {
+    return active;
+  }
+
+  /**
+   * chooses active or passive consumer based on boolean active
+   *
+   * @param activeConsumer which
+   * @param consumable what should be consumed
+   */
+  private void chooseActiveOrPassiveConsumer(Consumer passiveConsumer, Consumer activeConsumer,
+      Object consumable) {
+    if (active) {
+      activeConsumer.accept(consumable);
+    } else {
+      if (passiveConsumer != null) {
+        passiveConsumer.accept(consumable);
+      }
     }
+  }
 
-    public void setPORT(int PORT) {
-        this.PORT = PORT;
+  public void addActiveConsumers(Consumer<MessageToSend> activeMessageReceiver,
+      Consumer<String> activeUserRemover, Consumer<List<ClientUser>> activeUserAdder) {
+    addActiveConsumers(activeMessageReceiver, activeUserRemover, activeUserAdder, null);
+    //null was before: user -> {});
+  }
+
+  public void addActiveConsumers(Consumer<MessageToSend> activeMessageReceiver,
+      Consumer<String> activeUserRemover, Consumer<List<ClientUser>> activeUserAdder,
+      Consumer<ClientUser> activeChangeUsername) {
+    this.activeMessageReceiver = activeMessageReceiver;
+    this.activeUserRemover = activeUserRemover;
+    this.activeUserAdder = activeUserAdder;
+    this.active = true;
+  }
+
+  public void removeActiveConsumers() {
+    this.activeMessageReceiver = null;
+    this.activeUserRemover = null;
+    this.activeUserAdder = null;
+    this.active = false;
+  }
+
+  public void setPassiveMessageReceiver(Consumer<MessageToSend> passiveMessageReceiver) {
+    this.passiveMessageReceiver = passiveMessageReceiver;
+  }
+
+  public ClientUser getClientUser() {
+    return clientUser;
+  }
+
+  public void setClientUser(ClientUser clientUser) {
+    this.clientUser = clientUser;
+  }
+
+  /**
+   * @param userKey User to be searched
+   * @return User found
+   */
+  private User getUserFromList(User userKey) {
+    final User[] result = {userKey};
+    for (User clientUser : users) {
+      if (clientUser.equals(userKey)) {
+        result[0] = clientUser;
+      }
     }
+    return result[0];
+  }
 
-    public List<User> getUsers() {
-        return users;
-    }
+  /**
+   * Task to open a new connection
+   */
+  private class OpenConnectionTask extends AsyncTask<String, Void, String> {
 
-    public void setUsers(List<User> users) {
-        this.users = users;
-    }
-
-    public int getOldPort() {
-        return oldPort;
-    }
-
-    public void setOldPort(int oldPort) {
-        this.oldPort = oldPort;
-    }
-
-    public String getAddress() {
-        return oldAddress;
-    }
-
-    public boolean isActive() {
-        return active;
-    }
-
-    /**
-     * chooses active or passive consumer based on boolean active
-     *
-     * @param passiveConsumer
-     * @param activeConsumer  which
-     * @param consumable      what should be consumed
-     */
-    private void chooseActiveOrPassiveConsumer(Consumer passiveConsumer, Consumer activeConsumer, Object consumable) {
-        if (active) {
-            activeConsumer.accept(consumable);
-        } else {
-            if (passiveConsumer != null) {
-                passiveConsumer.accept(consumable);
-            }
+    protected String doInBackground(String... params) {
+      String address = params[0];
+      if (!address.equals(oldAddress)
+          || oldPort != PORT) { //one should not be able to connect to a server twice
+        closeConnection();
+        oldAddress = address;
+        oldPort = PORT;
+        connected = false;
+        users = new ArrayList<>();
+        messages = new LinkedList<>();
+        try {
+          socket = new Socket(address, PORT); //opens the connection
+          outputStream = new ObjectOutputStream(socket.getOutputStream());
+          inputStream = new ObjectInputStream(socket.getInputStream());
+          if (outputStream != null) {
+            //authenticate();
+            outputStream.writeObject(new MessageToSend(clientUser.getUser()));
+            connected = true;
+          }
+        } catch (IOException | IllegalArgumentException e) {
+          e.printStackTrace();
+          return e.getClass()
+              .getSimpleName(); //gets the exception and turns it into an error message
         }
+        return "unknown Error"; //if there is an unkown error
+      }
+      return "";
     }
 
-    public void addActiveConsumers(Consumer<MessageToSend> activeMessageReceiver, Consumer<String> activeUserRemover, Consumer<List<ClientUser>> activeUserAdder) {
-        addActiveConsumers(activeMessageReceiver, activeUserRemover, activeUserAdder, null);
-        //null was before: user -> {});
+    protected void onPostExecute(String feed) {
+      //when task is finished
+      // TODO: check this.exception
+      // TODO: do something with the feed
     }
+  }
 
-    public void addActiveConsumers(Consumer<MessageToSend> activeMessageReceiver, Consumer<String> activeUserRemover, Consumer<List<ClientUser>> activeUserAdder, Consumer<ClientUser> activeChangeUsername) {
-        this.activeMessageReceiver = activeMessageReceiver;
-        this.activeUserRemover = activeUserRemover;
-        this.activeUserAdder = activeUserAdder;
-        this.active = true;
-    }
+  /**
+   * Task to send a message
+   */
+  private class SendTask extends AsyncTask<String, Void, Boolean> {
 
-    public void removeActiveConsumers() {
-        this.activeMessageReceiver = null;
-        this.activeUserRemover = null;
-        this.activeUserAdder = null;
-        this.active = false;
-    }
-
-    public void setPassiveMessageReceiver(Consumer<MessageToSend> passiveMessageReceiver) {
-        this.passiveMessageReceiver = passiveMessageReceiver;
-    }
-
-    public ClientUser getClientUser() {
-        return clientUser;
-    }
-
-    public void setClientUser(ClientUser clientUser) {
-        this.clientUser = clientUser;
-    }
-
-    /**
-     *
-     * @param userKey User to be searched
-     * @return User found
-     */
-    private User getUserFromList(User userKey) {
-        final User[] result = {userKey};
-        for (User clientUser : users) {
-            if (clientUser.equals(userKey)) {
-                result[0] = clientUser;
-            }
+    protected Boolean doInBackground(String... params) {
+      for (String messageToSend : params) {
+        try {
+          //outputStream.writeObject(new MessageToSend(Security.encrypt(messageToSend, publicServerKey), clientUser.getName(), clientUser.getPublicKey()));
+          outputStream.writeObject(new MessageToSend(messageToSend, clientUser.getUser()));
+        } catch (IOException e) {
+          e.printStackTrace();
+          return false;
         }
-        return result[0];
+      }
+      return true;
     }
+  }
 
-    /**
-     * Task to open a new connection
-     */
-    private class OpenConnectionTask extends AsyncTask<String, Void, String> {
-        protected String doInBackground(String... params) {
-            String address = params[0];
-            if (!address.equals(oldAddress) || oldPort != PORT) { //one should not be able to connect to a server twice
-                closeConnection();
-                oldAddress = address;
-                oldPort = PORT;
-                connected = false;
-                users = new ArrayList<>();
-                messages = new LinkedList<>();
-                try {
-                    socket = new Socket(address, PORT); //opens the connection
-                    outputStream = new ObjectOutputStream(socket.getOutputStream());
-                    inputStream = new ObjectInputStream(socket.getInputStream());
-                    if (outputStream != null) {
-                        //authenticate();
-                        outputStream.writeObject(new MessageToSend(clientUser.getUser()));
-                        connected = true;
-                    }
-                } catch (IOException | IllegalArgumentException e) {
-                    e.printStackTrace();
-                    return e.getClass().getSimpleName(); //gets the exception and turns it into an error message
-                }
-                return "unknown Error"; //if there is an unkown error
-            }
-            return "";
-        }
+  /**
+   * Task to send a newRoomRequest
+   */
+  private class NewRoomTask extends AsyncTask<String, Void, Boolean> {
 
-        protected void onPostExecute(String feed) {
-            //when task is finished
-            // TODO: check this.exception
-            // TODO: do something with the feed
-        }
+    protected Boolean doInBackground(String... params) {
+      try {
+        outputStream.writeObject(new MessageToSend(MessageToSend.MessageType.NEW_ROOM));
+      } catch (IOException e) {
+        e.printStackTrace();
+        return false;
+      }
+      return true;
     }
-
-    /**
-     * Task to send a message
-     */
-    private class SendTask extends AsyncTask<String, Void, Boolean> {
-        protected Boolean doInBackground(String... params) {
-            for (String messageToSend : params) {
-                try {
-                    //outputStream.writeObject(new MessageToSend(Security.encrypt(messageToSend, publicServerKey), clientUser.getName(), clientUser.getPublicKey()));
-                    outputStream.writeObject(new MessageToSend(messageToSend, clientUser.getUser()));
-                } catch (IOException e) {
-                    e.printStackTrace();
-                    return false;
-                }
-            }
-            return true;
-        }
-    }
-
-    /**
-     * Task to send a newRoomRequest
-     */
-    private class NewRoomTask extends AsyncTask<String, Void, Boolean> {
-        protected Boolean doInBackground(String... params) {
-            try {
-                outputStream.writeObject(new MessageToSend(MessageToSend.MessageType.NEW_ROOM));
-            } catch (IOException e) {
-                e.printStackTrace();
-                return false;
-            }
-            return true;
-        }
-    }
+  }
 }

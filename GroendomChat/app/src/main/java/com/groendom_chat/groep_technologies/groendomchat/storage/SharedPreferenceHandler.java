@@ -15,15 +15,16 @@ import java.util.Locale;
  */
 
 public class SharedPreferenceHandler {
-    private static final String PREFS = "speed-o-meter-preferences-file";
-    private final SharedPreferences sharedPreferences;
-    private Context context;
 
-    public SharedPreferenceHandler(Context context) {
-        this.context = context;
-        // All objects are from android.context.Context
-        this.sharedPreferences = context.getSharedPreferences(PREFS, 0);
-    }
+  private static final String PREFS = "speed-o-meter-preferences-file";
+  private final SharedPreferences sharedPreferences;
+  private Context context;
+
+  public SharedPreferenceHandler(Context context) {
+    this.context = context;
+    // All objects are from android.context.Context
+    this.sharedPreferences = context.getSharedPreferences(PREFS, 0);
+  }
 
     /*public List<Float> getMeasurements(){
         int counter = sharedPreferences.getInt(COUNTER, 0);

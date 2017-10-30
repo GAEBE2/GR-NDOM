@@ -8,9 +8,8 @@ import java.util.Objects;
 
 public interface Consumer<T> {
 
-    /**
-     * used as work around for functions as variables, because of java 7
-     * @param obj
-     */
-    public void accept(T obj);
+  /**
+   * used as work around for functions as variables, because of java 7
+   */
+  void accept(T obj);
 }

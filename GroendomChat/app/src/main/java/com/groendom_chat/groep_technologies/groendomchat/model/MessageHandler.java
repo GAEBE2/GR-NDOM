@@ -14,22 +14,24 @@ import com.groendom_chat.groep_technologies.groendomchat.R;
  */
 
 public class MessageHandler {
-    private Context context;
 
-    public MessageHandler(Context context) {
-        this.context = context;
-    }
+  private Context context;
 
-    public void createOut(ViewGroup parent, MessageToSend message) {
-        LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        RelativeLayout child = (RelativeLayout) inflater.inflate(R.layout.bubble_out, parent, false);
+  public MessageHandler(Context context) {
+    this.context = context;
+  }
 
-        ((TextView) child.findViewById(R.id.bubble_text_content)).setText(message.getMessage());
-        ((TextView) child.findViewById(R.id.bubble_text_date)).setText(message.getDateString());
-        parent.addView(child);
-    }
+  public void createOut(ViewGroup parent, MessageToSend message) {
+    LayoutInflater inflater = (LayoutInflater) context
+        .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+    RelativeLayout child = (RelativeLayout) inflater.inflate(R.layout.bubble_out, parent, false);
 
-    public void createOut(ViewGroup parent, Icon icon){
+    ((TextView) child.findViewById(R.id.bubble_text_content)).setText(message.getMessage());
+    ((TextView) child.findViewById(R.id.bubble_text_date)).setText(message.getDateString());
+    parent.addView(child);
+  }
 
-    }
+  public void createOut(ViewGroup parent, Icon icon) {
+
+  }
 }
