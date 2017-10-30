@@ -44,6 +44,7 @@ android:
         - 'source-23'
         - 'source-24'
         - 'source-25'
+        - '.+'
 
 #env:
  #   global:
