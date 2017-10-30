@@ -75,12 +75,6 @@ public class ServerFunctions {
         return index;
     }
 
-    public static void log(String msg) {
-        if (LOG == null) {
-            LOG = Logger.getLogger("");
-        }
-    }
-
     static int insertIntoNewRoom(Handler handler){
         if (roomList == null) {
             roomList = new ArrayList<>();

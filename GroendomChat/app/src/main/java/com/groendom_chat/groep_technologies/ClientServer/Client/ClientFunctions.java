@@ -356,40 +356,13 @@ public class ClientFunctions {
         return result[0];
     }
 
-    /**
-     * Task to open a new connection
-     */
-    private class OpenConnectionTask extends AsyncTask<String, Void, String> {
-        protected String doInBackground(String... params) {
-            String address = params[0];
-            if (!address.equals(oldAddress) || oldPort != PORT) { //one should not be able to connect to a server twice
-                closeConnection();
-                oldAddress = address;
-                oldPort = PORT;
-                connected = false;
-                users = new ArrayList<>();
-                messages = new LinkedList<>();
-                try {
-                    socket = new Socket(address, PORT); //opens the connection
-                    outputStream = new ObjectOutputStream(socket.getOutputStream());
-                    inputStream = new ObjectInputStream(socket.getInputStream());
-                    if (outputStream != null) {
-                        //authenticate();
-                        outputStream.writeObject(new MessageToSend(clientUser.getUser()));
-                        connected = true;
-                    }
-                } catch (IOException | IllegalArgumentException e) {
-                    e.printStackTrace();
-                    return e.getClass().getSimpleName(); //gets the exception and turns it into an error message
-                }
-            }
-        }
-    }
-
     public void setConnected(boolean connected) {
         this.connected = connected;
     }
 
+    /**
+     * Task to open a new connection
+     */
     private class OpenConnectionTask extends AsyncTask<Object, Void, Void> {
         protected Void doInBackground(Object... params) {
             String address = (String) params[0];

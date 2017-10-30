@@ -92,6 +92,6 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void openChat(Callback cb) throws NoSuchProviderException, NoSuchAlgorithmException {
-        functions.openConnection("10.4.57.171", clientUser, cb);
+        functions.openConnection("10.4.57.128", clientUser, cb);
     }
 }

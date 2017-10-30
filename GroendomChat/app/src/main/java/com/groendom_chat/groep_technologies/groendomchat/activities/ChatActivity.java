@@ -34,8 +34,14 @@ public class ChatActivity extends Activity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setContentView(R.layout.chat_activity);
 
         ClientUser clientUser = (ClientUser) getIntent().getSerializableExtra(getString(R.string.client_user_value));
+
+        itemsAdapter = new ListViewAdapter(this, items, clientUser.getUser());
+        final EditText editText = (EditText) findViewById(R.id.edit_text_message);
+        final ListView listView = (ListView) findViewById(R.id.chat_activity_content);
+        listView.setAdapter(itemsAdapter);
 
         if (clientUser == null) {
             Toast.makeText(getApplicationContext(), "Failed pass data between the activities", Toast.LENGTH_LONG).show();
@@ -49,6 +55,12 @@ public class ChatActivity extends Activity {
                             @Override
                             public void run() {
                                 itemsAdapter.add(message);
+                                runOnUiThread(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        listView.setSelection(itemsAdapter.getCount() - 1);
+                                    }
+                                });
                             }
                         });
                     }
@@ -56,14 +68,22 @@ public class ChatActivity extends Activity {
             }, new Consumer<String>() {
                 @Override
                 public void accept(String obj) {
-                    System.out.println("Removed user:" + obj);
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            Toast.makeText(getApplicationContext(), "Other user left the chat room...", Toast.LENGTH_LONG).show();
+                        }
+                    });
                 }
             }, new Consumer<List<ClientUser>>() {
                 @Override
                 public void accept(List<ClientUser> obj) {
-                    for (ClientUser user : obj) {
-                        System.out.println("Users:" + user);
-                    }
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            Toast.makeText(getApplicationContext(), "New user has joined the chat room...", Toast.LENGTH_LONG).show();
+                        }
+                    });
                 }
             });
 
@@ -75,10 +95,8 @@ public class ChatActivity extends Activity {
 
             new ReceiveTask().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
 
-            setContentView(R.layout.chat_activity);
-
             Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-            toolbar.setTitle("Chat partner 1");
+            toolbar.setTitle("Chatroom");
 
             toolbar.setNavigationOnClickListener(new View.OnClickListener() {
                 @Override
@@ -88,10 +106,6 @@ public class ChatActivity extends Activity {
                 }
             });
 
-            itemsAdapter = new ListViewAdapter(this, items, clientUser.getUser());
-            final EditText editText = (EditText) findViewById(R.id.edit_text_message);
-            final ListView listView = (ListView) findViewById(R.id.chat_activity_content);
-            listView.setAdapter(itemsAdapter);
             FloatingActionButton sendButton = (FloatingActionButton) findViewById(R.id.button_send);
             sendButton.setOnClickListener(new View.OnClickListener() {
                 @Override

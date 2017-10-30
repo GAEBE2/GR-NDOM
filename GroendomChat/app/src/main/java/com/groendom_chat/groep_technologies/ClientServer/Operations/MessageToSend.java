@@ -19,8 +19,6 @@ public class MessageToSend implements Serializable {
         TEXT, IMAGE, USER_ADD, LOGIN, USER_REMOVE, ENCRYPTED_TEXT, RECONNECT, NEW_ROOM
     }
 
-    private MessageType messageType;
-
     //default port
     private static final int PORT = 9001;
     private MessageType messageType;
@@ -38,7 +36,7 @@ public class MessageToSend implements Serializable {
 
     public MessageToSend(UUID userID, PublicKey publicKey) {
         this();
-        messageType = MessageType.NEXT;
+        messageType = MessageType.TEXT;
         author = new User(userID, publicKey);
     }
 
@@ -203,17 +201,5 @@ public class MessageToSend implements Serializable {
 
     public void setEncryptedMessage(byte[] message) {
         this.encryptedMessage = message;
-    }
-
-    public enum MessageType {
-        TEXT, IMAGE, USER_ADD, LOGIN, USER_REMOVE, ENCRYPTED_TEXT, NEXT, RECONNECT
-    }
-
-    public static MessageToSend getReconnectMessage(User user, int arrNumber) {
-        MessageToSend messageToSend = new MessageToSend(user);
-        messageToSend.messageType = MessageType.RECONNECT;
-        messageToSend.port = arrNumber;
-
-        return messageToSend;
     }
 }
