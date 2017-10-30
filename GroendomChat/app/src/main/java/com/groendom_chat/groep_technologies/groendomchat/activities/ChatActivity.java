@@ -27,118 +27,125 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 public class ChatActivity extends Activity {
-    private final ArrayList<MessageToSend> items = new ArrayList<>();
-    private ArrayAdapter<MessageToSend> itemsAdapter;
-    private ClientFunctions functions;
+
+  private final ArrayList<MessageToSend> items = new ArrayList<>();
+  private ArrayAdapter<MessageToSend> itemsAdapter;
+  private ClientFunctions functions;
+
+  @Override
+  protected void onCreate(Bundle savedInstanceState) {
+    super.onCreate(savedInstanceState);
+    setContentView(R.layout.chat_activity);
+
+    ClientUser clientUser = (ClientUser) getIntent()
+        .getSerializableExtra(getString(R.string.client_user_value));
+
+    itemsAdapter = new ListViewAdapter(this, items, clientUser.getUser());
+    final EditText editText = (EditText) findViewById(R.id.edit_text_message);
+    final ListView listView = (ListView) findViewById(R.id.chat_activity_content);
+    listView.setAdapter(itemsAdapter);
+
+    if (clientUser == null) {
+      Toast.makeText(getApplicationContext(), "Failed pass data between the activities",
+          Toast.LENGTH_LONG).show();
+      finish();
+    } else {
+      functions = new ClientFunctions(new Consumer<MessageToSend>() {
+        @Override
+        public void accept(final MessageToSend message) {
+          if (itemsAdapter != null) {
+            runOnUiThread(new Runnable() {
+              @Override
+              public void run() {
+                itemsAdapter.add(message);
+                runOnUiThread(new Runnable() {
+                  @Override
+                  public void run() {
+                    listView.setSelection(itemsAdapter.getCount() - 1);
+                  }
+                });
+              }
+            });
+          }
+        }
+      }, new Consumer<String>() {
+        @Override
+        public void accept(String obj) {
+          runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+              Toast.makeText(getApplicationContext(), "Other user left the chat room...",
+                  Toast.LENGTH_LONG).show();
+            }
+          });
+        }
+      }, new Consumer<List<ClientUser>>() {
+        @Override
+        public void accept(List<ClientUser> obj) {
+          runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+              Toast.makeText(getApplicationContext(), "New user has joined the chat room...",
+                  Toast.LENGTH_LONG).show();
+            }
+          });
+        }
+      });
+
+      functions.setSocket(SocketHandler.getSocket());
+      functions.setObjectInputStream(SocketHandler.getInputStream());
+      functions.setObjectOutputStream(SocketHandler.getOutputStream());
+      functions.setClientUser(clientUser);
+      functions.setConnected(true);
+
+      new ReceiveTask().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+
+      Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+      toolbar.setTitle("Chatroom");
+
+      toolbar.setNavigationOnClickListener(new View.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+          finish();
+          functions.closeConnection();
+        }
+      });
+
+      FloatingActionButton sendButton = (FloatingActionButton) findViewById(R.id.button_send);
+      sendButton.setOnClickListener(new View.OnClickListener() {
+        @Override
+        public void onClick(View view) {
+          String text = editText.getText().toString();
+          if (!text.equals("")) {
+            try {
+              if (functions.sendMessage(text)) {
+                //items.add(new MessageToSend(text, clientUser.getName()));
+                editText.setText("");
+
+              } else {
+                Toast.makeText(getApplicationContext(), "Failed to send message :(",
+                    Toast.LENGTH_LONG).show();
+              }
+            } catch (IOException e) {
+              e.printStackTrace();
+            }
+          }
+        }
+      });
+    }
+  }
+
+  protected void onStop() {
+    super.onStop();
+    functions.closeConnection();
+  }
+
+  private class ReceiveTask extends AsyncTask<Void, Void, Void> {
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.chat_activity);
-
-        ClientUser clientUser = (ClientUser) getIntent().getSerializableExtra(getString(R.string.client_user_value));
-
-        itemsAdapter = new ListViewAdapter(this, items, clientUser.getUser());
-        final EditText editText = (EditText) findViewById(R.id.edit_text_message);
-        final ListView listView = (ListView) findViewById(R.id.chat_activity_content);
-        listView.setAdapter(itemsAdapter);
-
-        if (clientUser == null) {
-            Toast.makeText(getApplicationContext(), "Failed pass data between the activities", Toast.LENGTH_LONG).show();
-            finish();
-        } else {
-            functions = new ClientFunctions(new Consumer<MessageToSend>() {
-                @Override
-                public void accept(final MessageToSend message) {
-                    if (itemsAdapter != null) {
-                        runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                itemsAdapter.add(message);
-                                runOnUiThread(new Runnable() {
-                                    @Override
-                                    public void run() {
-                                        listView.setSelection(itemsAdapter.getCount() - 1);
-                                    }
-                                });
-                            }
-                        });
-                    }
-                }
-            }, new Consumer<String>() {
-                @Override
-                public void accept(String obj) {
-                    runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            Toast.makeText(getApplicationContext(), "Other user left the chat room...", Toast.LENGTH_LONG).show();
-                        }
-                    });
-                }
-            }, new Consumer<List<ClientUser>>() {
-                @Override
-                public void accept(List<ClientUser> obj) {
-                    runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            Toast.makeText(getApplicationContext(), "New user has joined the chat room...", Toast.LENGTH_LONG).show();
-                        }
-                    });
-                }
-            });
-
-            functions.setSocket(SocketHandler.getSocket());
-            functions.setObjectInputStream(SocketHandler.getInputStream());
-            functions.setObjectOutputStream(SocketHandler.getOutputStream());
-            functions.setClientUser(clientUser);
-            functions.setConnected(true);
-
-            new ReceiveTask().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
-
-            Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-            toolbar.setTitle("Chatroom");
-
-            toolbar.setNavigationOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    finish();
-                    functions.closeConnection();
-                }
-            });
-
-            FloatingActionButton sendButton = (FloatingActionButton) findViewById(R.id.button_send);
-            sendButton.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    String text = editText.getText().toString();
-                    if (!text.equals("")) {
-                        try {
-                            if (functions.sendMessage(text)) {
-                                //items.add(new MessageToSend(text, clientUser.getName()));
-                                editText.setText("");
-
-                            } else {
-                                Toast.makeText(getApplicationContext(), "Failed to send message :(", Toast.LENGTH_LONG).show();
-                            }
-                        } catch (IOException e) {
-                            e.printStackTrace();
-                        }
-                    }
-                }
-            });
-        }
+    protected Void doInBackground(Void... params) {
+      functions.waitForMessages();
+      return null;
     }
-
-    protected void onStop() {
-        super.onStop();
-        functions.closeConnection();
-    }
-
-    private class ReceiveTask extends AsyncTask<Void, Void, Void> {
-        @Override
-        protected Void doInBackground(Void... params) {
-            functions.waitForMessages();
-            return null;
-        }
-    }
+  }
 }

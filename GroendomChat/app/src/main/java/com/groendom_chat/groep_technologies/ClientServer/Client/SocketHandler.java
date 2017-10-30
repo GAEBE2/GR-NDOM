@@ -9,31 +9,32 @@ import java.net.Socket;
  */
 
 public class SocketHandler {
-    private static Socket socket;
-    private static ObjectInputStream inputStream;
-    private static ObjectOutputStream outputStream;
 
-    public static synchronized Socket getSocket(){
-        return socket;
-    }
+  private static Socket socket;
+  private static ObjectInputStream inputStream;
+  private static ObjectOutputStream outputStream;
 
-    public static synchronized void setSocket(Socket socket){
-        SocketHandler.socket = socket;
-    }
+  public static synchronized Socket getSocket() {
+    return socket;
+  }
 
-    public static synchronized ObjectInputStream getInputStream() {
-        return inputStream;
-    }
+  public static synchronized void setSocket(Socket socket) {
+    SocketHandler.socket = socket;
+  }
 
-    public static synchronized void setInputStream(ObjectInputStream inputStream) {
-        SocketHandler.inputStream = inputStream;
-    }
+  public static synchronized ObjectInputStream getInputStream() {
+    return inputStream;
+  }
 
-    public static synchronized ObjectOutputStream getOutputStream() {
-        return outputStream;
-    }
+  public static synchronized void setInputStream(ObjectInputStream inputStream) {
+    SocketHandler.inputStream = inputStream;
+  }
 
-    public static synchronized void setOutputStream(ObjectOutputStream outputStream) {
-        SocketHandler.outputStream = outputStream;
-    }
+  public static synchronized ObjectOutputStream getOutputStream() {
+    return outputStream;
+  }
+
+  public static synchronized void setOutputStream(ObjectOutputStream outputStream) {
+    SocketHandler.outputStream = outputStream;
+  }
 }
