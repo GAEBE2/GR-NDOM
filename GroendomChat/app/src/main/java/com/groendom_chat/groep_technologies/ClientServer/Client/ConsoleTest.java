@@ -9,7 +9,11 @@ import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
 import java.util.List;
 
+/**
+ * used to test without having to start the whole androird application, and to be modular
+ */
 public class ConsoleTest {
+
     public static void main(String[] args) throws NoSuchProviderException, NoSuchAlgorithmException, IOException, InterruptedException {
         final ClientFunctions functions = new ClientFunctions(new Consumer<MessageToSend>() {
             @Override

@@ -22,8 +22,7 @@ import java.util.logging.Logger;
  * Created by serge on 20-Mar-17.
  */
 public class ServerFunctions {
-    static List<MessageToSend> messageToSendList = new LinkedList<>();
-    static List<Handler> handlerList = new ArrayList<>();
+    private static List<Handler> handlerList = new ArrayList<>();
     static List<User> userList = new ArrayList<>();
     static List<ChatRoom> roomList = new ArrayList<>();
     static KeyPair pair;
@@ -46,7 +45,7 @@ public class ServerFunctions {
         log("The chat server is running on port: " + port);
         try (ServerSocket listener = new ServerSocket(port)) {
             while (open) {
-                Handler handler = new Handler(listener.accept(), pair, roomList, userList, new Consumer<Handler>() {
+                Handler handler = new Handler(listener.accept(), pair, new Consumer<Handler>() {
                     @Override
                     public void accept(Handler handler) {
                         handlerList.remove(handler);
@@ -58,8 +57,50 @@ public class ServerFunctions {
         }
     }
 
+    static int insetIntoRoom(Handler handler) {
+        if (roomList == null) {
+            roomList = new ArrayList<>();
+        }
+        int index = -1;
+        for (int i = 0; i < roomList.size(); i++) {
+            if(roomList.get(i).addHandler(handler)){
+                index = i;
+                break;
+            }
+        }
+        if(index == -1){
+            index = roomList.size();
+            roomList.add(new ChatRoom(handler));
+        }
+        return index;
+    }
 
     public static void log(String msg) {
+        if (LOG == null) {
+            LOG = Logger.getLogger("");
+        }
+    }
+
+    static int insertIntoNewRoom(Handler handler){
+        if (roomList == null) {
+            roomList = new ArrayList<>();
+        }
+        int index = -1;
+        for (int i = 0; i < roomList.size(); i++) {
+            if(roomList.get(i).addHandler(handler)){
+                index = i;
+                break;
+            }
+        }
+        if(index == -1){
+            roomList.add(new ChatRoom(handler));
+        }
+
+        roomList.get(handler.getRoomIndex()).removeHandler(handler);
+        return index;
+    }
+
+    static void log(String msg) {
         if (LOG == null) {
             LOG = Logger.getLogger("");
         }

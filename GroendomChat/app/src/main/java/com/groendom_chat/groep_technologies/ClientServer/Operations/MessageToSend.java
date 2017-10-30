@@ -15,6 +15,12 @@ import java.util.UUID;
  */
 public class MessageToSend implements Serializable {
 
+    public enum MessageType {
+        TEXT, IMAGE, USER_ADD, LOGIN, USER_REMOVE, ENCRYPTED_TEXT, RECONNECT, NEW_ROOM
+    }
+
+    private MessageType messageType;
+
     //default port
     private static final int PORT = 9001;
     private MessageType messageType;
@@ -35,7 +41,6 @@ public class MessageToSend implements Serializable {
         messageType = MessageType.NEXT;
         author = new User(userID, publicKey);
     }
-
 
     public MessageToSend(String loginUName, String address, int port) {
         this();
@@ -63,6 +68,11 @@ public class MessageToSend implements Serializable {
         messageType = MessageType.ENCRYPTED_TEXT;
         this.encryptedMessage = encryptedMessage;
         this.author = author;
+    }
+
+    public MessageToSend(MessageType type){
+        this();
+        this.messageType = MessageType.NEW_ROOM;
     }
 
     public MessageToSend(byte[] encryptedMessage, User author, byte[] file) {
@@ -197,5 +207,13 @@ public class MessageToSend implements Serializable {
 
     public enum MessageType {
         TEXT, IMAGE, USER_ADD, LOGIN, USER_REMOVE, ENCRYPTED_TEXT, NEXT, RECONNECT
+    }
+
+    public static MessageToSend getReconnectMessage(User user, int arrNumber) {
+        MessageToSend messageToSend = new MessageToSend(user);
+        messageToSend.messageType = MessageType.RECONNECT;
+        messageToSend.port = arrNumber;
+
+        return messageToSend;
     }
 }

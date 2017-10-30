@@ -16,7 +16,7 @@ public class ClientUser implements Serializable { // no longer extends User so t
     private User user;
 
     public ClientUser(User user) {
-        user = new User(user.getName(), user.getPublicKey());
+        this.user = new User(user.getName(), user.getPublicKey());
     }
 
     public ClientUser(String name, PublicKey publicKey, PrivateKey privateKey) {
@@ -37,7 +37,8 @@ public class ClientUser implements Serializable { // no longer extends User so t
     }
 
     /**
-     * @return custom name if set
+     *
+     * @return username or custom name
      */
     public String getName() {
         if (customName == null) {
