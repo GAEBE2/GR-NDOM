@@ -1,13 +1,12 @@
 package com.groendom_chat.groep_technologies.ClientServer.Client;
 
 import android.os.AsyncTask;
-
 import com.groendom_chat.groep_technologies.ClientServer.Client.UserGroups.ClientUser;
 import com.groendom_chat.groep_technologies.ClientServer.Client.UserGroups.User;
 import com.groendom_chat.groep_technologies.ClientServer.Operations.Authentication;
 import com.groendom_chat.groep_technologies.ClientServer.Operations.MessageToSend;
 import com.groendom_chat.groep_technologies.ClientServer.Operations.Security;
-
+import com.groendom_chat.groep_technologies.groendomchat.task.SendTask;
 import java.io.EOFException;
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -16,7 +15,6 @@ import java.net.Socket;
 import java.net.SocketException;
 import java.security.PublicKey;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
@@ -52,14 +50,14 @@ public class ClientFunctions {
   //Consumers which are used when this active == true
   private Consumer<MessageToSend> activeMessageReceiver;
   private Consumer<String> activeUserRemover;
-  private Consumer<List<ClientUser>> activeUserAdder;
+  private Consumer<Integer> activeUserAdder;
   //Consumers which are used when this active == false
   private Consumer<MessageToSend> passiveMessageReceiver;
   private Consumer<String> passiveUserRemover;
-  private Consumer<List<ClientUser>> passiveUserAdder;
+  private Consumer<Integer> passiveUserAdder;
 
   public ClientFunctions(Consumer<MessageToSend> passiveMessageReceiver,
-      Consumer<String> passiveUserRemover, Consumer<List<ClientUser>> passiveUserAdder) {
+      Consumer<String> passiveUserRemover, Consumer<Integer> passiveUserAdder) {
     this.passiveMessageReceiver = passiveMessageReceiver;
     this.passiveUserRemover = passiveUserRemover;
     this.passiveUserAdder = passiveUserAdder;
@@ -99,7 +97,7 @@ public class ClientFunctions {
    * @return if successfully
    */
   public boolean sendMessage(String messageToSend) throws IOException {
-    SendTask task = new SendTask();
+    SendTask task = new SendTask(outputStream, clientUser);
     try {
       return task.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, messageToSend)
           .get(3, TimeUnit.SECONDS);
@@ -133,11 +131,12 @@ public class ClientFunctions {
    * already connected server otherwise return a String with the reason curActivity is used to
    * create a toast on connection error/success - null if not used in activity
    */
-  public void openConnection(String address, ClientUser client, Callback cb) {
+  public void openConnection(String address, ClientUser client) {
     this.clientUser = client;
     OpenConnectionTask task = new OpenConnectionTask();
     try {
-      task.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, address, cb).get(3, TimeUnit.SECONDS);
+      users.add(client.getUser());
+      task.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, address).get(3, TimeUnit.SECONDS);
     } catch (InterruptedException | ExecutionException | TimeoutException e) {
       e.printStackTrace();
     }
@@ -186,7 +185,7 @@ public class ClientFunctions {
           switch (message.getMessageType()) {
             case ENCRYPTED_TEXT:
               String decryptedMessage = Security
-                  .decrypt(message.getEncryptedMessage(), clientUser.getPrivateKey());
+                  .decrypt(message, clientUser.getPrivateKey());
               message.setMessage(decryptedMessage);
             case TEXT:
               //message.setAuthor(getUserFromList(message.getAuthor()));
@@ -194,10 +193,9 @@ public class ClientFunctions {
               chooseActiveOrPassiveConsumer(passiveMessageReceiver, activeMessageReceiver, message);
               break;
             case USER_ADD:
-              ClientUser user = new ClientUser(message.getAuthor());
-              users.add(user.getUser());
-              chooseActiveOrPassiveConsumer(passiveUserAdder, activeUserAdder,
-                  Collections.singletonList(user));
+              users.add(message.getAuthor());
+              System.out.println("message:" + message.getMessage());
+              chooseActiveOrPassiveConsumer(passiveUserAdder, activeUserAdder, Integer.parseInt(message.getMessage()));
               break;
             case USER_LEFT:
               this.users.remove(getUserFromList(message.getAuthor()));
@@ -320,13 +318,13 @@ public class ClientFunctions {
   }
 
   public void addActiveConsumers(Consumer<MessageToSend> activeMessageReceiver,
-      Consumer<String> activeUserRemover, Consumer<List<ClientUser>> activeUserAdder) {
+      Consumer<String> activeUserRemover, Consumer<Integer> activeUserAdder) {
     addActiveConsumers(activeMessageReceiver, activeUserRemover, activeUserAdder, null);
     //null was before: user -> {});
   }
 
   public void addActiveConsumers(Consumer<MessageToSend> activeMessageReceiver,
-      Consumer<String> activeUserRemover, Consumer<List<ClientUser>> activeUserAdder,
+      Consumer<String> activeUserRemover, Consumer<Integer> activeUserAdder,
       Consumer<ClientUser> activeChangeUsername) {
     this.activeMessageReceiver = activeMessageReceiver;
     this.activeUserRemover = activeUserRemover;
@@ -374,11 +372,10 @@ public class ClientFunctions {
   /**
    * Task to open a new connection
    */
-  private class OpenConnectionTask extends AsyncTask<Object, Void, Void> {
+  private class OpenConnectionTask extends AsyncTask<String, Void, Void> {
 
-    protected Void doInBackground(Object... params) {
-      String address = (String) params[0];
-      Callback cb = (Callback) params[1];
+    protected Void doInBackground(String... params) {
+      String address = params[0];
       closeConnection();
       oldAddress = address;
       oldPort = PORT;
@@ -390,37 +387,13 @@ public class ClientFunctions {
         outputStream = new ObjectOutputStream(socket.getOutputStream());
         inputStream = new ObjectInputStream(socket.getInputStream());
         //authenticate();
-        outputStream.writeObject(MessageToSend.createAddUserMessage(clientUser.getUser()));
-        if (cb != null) {
-          cb.onFinish(socket, outputStream, inputStream);
-        }
+        System.out.println("users: " + users.size());
+        outputStream.writeObject(MessageToSend.createUserAddMessage(clientUser.getUser(), users.size()));
         connected = true;
       } catch (IOException | IllegalArgumentException e) {
         e.printStackTrace();
-        if (cb != null) {
-          cb.onFinish(e);
-        }
       }
       return null;
-    }
-  }
-
-  /**
-   * Task to send a message
-   */
-  private class SendTask extends AsyncTask<String, Void, Boolean> {
-
-    protected Boolean doInBackground(String... params) {
-      for (String messageToSend : params) {
-        try {
-          //outputStream.writeObject(new MessageToSend(Security.encrypt(messageToSend, publicServerKey), clientUser.getName(), clientUser.getPublicKey()));
-          outputStream.writeObject(MessageToSend.createTextMessage(messageToSend, clientUser.getUser()));
-        } catch (IOException e) {
-          e.printStackTrace();
-          return false;
-        }
-      }
-      return true;
     }
   }
 

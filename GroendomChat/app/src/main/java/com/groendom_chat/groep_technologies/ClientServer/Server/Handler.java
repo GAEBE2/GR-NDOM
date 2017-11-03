@@ -5,7 +5,6 @@ import com.groendom_chat.groep_technologies.ClientServer.Client.UserGroups.User;
 import com.groendom_chat.groep_technologies.ClientServer.Operations.Authentication;
 import com.groendom_chat.groep_technologies.ClientServer.Operations.MessageToSend;
 import com.groendom_chat.groep_technologies.ClientServer.Operations.Security;
-
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -13,8 +12,6 @@ import java.net.Socket;
 import java.net.SocketException;
 import java.security.KeyPair;
 import java.security.PublicKey;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Objects;
 
 public class Handler extends Thread {
@@ -47,10 +44,11 @@ public class Handler extends Thread {
       ServerFunctions.userList.add(user);
       roomIndex = ServerFunctions.insetIntoRoom(this);
 
+      Handler[] handlers = ServerFunctions.roomList.get(roomIndex).getHandlers();
       //send new user to active users
-      for (Handler handler : ServerFunctions.roomList.get(roomIndex).getHandlers()) {
-        if (handler != null && handler != this) {
-          handler.outputStream.writeObject(MessageToSend.createAddUserMessage(user));
+      for (Handler handler : handlers) {
+        if (handler != null) {
+          handler.outputStream.writeObject(MessageToSend.createUserAddMessage(handler.getUser(), handlers.length));
         }
       }
 
@@ -76,6 +74,7 @@ public class Handler extends Thread {
       receiveMessagesAndForwardThem();
     } catch (IOException e) {
       ServerFunctions.log("");
+      e.printStackTrace();
     } finally {
       handleDisconnect();
     }
@@ -165,7 +164,7 @@ public class Handler extends Thread {
         ServerFunctions.userList.remove(user);
         disconnect.accept(this);
         //tell everyone that user left the channel
-        sendMessageToEveryone(MessageToSend.createLogoutMessage(user));
+        sendMessageToEveryone(MessageToSend.createLogoutMessage(user, ServerFunctions.roomList.get(roomIndex).getHandlers().length));
       }
       ServerFunctions.log("client disconnected; IP: ");
       if (socket.getRemoteSocketAddress() != null && user != null) {

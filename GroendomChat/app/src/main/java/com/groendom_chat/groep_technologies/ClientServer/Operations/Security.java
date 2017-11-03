@@ -1,7 +1,6 @@
 package com.groendom_chat.groep_technologies.ClientServer.Operations;
 
 import android.util.Base64;
-
 import java.io.IOException;
 import java.io.Serializable;
 import java.math.BigInteger;
@@ -17,7 +16,6 @@ import java.security.SecureRandom;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.PKCS8EncodedKeySpec;
 import java.security.spec.X509EncodedKeySpec;
-
 import javax.crypto.Cipher;
 import javax.crypto.NoSuchPaddingException;
 
@@ -78,22 +76,27 @@ public class Security implements Serializable {
     return cipherText;
   }
 
+  public static String decrypt(MessageToSend message, Key key) {
+    String decryptedMessage = decrypt(message.getEncryptedMessage(), key);
+    return decryptedMessage == null ? message.getMessage() : decryptedMessage;
+  }
+
+  ;
+
   /**
    * @param encryptedText text that has been encrypted
    * @param key to use to decrypt encryptedText
    * @return decrypted text
    */
   public static String decrypt(byte[] encryptedText, Key key) {
-    byte[] decryptedText = null;
     try {
       Cipher cipher = key instanceof PublicKey ? getSingingCipher() : getCipher();
       cipher.init(Cipher.DECRYPT_MODE, key);
-      decryptedText = cipher.doFinal(encryptedText);
-
+      return new String(cipher.doFinal(encryptedText));
     } catch (Exception ex) {
       ex.printStackTrace();
+      return null;
     }
-    return decryptedText != null ? new String(decryptedText) : null;
   }
 
   /**

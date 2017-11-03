@@ -80,17 +80,20 @@ public class MessageToSend implements Serializable {
     return res;
   }
 
-  public static MessageToSend createAddUserMessage(User user) {
+  public static MessageToSend createUserAmountChangeMessage(User user, int usersAmount, MessageType type) {
     MessageToSend res = new MessageToSend();
-    res.messageType = MessageType.USER_ADD;
+    res.messageType = type;
     res.author = user;
+    res.setMessage(String.valueOf(usersAmount));
     return res;
   }
 
-  public static MessageToSend createLogoutMessage(User user) {
-    MessageToSend res = MessageToSend.createAddUserMessage(user);
-    res.setMessageType(MessageType.USER_LEFT);
-    return res;
+  public static MessageToSend createUserAddMessage(User user, int usersAmount) {
+    return createUserAmountChangeMessage(user, usersAmount, MessageType.USER_ADD);
+  }
+
+  public static MessageToSend createLogoutMessage(User user, int usersAmount) {
+    return createUserAmountChangeMessage(user, usersAmount, MessageType.USER_LEFT);
   }
 
   public static MessageToSend createSwitchRoomMessage() {
@@ -100,7 +103,7 @@ public class MessageToSend implements Serializable {
   }
 
   public static MessageToSend getReconnectMessage(User user, int arrNumber) {
-    MessageToSend messageToSend = MessageToSend.createAddUserMessage(user);
+    MessageToSend messageToSend = MessageToSend.createUserAddMessage(user, 0);
     messageToSend.messageType = MessageType.RECONNECT;
     messageToSend.port = arrNumber;
 
