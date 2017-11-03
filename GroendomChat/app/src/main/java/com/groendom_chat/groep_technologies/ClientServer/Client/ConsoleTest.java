@@ -19,9 +19,9 @@ public class ConsoleTest {
       public void accept(MessageToSend obj) {
         System.out.println(obj.getMessage());
       }
-    }, new Consumer<String>() {
+    }, new Consumer<Integer>() {
       @Override
-      public void accept(String obj) {
+      public void accept(Integer obj) {
         System.out.println(obj);
       }
     }, new Consumer<Integer>() {

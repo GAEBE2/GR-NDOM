@@ -61,9 +61,9 @@ public class ChatActivity extends Activity {
             });
           }
         }
-      }, new Consumer<String>() {
+      }, new Consumer<Integer>() {
         @Override
-        public void accept(String obj) {
+        public void accept(Integer obj) {
           runOnUiThread(new Runnable() {
             @Override
             public void run() {

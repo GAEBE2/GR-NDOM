@@ -30,6 +30,16 @@ public class Handler extends Thread {
     this.disconnect = disconnect;
   }
 
+  private int getHandlersSize(Handler[] handlers) {
+    int size = 0;
+    for(Handler handler : handlers) {
+      if(handler != null) {
+        size++;
+      }
+    }
+    return size;
+  }
+
   /**
    * the handler for a socket
    */
@@ -48,7 +58,7 @@ public class Handler extends Thread {
       //send new user to active users
       for (Handler handler : handlers) {
         if (handler != null) {
-          handler.outputStream.writeObject(MessageToSend.createUserAddMessage(handler.getUser(), handlers.length));
+          handler.outputStream.writeObject(MessageToSend.createUserAddMessage(handler.getUser(), getHandlersSize(handlers)));
         }
       }
 

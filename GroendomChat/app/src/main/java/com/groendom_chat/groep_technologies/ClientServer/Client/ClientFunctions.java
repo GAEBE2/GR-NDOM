@@ -49,15 +49,15 @@ public class ClientFunctions {
   private boolean connected = false;
   //Consumers which are used when this active == true
   private Consumer<MessageToSend> activeMessageReceiver;
-  private Consumer<String> activeUserRemover;
+  private Consumer<Integer> activeUserRemover;
   private Consumer<Integer> activeUserAdder;
   //Consumers which are used when this active == false
   private Consumer<MessageToSend> passiveMessageReceiver;
-  private Consumer<String> passiveUserRemover;
+  private Consumer<Integer> passiveUserRemover;
   private Consumer<Integer> passiveUserAdder;
 
   public ClientFunctions(Consumer<MessageToSend> passiveMessageReceiver,
-      Consumer<String> passiveUserRemover, Consumer<Integer> passiveUserAdder) {
+      Consumer<Integer> passiveUserRemover, Consumer<Integer> passiveUserAdder) {
     this.passiveMessageReceiver = passiveMessageReceiver;
     this.passiveUserRemover = passiveUserRemover;
     this.passiveUserAdder = passiveUserAdder;
@@ -199,8 +199,7 @@ public class ClientFunctions {
               break;
             case USER_LEFT:
               this.users.remove(getUserFromList(message.getAuthor()));
-              chooseActiveOrPassiveConsumer(passiveUserRemover, activeUserRemover,
-                  message.getAuthor().getName());
+              chooseActiveOrPassiveConsumer(passiveUserRemover, activeUserRemover, Integer.valueOf(message.getMessage()));
               break;
             default:
               break;
@@ -318,13 +317,13 @@ public class ClientFunctions {
   }
 
   public void addActiveConsumers(Consumer<MessageToSend> activeMessageReceiver,
-      Consumer<String> activeUserRemover, Consumer<Integer> activeUserAdder) {
+      Consumer<Integer> activeUserRemover, Consumer<Integer> activeUserAdder) {
     addActiveConsumers(activeMessageReceiver, activeUserRemover, activeUserAdder, null);
     //null was before: user -> {});
   }
 
   public void addActiveConsumers(Consumer<MessageToSend> activeMessageReceiver,
-      Consumer<String> activeUserRemover, Consumer<Integer> activeUserAdder,
+      Consumer<Integer> activeUserRemover, Consumer<Integer> activeUserAdder,
       Consumer<ClientUser> activeChangeUsername) {
     this.activeMessageReceiver = activeMessageReceiver;
     this.activeUserRemover = activeUserRemover;
@@ -387,7 +386,6 @@ public class ClientFunctions {
         outputStream = new ObjectOutputStream(socket.getOutputStream());
         inputStream = new ObjectInputStream(socket.getInputStream());
         //authenticate();
-        System.out.println("users: " + users.size());
         outputStream.writeObject(MessageToSend.createUserAddMessage(clientUser.getUser(), users.size()));
         connected = true;
       } catch (IOException | IllegalArgumentException e) {
