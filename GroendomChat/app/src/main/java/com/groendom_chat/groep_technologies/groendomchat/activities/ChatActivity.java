@@ -67,6 +67,7 @@ public class ChatActivity extends Activity {
           runOnUiThread(new Runnable() {
             @Override
             public void run() {
+              itemsAdapter.clear();
               Toast.makeText(getApplicationContext(), "Other user left the chat room...",
                   Toast.LENGTH_LONG).show();
             }

@@ -67,7 +67,9 @@ public class Handler extends Thread {
       for (MessageToSend messageToSend : ServerFunctions.roomList.get(roomIndex).getMessages()) {
         originalMessage = messageToSend.getMessage();
         if (originalMessage != null) {
-          messageToSend.setEncryptedMessage(Security.encrypt(originalMessage, publicKey));
+          if(publicKey != null) {
+            messageToSend.setEncryptedMessage(Security.encrypt(originalMessage, publicKey));
+          }
           messageToSend.setMessage(null);
           messageToSend.setMessageType(MessageToSend.MessageType.ENCRYPTED_TEXT);
           messageToSend.setPublicKey(keyPair.getPublic());
@@ -83,8 +85,8 @@ public class Handler extends Thread {
           " | username: " + user.getName());
       receiveMessagesAndForwardThem();
     } catch (IOException e) {
-      ServerFunctions.log("");
-      e.printStackTrace();
+      ServerFunctions.log("User left the room - EOFException");
+      //e.printStackTrace();
     } finally {
       handleDisconnect();
     }
@@ -152,7 +154,6 @@ public class Handler extends Thread {
           if (messageToSend.getMessageType() == MessageToSend.MessageType.NEW_ROOM) {
             ServerFunctions.insertIntoNewRoom(this);
           } else {
-
             ServerFunctions.roomList.get(roomIndex).addMessage(messageToSend);
             sendMessageToEveryone(messageToSend);
             ServerFunctions.log("message: " + messageToSend.getMessage() + " author: "
@@ -166,13 +167,14 @@ public class Handler extends Thread {
   }
 
   /**
-   * removes it form all lists, sends a diconnect message
+   * removes it form all lists, sends a disconnect message
    */
   public void handleDisconnect() {
     try {
       if (ServerFunctions.userList != null) {
         ServerFunctions.userList.remove(user);
         disconnect.accept(this);
+        ServerFunctions.roomList.get(roomIndex).removeHandler(this);
         //tell everyone that user left the channel
         sendMessageToEveryone(MessageToSend.createLogoutMessage(user, ServerFunctions.roomList.get(roomIndex).getHandlers().length));
       }

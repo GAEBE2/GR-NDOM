@@ -66,12 +66,14 @@ public class Security implements Serializable {
    */
   public static byte[] encrypt(String text, Key key) {
     byte[] cipherText = null;
-    try {
-      Cipher cipher = key instanceof PrivateKey ? getSingingCipher() : getCipher();
-      cipher.init(Cipher.ENCRYPT_MODE, key);
-      cipherText = cipher.doFinal(text.getBytes());
-    } catch (Exception e) {
-      e.printStackTrace();
+    if (key != null) {
+      try {
+        Cipher cipher = key instanceof PrivateKey ? getSingingCipher() : getCipher();
+        cipher.init(Cipher.ENCRYPT_MODE, key);
+        cipherText = cipher.doFinal(text.getBytes());
+      } catch (Exception e) {
+        e.printStackTrace();
+      }
     }
     return cipherText;
   }
