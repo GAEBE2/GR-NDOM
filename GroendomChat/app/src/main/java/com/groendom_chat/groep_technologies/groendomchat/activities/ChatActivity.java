@@ -30,13 +30,15 @@ public class ChatActivity extends Activity {
   private ClientFunctions functions;
   ClientUser clientUser = null;
   private boolean connected;
+  private boolean connectedWithUser;
+  private EditText editText;
 
   @Override
   protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
     setContentView(R.layout.chat_activity);
 
-    final EditText editText = (EditText) findViewById(R.id.edit_text_message);
+    editText = (EditText) findViewById(R.id.edit_text_message);
     final ListView listView = (ListView) findViewById(R.id.chat_activity_content);
     try {
       clientUser = new ClientUser(Security.generateKeyPair());
@@ -68,7 +70,8 @@ public class ChatActivity extends Activity {
           runOnUiThread(new Runnable() {
             @Override
             public void run() {
-              itemsAdapter.clear();
+              //itemsAdapter.clear();
+              notConnectedWithUser();
               Toast.makeText(getApplicationContext(), "Other user left the chat room...",
                   Toast.LENGTH_LONG).show();
             }
@@ -80,7 +83,13 @@ public class ChatActivity extends Activity {
           runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                  System.out.println("hoi:" + length);
+              if(length == 2) {
+                connectedWithUser = true;
+                editText.setEnabled(true);
+                editText.setHint(R.string.type_message);
+              } else {
+                notConnectedWithUser();
+              }
               Toast.makeText(getApplicationContext(), "Number of members: " + length,
                   Toast.LENGTH_LONG).show();
             }
@@ -111,7 +120,7 @@ public class ChatActivity extends Activity {
       @Override
       public void onClick(View view) {
         String text = editText.getText().toString();
-        if (connected && !text.equals("")) {
+        if (connected && connectedWithUser && !text.equals("")) {
           try {
             if (functions.sendMessage(text)) {
               //items.add(new MessageToSend(text, clientUser.getName()));
@@ -124,7 +133,7 @@ public class ChatActivity extends Activity {
           } catch (IOException e) {
             e.printStackTrace();
           }
-        } else if(!connected) {
+        } else if (!connected) {
           Toast.makeText(getApplicationContext(), "Not connected to the server",
               Toast.LENGTH_LONG).show();
         }
@@ -132,10 +141,16 @@ public class ChatActivity extends Activity {
     });
   }
 
+  private void notConnectedWithUser() {
+    connectedWithUser = false;
+    editText.setEnabled(false);
+    editText.setHint(R.string.not_connected_with_user);
+  }
+
 
   private void openChat() throws NoSuchProviderException, NoSuchAlgorithmException {
     this.connected = functions.openConnection("192.168.0.71", clientUser);
-    if(!connected) {
+    if (!connected) {
       Toast.makeText(getApplicationContext(), "Could not connected to the server",
           Toast.LENGTH_LONG).show();
     }

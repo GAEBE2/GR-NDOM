@@ -215,8 +215,7 @@ public class Handler extends Thread {
           System.err.println("message formation or handling error");
         }
       }
-      messageToSend
-          .setMessage("".equals(decryptedMessage) ? messageToSend.getMessage() : decryptedMessage);
+      //messageToSend.setMessage("".equals(decryptedMessage) ? messageToSend.getMessage() : decryptedMessage);
     }
   }
 
