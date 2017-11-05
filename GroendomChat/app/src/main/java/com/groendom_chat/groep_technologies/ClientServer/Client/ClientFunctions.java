@@ -131,15 +131,16 @@ public class ClientFunctions {
    * already connected server otherwise return a String with the reason curActivity is used to
    * create a toast on connection error/success - null if not used in activity
    */
-  public void openConnection(String address, ClientUser client) {
+  public boolean openConnection(String address, ClientUser client) {
     this.clientUser = client;
     OpenConnectionTask task = new OpenConnectionTask();
     try {
       users.add(client.getUser());
-      task.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, address).get(3, TimeUnit.SECONDS);
+      return task.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, address).get(3, TimeUnit.SECONDS);
     } catch (InterruptedException | ExecutionException | TimeoutException e) {
       e.printStackTrace();
     }
+    return false;
   }
 
   /**
@@ -371,9 +372,9 @@ public class ClientFunctions {
   /**
    * Task to open a new connection
    */
-  private class OpenConnectionTask extends AsyncTask<String, Void, Void> {
+  private class OpenConnectionTask extends AsyncTask<String, Void, Boolean> {
 
-    protected Void doInBackground(String... params) {
+    protected Boolean doInBackground(String... params) {
       String address = params[0];
       closeConnection();
       oldAddress = address;
@@ -388,10 +389,11 @@ public class ClientFunctions {
         //authenticate();
         outputStream.writeObject(MessageToSend.createUserAddMessage(clientUser.getUser(), users.size()));
         connected = true;
+        return true;
       } catch (IOException | IllegalArgumentException e) {
         e.printStackTrace();
       }
-      return null;
+      return false;
     }
   }
 

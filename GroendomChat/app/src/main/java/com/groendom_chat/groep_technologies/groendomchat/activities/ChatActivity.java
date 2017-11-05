@@ -29,6 +29,7 @@ public class ChatActivity extends Activity {
   private ArrayAdapter<MessageToSend> itemsAdapter;
   private ClientFunctions functions;
   ClientUser clientUser = null;
+  private boolean connected;
 
   @Override
   protected void onCreate(Bundle savedInstanceState) {
@@ -110,7 +111,7 @@ public class ChatActivity extends Activity {
       @Override
       public void onClick(View view) {
         String text = editText.getText().toString();
-        if (!text.equals("")) {
+        if (connected && !text.equals("")) {
           try {
             if (functions.sendMessage(text)) {
               //items.add(new MessageToSend(text, clientUser.getName()));
@@ -123,6 +124,9 @@ public class ChatActivity extends Activity {
           } catch (IOException e) {
             e.printStackTrace();
           }
+        } else if(!connected) {
+          Toast.makeText(getApplicationContext(), "Not connected to the server",
+              Toast.LENGTH_LONG).show();
         }
       }
     });
@@ -130,7 +134,11 @@ public class ChatActivity extends Activity {
 
 
   private void openChat() throws NoSuchProviderException, NoSuchAlgorithmException {
-    functions.openConnection("192.168.0.71", clientUser);
+    this.connected = functions.openConnection("192.168.0.71", clientUser);
+    if(!connected) {
+      Toast.makeText(getApplicationContext(), "Could not connected to the server",
+          Toast.LENGTH_LONG).show();
+    }
   }
 
   protected void onStop() {
