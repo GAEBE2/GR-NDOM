@@ -52,7 +52,7 @@ public class Handler extends Thread {
       user = getUserFromClient();
 
       ServerFunctions.userList.add(user);
-      roomIndex = ServerFunctions.insetIntoRoom(this);
+      roomIndex = ServerFunctions.insertIntoRoom(this, false);
 
       Handler[] handlers = ServerFunctions.roomList.get(roomIndex).getHandlers();
       //send new user to active users
@@ -152,7 +152,7 @@ public class Handler extends Thread {
         if (object != null && object instanceof MessageToSend) {
           MessageToSend messageToSend = ((MessageToSend) object);
           if (messageToSend.getMessageType() == MessageToSend.MessageType.NEW_ROOM) {
-            ServerFunctions.insertIntoNewRoom(this);
+            ServerFunctions.insertIntoRoom(this, true);
           } else {
             ServerFunctions.roomList.get(roomIndex).addMessage(messageToSend);
             sendMessageToEveryone(messageToSend);
@@ -174,9 +174,9 @@ public class Handler extends Thread {
       if (ServerFunctions.userList != null) {
         ServerFunctions.userList.remove(user);
         disconnect.accept(this);
-        ServerFunctions.roomList.get(roomIndex).removeHandler(this);
         //tell everyone that user left the channel
         sendMessageToEveryone(MessageToSend.createLogoutMessage(user, ServerFunctions.roomList.get(roomIndex).getHandlers().length));
+        //ServerFunctions.roomList.get(roomIndex).removeHandler(this);
       }
       ServerFunctions.log("client disconnected; IP: ");
       if (socket.getRemoteSocketAddress() != null && user != null) {

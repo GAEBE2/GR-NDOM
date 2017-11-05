@@ -11,4 +11,5 @@
     <string name="nav_header_subtitle">An awesome chat!</string>
     <string name="client_functions_value">client-functions</string>
     <string name="client_user_value">client-user</string>
+  <string name="action_refresh">Search new user</string>
 </resources>
