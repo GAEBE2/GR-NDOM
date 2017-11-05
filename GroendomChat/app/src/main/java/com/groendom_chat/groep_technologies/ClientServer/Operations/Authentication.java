@@ -17,16 +17,12 @@ public class Authentication implements Serializable {
     this.originalMessage = originalMessage;
   }
 
-  public void setPublicKey(PublicKey publicKey) {
-    this.publicKey = publicKey.getEncoded();
-  }
-
-  public void setEncryptedMessage(byte[] encryptedMessage) {
-    this.encryptedMessage = encryptedMessage;
-  }
-
   public byte[] getPublicKey() {
     return publicKey;
+  }
+
+  public void setPublicKey(PublicKey publicKey) {
+    this.publicKey = publicKey.getEncoded();
   }
 
   public String getOriginalMessage() {
@@ -35,5 +31,9 @@ public class Authentication implements Serializable {
 
   public byte[] getEncryptedMessage() {
     return encryptedMessage;
+  }
+
+  public void setEncryptedMessage(byte[] encryptedMessage) {
+    this.encryptedMessage = encryptedMessage;
   }
 }

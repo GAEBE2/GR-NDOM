@@ -1,14 +1,7 @@
 package com.groendom_chat.groep_technologies.groendomchat.storage;
 
 import android.content.Context;
-import android.content.Intent;
 import android.content.SharedPreferences;
-import android.content.res.Configuration;
-import android.os.Build;
-
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Locale;
 
 /**
  * Created by Patrick Wissiak on 02.09.2017.

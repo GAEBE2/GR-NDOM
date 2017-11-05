@@ -5,7 +5,6 @@ import com.groendom_chat.groep_technologies.ClientServer.Client.UserGroups.User;
 import com.groendom_chat.groep_technologies.ClientServer.Operations.Authentication;
 import com.groendom_chat.groep_technologies.ClientServer.Operations.MessageToSend;
 import com.groendom_chat.groep_technologies.ClientServer.Operations.Security;
-
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -13,8 +12,6 @@ import java.net.Socket;
 import java.net.SocketException;
 import java.security.KeyPair;
 import java.security.PublicKey;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Objects;
 
 public class Handler extends Thread {
@@ -33,6 +30,16 @@ public class Handler extends Thread {
     this.disconnect = disconnect;
   }
 
+  private int getHandlersSize(Handler[] handlers) {
+    int size = 0;
+    for(Handler handler : handlers) {
+      if(handler != null) {
+        size++;
+      }
+    }
+    return size;
+  }
+
   /**
    * the handler for a socket
    */
@@ -45,12 +52,13 @@ public class Handler extends Thread {
       user = getUserFromClient();
 
       ServerFunctions.userList.add(user);
-      roomIndex = ServerFunctions.insetIntoRoom(this);
+      roomIndex = ServerFunctions.insertIntoRoom(this, false);
 
+      Handler[] handlers = ServerFunctions.roomList.get(roomIndex).getHandlers();
       //send new user to active users
-      for (Handler handler : ServerFunctions.roomList.get(roomIndex).getHandlers()) {
-        if (handler != null && handler != this) {
-          handler.outputStream.writeObject(new MessageToSend(user));
+      for (Handler handler : handlers) {
+        if (handler != null) {
+          handler.outputStream.writeObject(MessageToSend.createUserAddMessage(handler.getUser(), getHandlersSize(handlers)));
         }
       }
 
@@ -59,7 +67,9 @@ public class Handler extends Thread {
       for (MessageToSend messageToSend : ServerFunctions.roomList.get(roomIndex).getMessages()) {
         originalMessage = messageToSend.getMessage();
         if (originalMessage != null) {
-          messageToSend.setEncryptedMessage(Security.encrypt(originalMessage, publicKey));
+          if(publicKey != null) {
+            messageToSend.setEncryptedMessage(Security.encrypt(originalMessage, publicKey));
+          }
           messageToSend.setMessage(null);
           messageToSend.setMessageType(MessageToSend.MessageType.ENCRYPTED_TEXT);
           messageToSend.setPublicKey(keyPair.getPublic());
@@ -75,7 +85,8 @@ public class Handler extends Thread {
           " | username: " + user.getName());
       receiveMessagesAndForwardThem();
     } catch (IOException e) {
-      ServerFunctions.log("");
+      ServerFunctions.log("User left the room - EOFException");
+      //e.printStackTrace();
     } finally {
       handleDisconnect();
     }
@@ -141,9 +152,8 @@ public class Handler extends Thread {
         if (object != null && object instanceof MessageToSend) {
           MessageToSend messageToSend = ((MessageToSend) object);
           if (messageToSend.getMessageType() == MessageToSend.MessageType.NEW_ROOM) {
-            ServerFunctions.insertIntoNewRoom(this);
+            ServerFunctions.insertIntoRoom(this, true);
           } else {
-
             ServerFunctions.roomList.get(roomIndex).addMessage(messageToSend);
             sendMessageToEveryone(messageToSend);
             ServerFunctions.log("message: " + messageToSend.getMessage() + " author: "
@@ -157,7 +167,7 @@ public class Handler extends Thread {
   }
 
   /**
-   * removes it form all lists, sends a diconnect message
+   * removes it form all lists, sends a disconnect message
    */
   public void handleDisconnect() {
     try {
@@ -165,7 +175,8 @@ public class Handler extends Thread {
         ServerFunctions.userList.remove(user);
         disconnect.accept(this);
         //tell everyone that user left the channel
-        sendMessageToEveryone(MessageToSend.createLogoutMessage(user));
+        sendMessageToEveryone(MessageToSend.createLogoutMessage(user, ServerFunctions.roomList.get(roomIndex).getHandlers().length));
+        //ServerFunctions.roomList.get(roomIndex).removeHandler(this);
       }
       ServerFunctions.log("client disconnected; IP: ");
       if (socket.getRemoteSocketAddress() != null && user != null) {
@@ -204,8 +215,7 @@ public class Handler extends Thread {
           System.err.println("message formation or handling error");
         }
       }
-      messageToSend
-          .setMessage("".equals(decryptedMessage) ? messageToSend.getMessage() : decryptedMessage);
+      //messageToSend.setMessage("".equals(decryptedMessage) ? messageToSend.getMessage() : decryptedMessage);
     }
   }
 

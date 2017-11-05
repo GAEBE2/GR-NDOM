@@ -7,6 +7,7 @@ import java.security.PublicKey;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.UUID;
 
 /**
  * Created by serge on 20-Mar-17.
@@ -18,11 +19,9 @@ public class MessageToSend implements Serializable {
     TEXT, IMAGE, USER_ADD, LOGIN, USER_LEFT, ENCRYPTED_TEXT, RECONNECT, NEW_ROOM
   }
 
-  private MessageType messageType;
-
   //default port
   private static final int PORT = 9001;
-
+  private MessageType messageType;
   private int port;
   private byte[] encryptedMessage;
   private String message;
@@ -35,19 +34,87 @@ public class MessageToSend implements Serializable {
     this.timeSend = new Date();
   }
 
-  public MessageToSend(String loginUName, String address, int port) {
-    this();
-    messageType = MessageType.LOGIN;
-    author = new User(loginUName);
-    message = address;
-    this.port = port;
+  public static MessageToSend createNextMessage(UUID userID, PublicKey publicKey) {
+    MessageToSend res = new MessageToSend();
+    res.messageType = MessageType.TEXT;
+    res.author = new User(userID, publicKey);
+    return res;
   }
 
-  public MessageToSend(User user) {
-    this();
-    messageType = MessageType.USER_ADD;
-    author = user;
+  public static MessageToSend createEncrpytedImageMessage(byte[] encryptedMessage, User author, byte[] file) {
+    MessageToSend res = createEncryptedTextMessage(encryptedMessage, author);
+    res.file = file;
+    res.messageType = MessageType.IMAGE;
+    return res;
   }
+
+  public static MessageToSend createImageMessage(String message, User author, byte[] file) {
+    MessageToSend res = createTextMessage(message, author);
+    res.file = file;
+    res.messageType = MessageType.IMAGE;
+    return res;
+  }
+
+  public static MessageToSend createLoginMessage(String loginUName, String address, int port) {
+    MessageToSend res = new MessageToSend();
+    res.messageType = MessageType.LOGIN;
+    res.author = new User(loginUName);
+    res.message = address;
+    res.port = port;
+    return res;
+  }
+
+  public static MessageToSend createEncryptedTextMessage(byte[] encryptedMessage, User author){
+    MessageToSend res = new MessageToSend();
+    res.messageType = MessageType.ENCRYPTED_TEXT;
+    res.encryptedMessage = encryptedMessage;
+    res.author = author;
+    return res;
+  }
+
+  public static MessageToSend createTextMessage(String message, User author){
+    MessageToSend res = new MessageToSend();
+    res.messageType = MessageType.TEXT;
+    res.message = message;
+    res.author = author;
+    return res;
+  }
+
+  public static MessageToSend createUserAmountChangeMessage(User user, int usersAmount, MessageType type) {
+    MessageToSend res = new MessageToSend();
+    res.messageType = type;
+    res.author = user;
+    res.setMessage(String.valueOf(usersAmount));
+    return res;
+  }
+
+  public static MessageToSend createUserAddMessage(User user, int usersAmount) {
+    return createUserAmountChangeMessage(user, usersAmount, MessageType.USER_ADD);
+  }
+
+  public static MessageToSend createLogoutMessage(User user, int usersAmount) {
+    return createUserAmountChangeMessage(user, usersAmount, MessageType.USER_LEFT);
+  }
+
+  public static MessageToSend createSwitchRoomMessage() {
+    MessageToSend res = new MessageToSend();
+    res.messageType = MessageType.NEW_ROOM;
+    return res;
+  }
+
+  public static MessageToSend getReconnectMessage(User user, int arrNumber) {
+    MessageToSend messageToSend = MessageToSend.createUserAddMessage(user, 0);
+    messageToSend.messageType = MessageType.RECONNECT;
+    messageToSend.port = arrNumber;
+
+    return messageToSend;
+  }
+
+
+  public static int getPORT() {
+    return PORT;
+  }
+
 
   /**
    * Format date string
@@ -63,9 +130,6 @@ public class MessageToSend implements Serializable {
     }
   }
 
-  /**
-   * @return java 7 date from today
-   */
   private Date getToday() {
     Calendar c = Calendar.getInstance();
 
@@ -75,43 +139,6 @@ public class MessageToSend implements Serializable {
     c.set(Calendar.MILLISECOND, 0);
 
     return c.getTime();
-  }
-
-  public MessageToSend(String message, User author) {
-    this();
-    messageType = MessageType.TEXT;
-    this.message = message;
-    this.author = author;
-  }
-
-  public MessageToSend(byte[] encryptedMessage, User author) {
-    this();
-    messageType = MessageType.ENCRYPTED_TEXT;
-    this.encryptedMessage = encryptedMessage;
-    this.author = author;
-  }
-
-  public MessageToSend(MessageType type) {
-    this();
-    this.messageType = MessageType.NEW_ROOM;
-  }
-
-  public MessageToSend(byte[] encryptedMessage, User author, byte[] file) {
-    this(encryptedMessage, author);
-    this.file = file;
-    messageType = MessageType.IMAGE;
-  }
-
-  public MessageToSend(String message, User author, byte[] file) {
-    this(message, author);
-    this.file = file;
-    messageType = MessageType.IMAGE;
-  }
-
-  public static MessageToSend createLogoutMessage(User user) {
-    MessageToSend res = new MessageToSend(user);
-    res.setMessageType(MessageType.USER_LEFT);
-    return res;
   }
 
   @Override
@@ -154,10 +181,6 @@ public class MessageToSend implements Serializable {
     return file != null && file.length > 0;
   }
 
-  public static int getPORT() {
-    return PORT;
-  }
-
   public MessageType getMessageType() {
     return messageType;
   }
@@ -186,19 +209,11 @@ public class MessageToSend implements Serializable {
     this.author.setPublicKey(publicKey);
   }
 
-  public void setEncryptedMessage(byte[] message) {
-    this.encryptedMessage = message;
-  }
-
   public byte[] getEncryptedMessage() {
     return encryptedMessage;
   }
 
-  public static MessageToSend getReconnectMessage(User user, int arrNumber) {
-    MessageToSend messageToSend = new MessageToSend(user);
-    messageToSend.messageType = MessageType.RECONNECT;
-    messageToSend.port = arrNumber;
-
-    return messageToSend;
+  public void setEncryptedMessage(byte[] message) {
+    this.encryptedMessage = message;
   }
 }

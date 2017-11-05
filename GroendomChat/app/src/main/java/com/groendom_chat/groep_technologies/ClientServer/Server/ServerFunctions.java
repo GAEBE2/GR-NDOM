@@ -4,15 +4,16 @@ import com.groendom_chat.groep_technologies.ClientServer.Client.Consumer;
 import com.groendom_chat.groep_technologies.ClientServer.Client.UserGroups.User;
 import com.groendom_chat.groep_technologies.ClientServer.Operations.MessageToSend;
 import com.groendom_chat.groep_technologies.ClientServer.Operations.Security;
-
-import org.apache.commons.lang3.math.NumberUtils;
-
-import java.io.*;
+import java.io.IOException;
 import java.net.ServerSocket;
-import java.security.*;
-import java.util.*;
+import java.security.KeyPair;
+import java.security.NoSuchAlgorithmException;
+import java.security.NoSuchProviderException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.apache.commons.lang3.math.NumberUtils;
 
 /**
  * Created by serge on 20-Mar-17.
@@ -22,11 +23,8 @@ public class ServerFunctions {
   private static List<Handler> handlerList = new ArrayList<>();
   static List<User> userList = new ArrayList<>();
   static List<ChatRoom> roomList = new ArrayList<>();
-
-
-  private static Logger LOG = Logger.getLogger("");
   static KeyPair pair;
-
+  private static Logger LOG = Logger.getLogger("");
   private static boolean open = true;
 
   private static int port = MessageToSend.getPORT(); //standard
@@ -57,11 +55,7 @@ public class ServerFunctions {
     }
   }
 
-  /**
-   * @param handler to insert
-   * @return index of room, in roomList
-   */
-  static int insetIntoRoom(Handler handler) {
+  static int insertIntoRoom(Handler handler, boolean newRoom) {
     if (roomList == null) {
       roomList = new ArrayList<>();
     }
@@ -73,40 +67,19 @@ public class ServerFunctions {
       }
     }
     if (index == -1) {
-      index = roomList.size();
-      roomList.add(new ChatRoom(handler));
-    }
-    return index;
-  }
-
-  /**
-   * changes room
-   *
-   * @param handler to insert
-   * @return index of room, in roomList
-   */
-  static int insertIntoNewRoom(Handler handler) {
-    if (roomList == null) {
-      roomList = new ArrayList<>();
-    }
-    int index = -1;
-    for (int i = 0; i < roomList.size(); i++) {
-      if (roomList.get(i).addHandler(handler)) {
-        index = i;
-        break;
+      if(!newRoom) {
+        index = roomList.size();
       }
-    }
-    if (index == -1) {
       roomList.add(new ChatRoom(handler));
     }
 
-    roomList.get(handler.getRoomIndex()).removeHandler(handler);
+    if(newRoom) {
+      roomList.get(handler.getRoomIndex()).removeHandler(handler);
+    }
+
     return index;
   }
 
-  /**
-   * simple log message, function
-   */
   static void log(String msg) {
     if (LOG == null) {
       LOG = Logger.getLogger("");

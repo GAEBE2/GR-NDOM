@@ -1,8 +1,8 @@
 package com.groendom_chat.groep_technologies.ClientServer.Operations;
 
 import android.util.Base64;
-
 import java.io.IOException;
+import java.io.Serializable;
 import java.math.BigInteger;
 import java.security.Key;
 import java.security.KeyFactory;
@@ -16,14 +16,13 @@ import java.security.SecureRandom;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.PKCS8EncodedKeySpec;
 import java.security.spec.X509EncodedKeySpec;
-
 import javax.crypto.Cipher;
 import javax.crypto.NoSuchPaddingException;
 
 /**
  * Created by tkr6u on 20.04.2017.
  */
-public class Security {
+public class Security implements Serializable {
 
   private static SecureRandom random = new SecureRandom();
   private static KeyFactory factory = getNewFactory();
@@ -67,15 +66,24 @@ public class Security {
    */
   public static byte[] encrypt(String text, Key key) {
     byte[] cipherText = null;
-    try {
-      Cipher cipher = key instanceof PrivateKey ? getSingingCipher() : getCipher();
-      cipher.init(Cipher.ENCRYPT_MODE, key);
-      cipherText = cipher.doFinal(text.getBytes());
-    } catch (Exception e) {
-      e.printStackTrace();
+    if (key != null) {
+      try {
+        Cipher cipher = key instanceof PrivateKey ? getSingingCipher() : getCipher();
+        cipher.init(Cipher.ENCRYPT_MODE, key);
+        cipherText = cipher.doFinal(text.getBytes());
+      } catch (Exception e) {
+        e.printStackTrace();
+      }
     }
     return cipherText;
   }
+
+  public static String decrypt(MessageToSend message, Key key) {
+    String decryptedMessage = decrypt(message.getEncryptedMessage(), key);
+    return decryptedMessage == null ? message.getMessage() : decryptedMessage;
+  }
+
+  ;
 
   /**
    * @param encryptedText text that has been encrypted
@@ -83,16 +91,14 @@ public class Security {
    * @return decrypted text
    */
   public static String decrypt(byte[] encryptedText, Key key) {
-    byte[] decryptedText = null;
     try {
       Cipher cipher = key instanceof PublicKey ? getSingingCipher() : getCipher();
       cipher.init(Cipher.DECRYPT_MODE, key);
-      decryptedText = cipher.doFinal(encryptedText);
-
+      return new String(cipher.doFinal(encryptedText));
     } catch (Exception ex) {
       ex.printStackTrace();
+      return null;
     }
-    return decryptedText != null ? new String(decryptedText) : null;
   }
 
   /**

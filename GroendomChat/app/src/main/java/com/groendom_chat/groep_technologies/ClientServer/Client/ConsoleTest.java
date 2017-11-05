@@ -3,11 +3,9 @@ package com.groendom_chat.groep_technologies.ClientServer.Client;
 import com.groendom_chat.groep_technologies.ClientServer.Client.UserGroups.ClientUser;
 import com.groendom_chat.groep_technologies.ClientServer.Operations.MessageToSend;
 import com.groendom_chat.groep_technologies.ClientServer.Operations.Security;
-
 import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
-import java.util.List;
 
 /**
  * used to test without having to start the whole androird application, and to be modular
@@ -21,17 +19,15 @@ public class ConsoleTest {
       public void accept(MessageToSend obj) {
         System.out.println(obj.getMessage());
       }
-    }, new Consumer<String>() {
+    }, new Consumer<Integer>() {
       @Override
-      public void accept(String obj) {
+      public void accept(Integer obj) {
         System.out.println(obj);
       }
-    }, new Consumer<List<ClientUser>>() {
+    }, new Consumer<Integer>() {
       @Override
-      public void accept(List<ClientUser> obj) {
-        for (ClientUser user : obj) {
-          System.out.println(user);
-        }
+      public void accept(Integer obj) {
+        System.out.println(obj);
       }
     });
     functions.setActiveConsumers(new Consumer<MessageToSend>() {

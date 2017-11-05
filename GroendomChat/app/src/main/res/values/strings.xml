@@ -2,10 +2,14 @@
     <string name="app_name">Groendom Chat</string>
     <string name="find_chat">Find chat</string>
     <string name="type_message">Type a message to send</string>
+    <string name="not_connected_with_user">Not connected with user</string>
     <string name="home">Home</string>
     <string name="settings">Settings</string>
     <string name="content">Content</string>
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
     <string name="nav_header_subtitle">An awesome chat!</string>
+    <string name="client_functions_value">client-functions</string>
+    <string name="client_user_value">client-user</string>
+  <string name="action_refresh">Search new user</string>
 </resources>
