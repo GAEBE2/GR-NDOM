@@ -139,4 +139,4 @@ Product Owner: Yvo Keller
 - Heute: Continous Integration abschliessen
 
 ## Weiteres
-Product Owner: Yvo Keller
+Product Owner: Yvo Kellerg
