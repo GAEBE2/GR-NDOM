@@ -10,9 +10,3 @@ Um den Server zu starten muss Java auf dem Computer installiert sein. Man geht d
 
 # Documentation
 The documentation can be found in the documenation folder of the "android-frontend" branch.
-
-# Installation
-
-Um die App zu starten muss das APK, welches in unserem Repository vorhanden ist, auf ein Android-Gerät kopiert und dort ausgeführt werden. Das APK installiert dann die App auf dem Gerät und von dort aus kann es gestartet werden.
-
-Um den Server zu starten muss Java auf dem Computer installiert sein. Man geht dann zum Speicherort von «server.jar». Dort muss die Kommandozeile aufgerufen werden und man kann den Server starten mithilfe des Befehls: «java -jar server.jar».
